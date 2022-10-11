@@ -1,0 +1,33 @@
+name: CI Build
+
+on:
+  push:
+  pull_request:
+    types: [opened, reopened]
+
+jobs:
+
+  thorough_check:
+    name: Thorough code check / python-3.8 / ubuntu-latest
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.8
+      - name: Python info
+        run: |
+          which python
+          python --version
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e .[dev]
+      - name: Show pip list
+        run: |
+          pip list
+      - name: Run test with coverage
+        run: pytest --cov --cov-report term --cov-report xml
+      - name: Check style against standards using prospector
+        run: prospector -o grouped -o pylint:pylint-report.txt
