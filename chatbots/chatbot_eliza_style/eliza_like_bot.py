@@ -1,7 +1,11 @@
 import random
 import re
-from reflection import reflect
-from text_patterns import psychobabble
+if __package__:
+    from .reflection import reflect
+    from .text_patterns import psychobabble
+else:
+    from reflection import reflect
+    from text_patterns import psychobabble
 
 
 def eliza_answer(user_input: str):
@@ -12,14 +16,13 @@ def eliza_answer(user_input: str):
     user_input
         String with user input for ELIZA to respond to.
     """
-    user_input = user_input.strip(",.?!")
 
     # Test input string for all known text patter in pychobabble
     for pattern, responses in psychobabble:
         match = re.search(pattern, str(user_input))
         if match:
             answer = random.choice(responses)
-            return answer.format(*[reflect(g) for g in match.groups()])
+            return answer.format(*[reflect(g.strip(",.?!")) for g in match.groups()])
 
 
 def run_eliza_bot():
