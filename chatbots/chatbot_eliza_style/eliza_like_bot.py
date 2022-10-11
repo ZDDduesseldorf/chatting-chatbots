@@ -31,7 +31,7 @@ def run_eliza_bot():
         user_input = input(">> ")
         answer = eliza_answer(user_input)
         if answer is None:
-            answer = "Mhhh. I am not sure if I can follow..."
+            print("Mhhh. I am not sure if I can follow...")
         else:
             print(answer)
 
