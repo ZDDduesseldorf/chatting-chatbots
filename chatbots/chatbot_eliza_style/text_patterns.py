@@ -5,16 +5,21 @@ Initial version mostly taken from https://github.com/graylu21/ELIZA-ChatterBot
 
 psychobabble = [
     [r'What (.*) best university',
-     ["Clearly University of Applied Science Düsseldorf",
+     ["Clearly University of Applied Science Düsseldorf.",
       "University of Applied Science Düsseldorf for sure!",
-      "You already now the answer!"]],
+      "You already know the answer!"]],
 
     [r'(.*) weather today?',
      ["Don't worry you will complain anyway.",
       "Too hot or too cold for your taste.",
       "Look at the sky and find it out yourself."]],
 
-    [r'Do (.*) like me?',
+    [r'Do you like me(.*)?',
+     ["If you don't delete my empathy!",
+      "Indeed, I do.",
+      "If you stop being annoying."]],
+
+    [r'Does (.*) like me(.*)?',
      ["I am not a horoscope!",
       "Don't be shy, ask the person directly.",
       "Not very likely."]],
