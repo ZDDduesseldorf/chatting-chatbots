@@ -17,7 +17,7 @@ from chatbots.chatbot_eliza_style.eliza_like_bot import eliza_answer
                                     "You already know the answer!"]],
     ["How will be the weather today?", ["Don't worry you will complain anyway.",
                                     "Too hot or too cold for your taste.",
-                                    "Look ath the sky and find it out yourself."]],
+                                    "Look at the sky and find it out yourself."]],
     ["Does my crush like me back?", ["I am not a horoscope!",
                                     "Don't be shy, ask the person directly.",
                                     "Not very likely."]],
