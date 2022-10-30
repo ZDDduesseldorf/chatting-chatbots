@@ -38,6 +38,7 @@ setup(
     python_requires='>=3.7',
     install_requires=[
         "numpy",
+        "Wikipedia-API"
     ],
     extras_require={"dev": ["isort>=5.1.0",
                             "pylint<2.12",
