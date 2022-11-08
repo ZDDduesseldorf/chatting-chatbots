@@ -1,5 +1,5 @@
 import pytest
-from chatbots.chatbot_eliza_style.eliza_like_bot import eliza_answer
+from chattingchatbots.chatbot_eliza_style.eliza_like_bot import eliza_answer
 
 
 @pytest.mark.parametrize('user_input, expected_outputs', [

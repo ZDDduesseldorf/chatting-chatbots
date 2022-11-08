@@ -1,7 +1,7 @@
 import random
 import re
-from chatbots.chatbot_eliza_style.reflection import reflect
-from chatbots.chatbot_eliza_style.text_patterns import psychobabble
+from chattingchatbots.chatbot_eliza_style.reflection import reflect
+from chattingchatbots.chatbot_eliza_style.text_patterns import psychobabble
 
 
 def eliza_answer(user_input: str):
@@ -32,7 +32,7 @@ def run_eliza_bot():
         answer = eliza_answer(user_input)
         if answer is None:
             print("Mhhh. I am not sure if I can follow...")
-        else:
+        else: 
             print(answer)
 
     print("Thanks for talking to me. Bye!")

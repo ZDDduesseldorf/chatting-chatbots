@@ -10,7 +10,7 @@ long_description = (this_directory / "README.md").read_text()
 here = os.path.abspath(os.path.dirname(__file__))
 
 version = {}
-with open(os.path.join(here, "chatbots", "__version__.py")) as f:
+with open(os.path.join(here, "chattingchatbots", "__version__.py")) as f:
     exec(f.read(), version)
 
 setup(
