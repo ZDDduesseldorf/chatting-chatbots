@@ -19,24 +19,31 @@ for path in [scraped_resources_folder_name, processed_resources_folder_name]:
 base_url = "https://transcripts.foreverdreaming.org/"
 
 url_steps = list(range(0, 25, 25))
-ep_links = []
+episode_links = {}
 
+# Collect episode links in dictionary. Keys are formatted episode titles(example: 01x01_Plot)
 for url_step in url_steps:
     page = requests.get(base_url + "viewforum.php?f=177&start=" + str(url_step))
     soup = BeautifulSoup(page.content, "html.parser")
     tds = soup.findAll("td", class_ = "topic-titles row2")
     for i, td in enumerate(tds):
         if i != 0: #first td is not a link to an episode
-            ep_links.append(td.find("h3").find("a")["href"][2:])          
+            link = base_url + td.find("h3").find("a")
+            link_episode = link.string
+            link_url = (link["href"][2:])
+            episode_links[link_episode] = link_url        
 
-
-page = requests.get(base_url + ep_links[0])
-soup = BeautifulSoup(page.content, "html.parser")
-result_set = soup.find("div", class_ = "postbody").find_all("p")
-lines = []
-for result in result_set:
-    if result.string != None: #remove text of empty p tags
-        lines.append(result.string)
+# create on txt file per collected link
+for episode_link in episode_links:
+    page = requests.get(episode_link)
+    soup = BeautifulSoup(page.content, "html.parser")
+    result_set = soup.find("div", class_ = "postbody").find_all("p")
+    lines = []
+    filename = ""
+    stream = open(filename, "w")
+    for result in result_set:
+        if result.string != None: #remove text of empty p tags
+            lines.append(result.string)
 
 question_and_answers = {}
 
