@@ -18,7 +18,7 @@ for path in [scraped_resources_folder_name, processed_resources_folder_name]:
 
 base_url = "https://transcripts.foreverdreaming.org/"
 
-url_steps = list(range(0, 25, 25))
+url_steps = list(range(0, 201, 25))
 episode_links = {}
 
 # Collect episode links in dictionary. Keys are formatted episode titles(example: 01x01_Plot)
@@ -28,32 +28,18 @@ for url_step in url_steps:
     tds = soup.findAll("td", class_ = "topic-titles row2")
     for i, td in enumerate(tds):
         if i != 0: #first td is not a link to an episode
-            link = base_url + td.find("h3").find("a")
-            link_episode = link.string
-            link_url = (link["href"][2:])
-            episode_links[link_episode] = link_url        
+            link = td.find("h3").find("a")
+            link_episode_name = link.string[0:link.string.index(" ")]
+            link_url = base_url + link["href"][2:]
+            episode_links[link_episode_name] = link_url        
 
 # create on txt file per collected link
-for episode_link in episode_links:
+for episode_name, episode_link in episode_links.items():
     page = requests.get(episode_link)
     soup = BeautifulSoup(page.content, "html.parser")
     result_set = soup.find("div", class_ = "postbody").find_all("p")
-    lines = []
-    filename = ""
-    stream = open(filename, "w")
-    for result in result_set:
-        if result.string != None: #remove text of empty p tags
-            lines.append(result.string)
-
-question_and_answers = {}
-
-for line_index, line in enumerate(lines):
-    index = line.find("Barney:")
-    if index == 0:
-        previous_line = lines[line_index-1]
-        # wont work if previous line has no ":" or Barney has first line of an episode
-        previous_line_text = previous_line[previous_line.find(":")+1:]
-        question_and_answers[previous_line_text] = line[len("Barney:"):]
-    
-for key, value in question_and_answers.items():
-    print(key, value, sep="               ", end="\n---------------------")
+    filepath = os.path.join(scraped_resources_folder_name, episode_name)
+    with open(filepath, "w") as stream:
+        for result in result_set:
+            if result.string != None: #remove text of empty p tags
+                stream.write(result.string + "\n")
