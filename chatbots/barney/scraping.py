@@ -30,7 +30,7 @@ for url_step in url_steps:
             link_url = base_url + link["href"][2:]
             episode_links[link_episode_name] = link_url        
 
-# create on txt file per collected link
+# create a txt file per collected link
 for episode_name, episode_link in episode_links.items():
     page = requests.get(episode_link)
     soup = BeautifulSoup(page.content, "html.parser")
