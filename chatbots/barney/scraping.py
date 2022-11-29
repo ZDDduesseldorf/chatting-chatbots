@@ -1,20 +1,17 @@
 import os
 from bs4 import BeautifulSoup
 import requests
+from config import processed_resources_folder_name, scraped_resources_folder_name
 
 #build all urls
 # get all texts
 # get individuell lines
 # create dictionary for barney lines, with all the lines prior to them as a key 
 
-resources_directory_name = "resources"
-scraped_resources_folder_name = os.path.join(resources_directory_name, "scraped")
-processed_resources_folder_name = os.path.join(resources_directory_name, "processed")
 
 for path in [scraped_resources_folder_name, processed_resources_folder_name]:
     if(not os.path.isdir(path)):
         os.makedirs(path)
-
 
 base_url = "https://transcripts.foreverdreaming.org/"
 

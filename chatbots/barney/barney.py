@@ -2,11 +2,8 @@ import os
 
 questions_and_answers = {}
 
-resources_directory_name = "resources"
-processed_resources_folder_name = os.path.join(resources_directory_name, "processed")
-
-for file_name in os.listdir(processed_resources_folder_name):
-    path = os.path.join(processed_resources_folder_name, file_name)
+for file_name in os.listdir(config.processed_resources_folder_name):
+    path = os.path.join(config.processed_resources_folder_name, file_name)
     with open(path, "r") as stream:
         lines = stream.read().splitlines()
 
