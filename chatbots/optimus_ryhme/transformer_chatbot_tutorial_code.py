@@ -32,39 +32,39 @@ path_to_movie_conversations = os.path.join(path_to_dataset, 'movie_conversations
 
 # -------------------------- Parameters ----------------------------------------------
 # Maximum number of samples to preprocess
-MAX_SAMPLES = 500
+MAX_SAMPLES = 50000
 # Maximum sentence length
-MAX_LENGTH = 20
+MAX_LENGTH = 40
 # BATCH_- and BUFFER_SIZE are used in dataset creation
 BATCH_SIZE = 64
 BUFFER_SIZE = 20000
-# Hyper-parameters - in the tutorial its stated that um_layers, d_model, and units are reduced. Refer to 'Attention is all you need' for other version of the transformer 
+# Hyper-parameters - in the tutorial its stated that num_layers, d_model, and units are reduced. Refer to 'Attention is all you need' for other versions
 NUM_LAYERS = 2
 D_MODEL = 256
 NUM_HEADS = 8
 UNITS = 512
 DROPOUT = 0.1
 # EPOCHS are used in FIT MODEL
-EPOCHS = 5
+EPOCHS = 20
 
 
 # --------------------------------- functions ----------------------------------------
 
 def preprocess_sentence(sentence):
   sentence = sentence.lower().strip()
-  # creating a space between a word and the punctuation following it
-  # eg: "he is a boy." => "he is a boy ."
+    # creating a space between a word and the punctuation following it
+    # eg: "he is a boy." => "he is a boy ."
   sentence = re.sub(r"([?.!,])", r" \1 ", sentence)
   sentence = re.sub(r'[" "]+', " ", sentence)
-  # replacing everything with space except (a-z, A-Z, ".", "?", "!", ",")
+    # replacing everything with space except (a-z, A-Z, ".", "?", "!", ",")
   sentence = re.sub(r"[^a-zA-Z?.!,]+", " ", sentence)
   sentence = sentence.strip()
-  # adding a start and an end token to the sentence
+    # adding a start and an end token to the sentence
   return sentence
 
 
 def load_conversations():
-  # dictionary of line id to text
+    # dictionary of line id to text
   id2line = {}
   with open(path_to_movie_lines, errors='ignore') as file:
     lines = file.readlines()
@@ -99,7 +99,7 @@ def tokenize_and_filter(inputs, outputs):
       tokenized_inputs.append(sentence1)
       tokenized_outputs.append(sentence2)
   
-  # pad tokenized sentences
+    # pad tokenized sentences
   tokenized_inputs = tf.keras.preprocessing.sequence.pad_sequences(
       tokenized_inputs, maxlen=MAX_LENGTH, padding='post')
   tokenized_outputs = tf.keras.preprocessing.sequence.pad_sequences(
@@ -112,15 +112,15 @@ def scaled_dot_product_attention(query, key, value, mask):
   """Calculate the attention weights. """
   matmul_qk = tf.matmul(query, key, transpose_b=True)
 
-  # scale matmul_qk
+    # scale matmul_qk
   depth = tf.cast(tf.shape(key)[-1], tf.float32)
   logits = matmul_qk / tf.math.sqrt(depth)
 
-  # add the mask to zero out padding tokens
+    # add the mask to zero out padding tokens
   if mask is not None:
     logits += (mask * -1e9)
 
-  # softmax is normalized on the last axis (seq_len_k)
+    # softmax is normalized on the last axis (seq_len_k)
   attention_weights = tf.nn.softmax(logits, axis=-1)
 
   output = tf.matmul(attention_weights, value)
@@ -129,7 +129,7 @@ def scaled_dot_product_attention(query, key, value, mask):
 
 def create_padding_mask(x):
   mask = tf.cast(tf.math.equal(x, 0), tf.float32)
-  # (batch_size, 1, 1, sequence length)
+    # (batch_size, 1, 1, sequence length)
   return mask[:, tf.newaxis, tf.newaxis, :]
 
 def create_look_ahead_mask(x):
@@ -279,12 +279,12 @@ def transformer(vocab_size,
   enc_padding_mask = tf.keras.layers.Lambda(
       create_padding_mask, output_shape=(1, 1, None),
       name='enc_padding_mask')(inputs)
-  # mask the future tokens for decoder inputs at the 1st attention block
+    # mask the future tokens for decoder inputs at the 1st attention block
   look_ahead_mask = tf.keras.layers.Lambda(
       create_look_ahead_mask,
       output_shape=(1, None, None),
       name='look_ahead_mask')(dec_inputs)
-  # mask the encoder outputs for the 2nd attention block
+    # mask the encoder outputs for the 2nd attention block
   dec_padding_mask = tf.keras.layers.Lambda(
       create_padding_mask, output_shape=(1, 1, None),
       name='dec_padding_mask')(inputs)
@@ -426,11 +426,12 @@ class CustomSchedule(tf.keras.optimizers.schedules.LearningRateSchedule):
 
 questions, answers = load_conversations()
 
+
 print('Sample question: {}'.format(questions[20]))
 print('Sample answer: {}'.format(answers[20]))
 
 # Build tokenizer using tfds for both questions and answers
-# ------ DEBUG ----- original code: tokenizer = tfds.features.text.SubwordTextEncoder.build_from_corpus(questions + answers, target_vocab_size=2**13) -------- DEBUG -----
+# ------ DEBUG ----- original code: tokenizer = tfds.features.text.SubwordTextEncoder.build_from_corpus(questions + answers, target_vocab_size=2**13)
 # ------ DEBUG ----- instead of using deprecated code, we should use tensorflow_text
 tokenizer = tfds.deprecated.text.SubwordTextEncoder.build_from_corpus(
     questions + answers, target_vocab_size=2**13)
@@ -484,11 +485,12 @@ learning_rate = CustomSchedule(D_MODEL)
 optimizer = tf.keras.optimizers.Adam(learning_rate, beta_1=0.9, beta_2=0.98, epsilon=1e-9)
 
 def accuracy(y_true, y_pred):
-  # ensure labels have shape (batch_size, MAX_LENGTH - 1)
+    # ensure labels have shape (batch_size, MAX_LENGTH - 1)
   y_true = tf.reshape(y_true, shape=(-1, MAX_LENGTH - 1))
-  # -- DEBUG -- original code: accuracy = tf.metrics.SparseCategoricalAccuracy()(y_true, y_pred) --------------- DEBUG -------------
+    # -- DEBUG -- original code: accuracy = tf.metrics.SparseCategoricalAccuracy()(y_true, y_pred) --------------- DEBUG -------------
   accuracy = tf.losses.SparseCategoricalCrossentropy()(y_true, y_pred)
   return accuracy
+
 
 model.compile(optimizer=optimizer, loss=loss_function, metrics=[accuracy])
 
@@ -539,6 +541,7 @@ def predict(sentence):
   print('Output: {}'.format(predicted_sentence))
 
   return predicted_sentence
+
 
 # user_input = ""
 # while user_input != "exit":
