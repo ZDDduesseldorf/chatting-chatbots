@@ -32,9 +32,9 @@ path_to_movie_conversations = os.path.join(path_to_dataset, 'movie_conversations
 
 # -------------------------- Parameters ----------------------------------------------
 # Maximum number of samples to preprocess
-MAX_SAMPLES = 50000
+MAX_SAMPLES = 500
 # Maximum sentence length
-MAX_LENGTH = 40
+MAX_LENGTH = 20
 # BATCH_- and BUFFER_SIZE are used in dataset creation
 BATCH_SIZE = 64
 BUFFER_SIZE = 20000
@@ -45,7 +45,7 @@ NUM_HEADS = 8
 UNITS = 512
 DROPOUT = 0.1
 # EPOCHS are used in FIT MODEL
-EPOCHS = 20
+EPOCHS = 5
 
 
 # --------------------------------- functions ----------------------------------------
@@ -496,8 +496,6 @@ model.compile(optimizer=optimizer, loss=loss_function, metrics=[accuracy])
 # ------------ FIT MODEL -----------------------
 
 model.fit(dataset, epochs=EPOCHS)
-#path = 
-model.save('/models/model')
 
 
 # ------------ EVALUATE AND PREDICT ---------------
@@ -509,6 +507,9 @@ def evaluate(sentence):
       START_TOKEN + tokenizer.encode(sentence) + END_TOKEN, axis=0)
 
   output = tf.expand_dims(START_TOKEN, 0)
+
+  print(f"Sentence: {sentence}")
+  print(f"Output: {output}")
 
   for i in range(MAX_LENGTH):
     predictions = model(inputs=[sentence, output], training=False)
@@ -539,12 +540,15 @@ def predict(sentence):
 
   return predicted_sentence
 
-user_input = ""
-while user_input != "exit":
-     user_input = input()
-     predict(user_input)
+# user_input = ""
+# while user_input != "exit":
+#      user_input = input()
+#      predict(user_input)
 
 sentence = 'I am not crazy, my mother had me tested.'
-for _ in range(5):
+for _ in range(1):
   sentence = predict(sentence)
   print('')
+
+path = f"./models/{MAX_SAMPLES}Samples_{MAX_LENGTH}Length_{EPOCHS}Epochs/model_weights"
+model.save_weights(path)
