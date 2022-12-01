@@ -14,7 +14,7 @@ import tensorflow_datasets as tfds
 
 import os
 import re
-import numpy as np
+#import numpy as np
 
 #import matplotlib.pyplot as plt
 
@@ -32,7 +32,7 @@ path_to_movie_conversations = os.path.join(path_to_dataset, 'movie_conversations
 
 # -------------------------- Parameters ----------------------------------------------
 # Maximum number of samples to preprocess
-MAX_SAMPLES = 50000
+MAX_SAMPLES = 300000
 # Maximum sentence length
 MAX_LENGTH = 40
 # BATCH_- and BUFFER_SIZE are used in dataset creation
@@ -45,8 +45,7 @@ NUM_HEADS = 8
 UNITS = 512
 DROPOUT = 0.1
 # EPOCHS are used in FIT MODEL
-EPOCHS = 20
-
+EPOCHS = 10
 
 # --------------------------------- functions ----------------------------------------
 
@@ -470,6 +469,7 @@ dataset = dataset.prefetch(tf.data.experimental.AUTOTUNE)
 
 tf.keras.backend.clear_session()
 
+
 model = transformer(
     vocab_size=VOCAB_SIZE,
     num_layers=NUM_LAYERS,
@@ -477,6 +477,7 @@ model = transformer(
     d_model=D_MODEL,
     num_heads=NUM_HEADS,
     dropout=DROPOUT)
+
 
 # ------------ COMPILE MODEL -----------------------
 
@@ -497,7 +498,8 @@ model.compile(optimizer=optimizer, loss=loss_function, metrics=[accuracy])
 
 # ------------ FIT MODEL -----------------------
 
-model.fit(dataset, epochs=EPOCHS)
+csv_logger = tf.keras.callbacks.CSVLogger(f"./models/{MAX_SAMPLES}Samples_{MAX_LENGTH}Length_{EPOCHS}Epochs_Training_log.csv", append = True, separator = ';')
+model.fit(dataset, epochs=EPOCHS, callbacks=[csv_logger])
 
 
 # ------------ EVALUATE AND PREDICT ---------------
@@ -510,8 +512,8 @@ def evaluate(sentence):
 
   output = tf.expand_dims(START_TOKEN, 0)
 
-  print(f"Sentence: {sentence}")
-  print(f"Output: {output}")
+  #print(f"Sentence: {sentence}")
+  #print(f"Output: {output}")
 
   for i in range(MAX_LENGTH):
     predictions = model(inputs=[sentence, output], training=False)
@@ -543,13 +545,13 @@ def predict(sentence):
   return predicted_sentence
 
 
-# user_input = ""
-# while user_input != "exit":
-#      user_input = input()
-#      predict(user_input)
+user_input = ""
+while user_input != "exit":
+    user_input = input()
+    predict(user_input)
 
 sentence = 'I am not crazy, my mother had me tested.'
-for _ in range(1):
+for _ in range(5):
   sentence = predict(sentence)
   print('')
 
