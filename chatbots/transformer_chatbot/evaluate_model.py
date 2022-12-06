@@ -16,6 +16,7 @@ NUM_HEADS = int(os.environ.get('NUM_HEADS'))
 DROPOUT = float(os.environ.get('DROPOUT'))
 MAX_LENGTH = int(os.environ.get('MAX_LENGTH'))
 MAX_SAMPLES = int(os.environ.get('MAX_SAMPLES'))
+EPOCHS = int(os.environ.get('EPOCHS'))
 
 load_dotenv()
 
@@ -29,8 +30,9 @@ model = transformer.transformer(
     num_heads=NUM_HEADS,
     dropout=DROPOUT)
 
+path = f"./models/{EPOCHS}EPOCHS_{MAX_SAMPLES}SAMPLES_{MAX_LENGTH}LENGTH/"
 
-model.load_weights('./models/169000Samples_50Length_20Epochs/model_weights')
+model.load_weights(path)
 
 
 def evaluate(sentence):
