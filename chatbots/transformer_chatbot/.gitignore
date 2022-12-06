@@ -1,0 +1,5 @@
+models/
+data/dataset/
+train_model.ipynb
+tokenizer.subwords
+ipynb_checkpoints/
