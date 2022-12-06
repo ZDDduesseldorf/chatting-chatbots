@@ -10,21 +10,17 @@ import tensorflow as tf
 tf.random.set_seed(1234)
 import tensorflow_datasets as tfds
 from tqdm import tqdm
-
-#------------------ set data set specific methods -----------------------------------
-import LoadMovieDataset as load
-from PreprocessSentence import preprocess_sentence
+import os
 
 
-# -------------------------- Parameters ----------------------------------------------
 
-# Maximum number of Why not samples to preprocess
-MAX_SAMPLES = 100000
+
+# ------------------------- Model Settings ------------------------------------------------
 # Maximum sentence length
-MAX_LENGTH = 40
+MAX_LENGTH = 30
 # BATCH_- and BUFFER_SIZE are used in dataset creation
-BATCH_SIZE = 128
-BUFFER_SIZE = 50000
+BATCH_SIZE = 128    #originally 64
+BUFFER_SIZE = 50000 #originally 20000
 # Hyper-parameters - in the tutorial its stated that num_layers, d_model, and units are reduced. Refer to 'Attention is all you need' for other versions
 NUM_LAYERS = 5  #originally 2
 D_MODEL = 256   #originally 256
@@ -32,21 +28,44 @@ NUM_HEADS = 16  #originally 8
 UNITS = 512    #originally 512
 DROPOUT = 0.1   #originaly 0.1
 # EPOCHS are used in FIT MODEL
-EPOCHS = 20
+EPOCHS = 15
+
+# ----------- Tokenizer Settings ----------------
+# set data set specific methods
+import LoadMovieDataset as load
+from PreprocessSentence import preprocess_sentence
+# Maximum number of Why not samples to preprocess
+MAX_SAMPLES = 300000
 # 
-VOCAB_SIZE = 2**13 #originally 2**13
-
-# ------------------------- Settings ------------------------------------------------
-# load a model or fit a new one?
-loadWeights = True
-# load a tokenizer or save a new one?
-loadTokenizer = True
-
-modelPath = f"./models/{MAX_SAMPLES}Samples_{MAX_LENGTH}Length_{EPOCHS}Epochs/model_weights"
-tokenizerPath = f"{load.getTokenizerDirectory()}{MAX_SAMPLES}Samples_{VOCAB_SIZE}VocabSize_Tokenizer"
+VOCAB_SIZE = 2**14 #originally 2**13
 
 
+#region filepath logic
 
+def checkAndCreateDirectory(dir):
+  if os.path.exists(dir):
+      print(f"Directory {dir} already exitsts")
+      return True
+  else:
+      print(f"Directory {dir} created")
+      os.mkdir(dir)
+      
+      return False
+
+if("optimus_ryhme" in os.getcwd()): #if we are starting from console or from VSCode
+    directory = os.path.abspath(f"../../../models/{load.getDatasetDirectory()}")
+else:
+    directory = os.path.abspath(f"./models/{load.getDatasetDirectory()}")
+    
+checkAndCreateDirectory(directory)
+
+modelPath = f"{directory}/{MAX_SAMPLES}Samples_{VOCAB_SIZE}VocabSize_{MAX_LENGTH}Length_{EPOCHS}Epochs_{BATCH_SIZE}Batch_{BUFFER_SIZE}Buffer_{NUM_LAYERS}Layers_{NUM_HEADS}Heads"
+loadWeights = checkAndCreateDirectory(modelPath)
+
+tokenizerFilePath = f"{directory}/{MAX_SAMPLES}Samples_{VOCAB_SIZE}VocabSize_Tokenizer"
+loadTokenizer = os.path.exists(f"{tokenizerFilePath}.subwords")
+
+#endregion
 
 #region Functions
 
@@ -439,12 +458,13 @@ print('Sample answer: {}'.format(answers[20]))
 
 
 if loadTokenizer:
-  tokenizer = tfds.deprecated.text.SubwordTextEncoder.load_from_file(tokenizerPath)
+  print(f"Loading Tokenizer from {tokenizerFilePath}")
+  tokenizer = tfds.deprecated.text.SubwordTextEncoder.load_from_file(tokenizerFilePath)
 else:
   # Build tokenizer using tfds for both questions and answers
   print("Building Tokenizer: ")
   tokenizer = tfds.deprecated.text.SubwordTextEncoder.build_from_corpus(questions + answers, target_vocab_size=VOCAB_SIZE)
-  tokenizer.save_to_file(tokenizerPath)
+  tokenizer.save_to_file(tokenizerFilePath)
 
 # Define start and end token to indicate the start and end of a sentence
 START_TOKEN, END_TOKEN = [tokenizer.vocab_size], [tokenizer.vocab_size + 1]
@@ -502,21 +522,24 @@ model.compile(optimizer=optimizer, loss=loss_function)
 # ------------ Load or FIT MODEL -----------------------
 
 if loadWeights:
-  model.load_weights(modelPath)
+  print(f"Loading model weights from {modelPath}\model_weights")
+  model.load_weights(f"{modelPath}\model_weights")
 else:
-  csv_logger = tf.keras.callbacks.CSVLogger(f"./models/{MAX_SAMPLES}Samples_{MAX_LENGTH}Length_{EPOCHS}Epochs_Training_log.csv", append = True, separator = ';')
+  csv_logger = tf.keras.callbacks.CSVLogger(f"{modelPath}\Training_log.csv", append = True, separator = ';')
   model.fit(dataset, epochs=EPOCHS, callbacks=[csv_logger])
-  model.save_weights(modelPath)
+  model.save_weights(f"{modelPath}\model_weights")
 
 
 # ------------ Start chatting ---------------
 
 print("Start chatting: ")
-user_input = ""
-while user_input != "exit":
-    user_input = input()
-    predict(user_input)
+user_input = input()
 
+while user_input != "exit":
+    predict(user_input)
+    user_input = input()
+
+print("end of program")
 # sentence = 'I am not crazy, my mother had me tested.'
 # for _ in range(5):
 #   sentence = predict(sentence)

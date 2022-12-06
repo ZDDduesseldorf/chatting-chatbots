@@ -12,10 +12,10 @@ path_to_dataset = os.path.join(os.path.dirname(path_to_zip), "cornell movie-dial
 path_to_movie_lines = os.path.join(path_to_dataset, 'movie_lines.txt')
 path_to_movie_conversations = os.path.join(path_to_dataset, 'movie_conversations.txt')
 
-tokenizerPath = "./tokenizers/MovieDataSet/"
+datasetPath = "MovieDataSet"
 
-def getTokenizerDirectory():
-    return tokenizerPath
+def getDatasetDirectory():
+    return datasetPath
 
 def load_conversations(MAX_SAMPLES):
     # dictionary of line id to text
