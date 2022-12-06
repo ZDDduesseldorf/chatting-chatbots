@@ -6,90 +6,55 @@ Created on Mon Nov 28 15:06:13 2022
 """
 
 from __future__ import absolute_import, division, print_function, unicode_literals
-
 import tensorflow as tf
 tf.random.set_seed(1234)
-
 import tensorflow_datasets as tfds
+from tqdm import tqdm
 
-import os
-import re
-#import numpy as np
+#------------------ set data set specific methods -----------------------------------
+import LoadMovieDataset as load
+from PreprocessSentence import preprocess_sentence
 
-#import matplotlib.pyplot as plt
-
-path_to_zip = tf.keras.utils.get_file(
-    'cornell_movie_dialogs.zip',
-    origin=
-    'http://www.cs.cornell.edu/~cristian/data/cornell_movie_dialogs_corpus.zip',
-    extract=True)
-
-path_to_dataset = os.path.join(
-    os.path.dirname(path_to_zip), "cornell movie-dialogs corpus")
-
-path_to_movie_lines = os.path.join(path_to_dataset, 'movie_lines.txt')
-path_to_movie_conversations = os.path.join(path_to_dataset, 'movie_conversations.txt')
 
 # -------------------------- Parameters ----------------------------------------------
-# Maximum number of samples to preprocess
-MAX_SAMPLES = 300000
+
+# Maximum number of Why not samples to preprocess
+MAX_SAMPLES = 100000
 # Maximum sentence length
 MAX_LENGTH = 40
 # BATCH_- and BUFFER_SIZE are used in dataset creation
-BATCH_SIZE = 64
-BUFFER_SIZE = 20000
+BATCH_SIZE = 128
+BUFFER_SIZE = 50000
 # Hyper-parameters - in the tutorial its stated that num_layers, d_model, and units are reduced. Refer to 'Attention is all you need' for other versions
-NUM_LAYERS = 2
-D_MODEL = 256
-NUM_HEADS = 8
-UNITS = 512
-DROPOUT = 0.1
+NUM_LAYERS = 5  #originally 2
+D_MODEL = 256   #originally 256
+NUM_HEADS = 16  #originally 8
+UNITS = 512    #originally 512
+DROPOUT = 0.1   #originaly 0.1
 # EPOCHS are used in FIT MODEL
-EPOCHS = 10
+EPOCHS = 20
+# 
+VOCAB_SIZE = 2**13 #originally 2**13
 
-# --------------------------------- functions ----------------------------------------
+# ------------------------- Settings ------------------------------------------------
+# load a model or fit a new one?
+loadWeights = True
+# load a tokenizer or save a new one?
+loadTokenizer = True
 
-def preprocess_sentence(sentence):
-  sentence = sentence.lower().strip()
-    # creating a space between a word and the punctuation following it
-    # eg: "he is a boy." => "he is a boy ."
-  sentence = re.sub(r"([?.!,])", r" \1 ", sentence)
-  sentence = re.sub(r'[" "]+', " ", sentence)
-    # replacing everything with space except (a-z, A-Z, ".", "?", "!", ",")
-  sentence = re.sub(r"[^a-zA-Z?.!,]+", " ", sentence)
-  sentence = sentence.strip()
-    # adding a start and an end token to the sentence
-  return sentence
+modelPath = f"./models/{MAX_SAMPLES}Samples_{MAX_LENGTH}Length_{EPOCHS}Epochs/model_weights"
+tokenizerPath = f"{load.getTokenizerDirectory()}{MAX_SAMPLES}Samples_{VOCAB_SIZE}VocabSize_Tokenizer"
 
 
-def load_conversations():
-    # dictionary of line id to text
-  id2line = {}
-  with open(path_to_movie_lines, errors='ignore') as file:
-    lines = file.readlines()
-  for line in lines:
-    parts = line.replace('\n', '').split(' +++$+++ ')
-    id2line[parts[0]] = parts[4]
 
-  inputs, outputs = [], []
-  with open(path_to_movie_conversations, 'r') as file:
-    lines = file.readlines()
-  for line in lines:
-    parts = line.replace('\n', '').split(' +++$+++ ')
-    # get conversation in a list of line ID
-    conversation = [line[1:-1] for line in parts[3][1:-1].split(', ')]
-    for i in range(len(conversation) - 1):
-      inputs.append(preprocess_sentence(id2line[conversation[i]]))
-      outputs.append(preprocess_sentence(id2line[conversation[i + 1]]))
-      if len(inputs) >= MAX_SAMPLES:
-        return inputs, outputs
-  return inputs, outputs
+
+#region Functions
 
 # Tokenize, filter and pad sentences
 def tokenize_and_filter(inputs, outputs):
   tokenized_inputs, tokenized_outputs = [], []
   
-  for (sentence1, sentence2) in zip(inputs, outputs):
+  for (sentence1, sentence2) in tqdm(zip(inputs, outputs), desc="Tokenizing: "):
     # tokenize sentence
     sentence1 = START_TOKEN + tokenizer.encode(sentence1) + END_TOKEN
     sentence2 = START_TOKEN + tokenizer.encode(sentence2) + END_TOKEN
@@ -126,10 +91,12 @@ def scaled_dot_product_attention(query, key, value, mask):
 
   return output
 
+
 def create_padding_mask(x):
   mask = tf.cast(tf.math.equal(x, 0), tf.float32)
     # (batch_size, 1, 1, sequence length)
   return mask[:, tf.newaxis, tf.newaxis, :]
+
 
 def create_look_ahead_mask(x):
   seq_len = tf.shape(x)[1]
@@ -310,6 +277,7 @@ def transformer(vocab_size,
 
   return tf.keras.Model(inputs=[inputs, dec_inputs], outputs=outputs, name=name)
 
+
 def loss_function(y_true, y_pred):
   y_true = tf.reshape(y_true, shape=(-1, MAX_LENGTH - 1))
   
@@ -322,9 +290,50 @@ def loss_function(y_true, y_pred):
   return tf.reduce_mean(loss)
 
 
+def evaluate(sentence):
+  sentence = preprocess_sentence(sentence)
 
-# ------------------------------- Classes --------------------------------------------
+  sentence = tf.expand_dims(
+      START_TOKEN + tokenizer.encode(sentence) + END_TOKEN, axis=0)
 
+  output = tf.expand_dims(START_TOKEN, 0)
+
+  #print(f"Sentence: {sentence}")
+  #print(f"Output: {output}")
+
+  for i in range(MAX_LENGTH):
+    predictions = model(inputs=[sentence, output], training=False)
+
+    # select the last word from the seq_len dimension
+    predictions = predictions[:, -1:, :]
+    predicted_id = tf.cast(tf.argmax(predictions, axis=-1), tf.int32)
+
+    # return the result if the predicted_id is equal to the end token
+    if tf.equal(predicted_id, END_TOKEN[0]):
+      break
+
+    # concatenated the predicted_id to the output which is given to the decoder
+    # as its input.
+    output = tf.concat([output, predicted_id], axis=-1)
+
+  return tf.squeeze(output, axis=0)
+
+
+def predict(sentence):
+  prediction = evaluate(sentence)
+
+  predicted_sentence = tokenizer.decode(
+      [i for i in prediction if i < tokenizer.vocab_size])
+
+  print('Input: {}'.format(sentence))
+  print('Output: {}'.format(predicted_sentence))
+
+  return predicted_sentence
+
+#endregion
+
+
+#region Classes
 class PositionalEncoding(tf.keras.layers.Layer):
 
   def __init__(self, position, d_model):
@@ -418,31 +427,31 @@ class CustomSchedule(tf.keras.optimizers.schedules.LearningRateSchedule):
     arg2 = step * (self.warmup_steps**-1.5)
 
     return tf.math.rsqrt(self.d_model) * tf.math.minimum(arg1, arg2)
-
+#endregion
 
 
 # ------------------------------ Execution ------------------------------------------
 
-questions, answers = load_conversations()
-
-
+print("Load conversations.")
+questions, answers = load.load_conversations(MAX_SAMPLES)
 print('Sample question: {}'.format(questions[20]))
 print('Sample answer: {}'.format(answers[20]))
 
-# Build tokenizer using tfds for both questions and answers
-# ------ DEBUG ----- original code: tokenizer = tfds.features.text.SubwordTextEncoder.build_from_corpus(questions + answers, target_vocab_size=2**13)
-# ------ DEBUG ----- instead of using deprecated code, we should use tensorflow_text
-tokenizer = tfds.deprecated.text.SubwordTextEncoder.build_from_corpus(
-    questions + answers, target_vocab_size=2**13)
+
+if loadTokenizer:
+  tokenizer = tfds.deprecated.text.SubwordTextEncoder.load_from_file(tokenizerPath)
+else:
+  # Build tokenizer using tfds for both questions and answers
+  print("Building Tokenizer: ")
+  tokenizer = tfds.deprecated.text.SubwordTextEncoder.build_from_corpus(questions + answers, target_vocab_size=VOCAB_SIZE)
+  tokenizer.save_to_file(tokenizerPath)
 
 # Define start and end token to indicate the start and end of a sentence
 START_TOKEN, END_TOKEN = [tokenizer.vocab_size], [tokenizer.vocab_size + 1]
-
 # Vocabulary size plus start and end token
 VOCAB_SIZE = tokenizer.vocab_size + 2
-
-
 questions, answers = tokenize_and_filter(questions, answers)
+
 
 print('Vocab size: {}'.format(VOCAB_SIZE))
 print('Number of samples: {}'.format(len(questions)))
@@ -483,77 +492,32 @@ model = transformer(
 
 learning_rate = CustomSchedule(D_MODEL)
 
+
 optimizer = tf.keras.optimizers.Adam(learning_rate, beta_1=0.9, beta_2=0.98, epsilon=1e-9)
 
-def accuracy(y_true, y_pred):
-    # ensure labels have shape (batch_size, MAX_LENGTH - 1)
-  y_true = tf.reshape(y_true, shape=(-1, MAX_LENGTH - 1))
-    # -- DEBUG -- original code: accuracy = tf.metrics.SparseCategoricalAccuracy()(y_true, y_pred) --------------- DEBUG -------------
-  accuracy = tf.losses.SparseCategoricalCrossentropy()(y_true, y_pred)
-  return accuracy
+
+model.compile(optimizer=optimizer, loss=loss_function)
 
 
-model.compile(optimizer=optimizer, loss=loss_function, metrics=[accuracy])
+# ------------ Load or FIT MODEL -----------------------
+
+if loadWeights:
+  model.load_weights(modelPath)
+else:
+  csv_logger = tf.keras.callbacks.CSVLogger(f"./models/{MAX_SAMPLES}Samples_{MAX_LENGTH}Length_{EPOCHS}Epochs_Training_log.csv", append = True, separator = ';')
+  model.fit(dataset, epochs=EPOCHS, callbacks=[csv_logger])
+  model.save_weights(modelPath)
 
 
-# ------------ FIT MODEL -----------------------
+# ------------ Start chatting ---------------
 
-csv_logger = tf.keras.callbacks.CSVLogger(f"./models/{MAX_SAMPLES}Samples_{MAX_LENGTH}Length_{EPOCHS}Epochs_Training_log.csv", append = True, separator = ';')
-model.fit(dataset, epochs=EPOCHS, callbacks=[csv_logger])
-
-
-# ------------ EVALUATE AND PREDICT ---------------
-
-def evaluate(sentence):
-  sentence = preprocess_sentence(sentence)
-
-  sentence = tf.expand_dims(
-      START_TOKEN + tokenizer.encode(sentence) + END_TOKEN, axis=0)
-
-  output = tf.expand_dims(START_TOKEN, 0)
-
-  #print(f"Sentence: {sentence}")
-  #print(f"Output: {output}")
-
-  for i in range(MAX_LENGTH):
-    predictions = model(inputs=[sentence, output], training=False)
-
-    # select the last word from the seq_len dimension
-    predictions = predictions[:, -1:, :]
-    predicted_id = tf.cast(tf.argmax(predictions, axis=-1), tf.int32)
-
-    # return the result if the predicted_id is equal to the end token
-    if tf.equal(predicted_id, END_TOKEN[0]):
-      break
-
-    # concatenated the predicted_id to the output which is given to the decoder
-    # as its input.
-    output = tf.concat([output, predicted_id], axis=-1)
-
-  return tf.squeeze(output, axis=0)
-
-
-def predict(sentence):
-  prediction = evaluate(sentence)
-
-  predicted_sentence = tokenizer.decode(
-      [i for i in prediction if i < tokenizer.vocab_size])
-
-  print('Input: {}'.format(sentence))
-  print('Output: {}'.format(predicted_sentence))
-
-  return predicted_sentence
-
-
+print("Start chatting: ")
 user_input = ""
 while user_input != "exit":
     user_input = input()
     predict(user_input)
 
-sentence = 'I am not crazy, my mother had me tested.'
-for _ in range(5):
-  sentence = predict(sentence)
-  print('')
-
-path = f"./models/{MAX_SAMPLES}Samples_{MAX_LENGTH}Length_{EPOCHS}Epochs/model_weights"
-model.save_weights(path)
+# sentence = 'I am not crazy, my mother had me tested.'
+# for _ in range(5):
+#   sentence = predict(sentence)
+#   print('')
