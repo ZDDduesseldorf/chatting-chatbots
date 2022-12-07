@@ -34,7 +34,7 @@ class DataController:
         self._tokenizer = None
 
     def get_tokenizer(self):
-        if self._tokenizer == None:
+        if self._tokenizer is None:
             self._tokenizer = tfds.deprecated.text.SubwordTextEncoder.load_from_file(
                 DATASET_PATH
             )
