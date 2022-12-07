@@ -4,7 +4,7 @@ from lib.data import DataController, preprocess_utterance
 
 
 def extract_line_data():
-    with open('data/movie_dialog_corpus/movie_lines.tsv') as file:
+    with open("data/movie_dialog_corpus/movie_lines.tsv", encoding="utf-8") as file:
         for line in file:
             line = re.sub(r'\n$', "", line)
 
@@ -19,7 +19,7 @@ def extract_line_data():
 
 
 def extract_conversations():
-    with open('data/movie_dialog_corpus/movie_conversations.tsv') as file:
+    with open("data/movie_dialog_corpus/movie_conversations.tsv", encoding="utf-8") as file:
         for line in file:
             yield re.search(r'\[([^]]*)\]', line).group(1)[1:-1].split("' '")
 
