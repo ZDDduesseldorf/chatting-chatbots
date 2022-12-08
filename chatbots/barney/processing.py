@@ -10,8 +10,8 @@ for file_name in sorted(os.listdir(scraped_resources_folder_name)):
     # remove lines with instructions
     lines = filter(lambda line: False if re.search(r"^\(.*\)$", line) else True, lines)
     
-    # remove instructions in the middle of text and the space behind it
-    lines = list(map(lambda line: re.sub(r"\(.*\) ", "", line), lines))
+    # remove instructions in the middle of text and the space in front of it
+    lines = list(map(lambda line: re.sub(r" \(.*\)", "", line), lines))
 
     lines = list(map(lambda line: re.sub(r"^\[.*\]$", csv_separator, line), lines))
 
