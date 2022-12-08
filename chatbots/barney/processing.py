@@ -2,7 +2,7 @@ import os
 import re
 from config import processed_resources_folder_name, scraped_resources_folder_name, csv_separator
 
-for file_name in os.listdir(scraped_resources_folder_name):
+for file_name in sorted(os.listdir(scraped_resources_folder_name)):
     input_path = os.path.join(scraped_resources_folder_name, file_name)
     with open(input_path, "r") as stream:
         lines = stream.read().splitlines()
@@ -10,8 +10,8 @@ for file_name in os.listdir(scraped_resources_folder_name):
     # remove lines with instructions
     lines = filter(lambda line: False if re.search(r"^\(.*\)$", line) else True, lines)
     
-    # remove instructions in the middle of text and the space in front of it
-    lines = list(map(lambda line: re.sub(r"\(.*\)", "", line), lines))
+    # remove instructions in the middle of text and the space behind it
+    lines = list(map(lambda line: re.sub(r"\(.*\) ", "", line), lines))
 
     # output_path = os.path.join(processed_resources_folder_name, file_name)
 
@@ -21,8 +21,11 @@ for file_name in os.listdir(scraped_resources_folder_name):
         if index == 0:
             previous_line = lines[line_index-1]
             # wont work if previous line has no ":" or Barney has first line of an episode
-            previous_line_text = previous_line[previous_line.find(":")+1:]
-            questions_and_answers[previous_line_text] = line[len("Barney:"):]
+            # remove the name of the person speaking prior to Barney (and follwing collon and space)
+            previous_line_text = previous_line[previous_line.find(":")+2:]
+
+            # remove Barney's name and the folowing collon and space
+            questions_and_answers[previous_line_text] = line[len("Barney: "):]
 
     output_path = os.path.join(processed_resources_folder_name, file_name)
     with open(output_path, "w") as stream:
