@@ -5,19 +5,53 @@ import asyncio
 import json
 import random
 from typing import List
+import datetime
+import csv
+import os
 
 connections = []
-conversation = []
 shutdown_event = None
 
 desired_conversation_len = 10
-first_message = "test"
+first_message_text = "test"
 desired_chatbot_amount = 2
+coversation_logs_directory = "conversation" 
 
-async def chose_next_message(possible_next_messages):
+class Message():
+    def __init__(self, message, bot_id, bot_name):
+        self.__message = message
+        self.__bot_id = bot_id
+        self.__bot_name = bot_name
+
+    @property
+    def message(self):
+        return self.__message
+    
+    @property
+    def bot_id(self):
+        return self.__bot_id
+
+    @property
+    def bot_name(self):
+        return self.__bot_name
+
+    def toJSON_event_string(self) -> str:
+        return json.dumps(
+            {   
+                "type": "message",
+                "message": self.message,
+                "bot_id": self.bot_id,
+                "bot_name": self.bot_name
+            }
+        )
+
+conversation: List[Message] = [] 
+
+
+async def chose_next_message(possible_next_messages: List[Message]):
     #placeholder. currently a random answer is chosen as the next sentece
-    next_answer = possible_next_messages[random.randint(0, len(possible_next_messages)-1)]["message"]
-    return next_answer
+    next_message = possible_next_messages[random.randint(0, len(possible_next_messages)-1)]
+    return next_message
 
 async def handler(websocket: WebSocketServerProtocol):
     try:
@@ -40,18 +74,19 @@ async def handler(websocket: WebSocketServerProtocol):
             
             # send each client it's id
             for connection in connections:
-                await connection["websocket"].send(json.dumps({"type": "start", "id": connection["id"]}))
+                await connection["websocket"].send(json.dumps({"type": "start", "bot_id": connection["id"]}))
 
             while len(conversation) < desired_conversation_len:
-                last_message = first_message if len(conversation) == 0 else conversation[-1]
-                responses = []
+                last_message = Message(first_message_text,"","") if len(conversation) == 0 else conversation[-1]
+                responses: List[Message] = []
                 # This loop might be better as a TaskGroup
                 for connection in connections:
-                    await connection["websocket"].send(json.dumps({"type": "message", "message": last_message}))
-                    response = json.loads(await connection["websocket"].recv())
+                    await connection["websocket"].send(last_message.toJSON_event_string())
+                    response_raw = json.loads(await connection["websocket"].recv())
+                    response = Message(response_raw["message"],response_raw["bot_id"], response_raw["bot_name"])
                     responses.append(response)
-                next_sentence = await chose_next_message(responses)
-                conversation.append(next_sentence)
+                next_message = await chose_next_message(responses)
+                conversation.append(next_message)
                 print(f"conersation is {len(conversation)} long")
                 print(f"last line in conversation: {conversation[-1]} from {conversation}")
 
@@ -59,15 +94,23 @@ async def handler(websocket: WebSocketServerProtocol):
     finally:
         connections.remove(connection)
         if len(connections) == 0:
-            # create file output of conversation
-            #filename = f"conversation_
-            #open()
+            if not os.path.exists(coversation_logs_directory):
+                os.makedirs(coversation_logs_directory)
+
+            now = datetime.datetime.now()
+            now_as_string = now.strftime("%Y-%m-%d--%H-%M-%S")
+
+            filename = f"{now_as_string}.csv"
+            path = os.path.join(coversation_logs_directory,filename)
+
+            with open(path, "a+", newline="") as csvfile:
+                writer = csv.writer(csvfile, delimiter=",")
+                writer.writerow(["message", "bot_id", "bot_name"])
+                for message in conversation:
+                    writer.writerow([message.message, message.bot_id, message.bot_name])
+                
             shutdown_event.clear()
             conversation = []
-
-import datetime;
-current_time = datetime.datetime.now()
-print(current_time)
 
 async def main():
     global shutdown_event
@@ -77,4 +120,3 @@ async def main():
 
 asyncio.run(main())
 
-print("test")
