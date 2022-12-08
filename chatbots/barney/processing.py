@@ -13,14 +13,18 @@ for file_name in sorted(os.listdir(scraped_resources_folder_name)):
     # remove instructions in the middle of text and the space behind it
     lines = list(map(lambda line: re.sub(r"\(.*\) ", "", line), lines))
 
-    # output_path = os.path.join(processed_resources_folder_name, file_name)
+    lines = list(map(lambda line: re.sub(r"^\[.*\]$", csv_separator, line), lines))
 
     questions_and_answers = {}
     for line_index, line in enumerate(lines):
         index = line.find("Barney:")
         if index == 0:
             previous_line = lines[line_index-1]
-            # wont work if previous line has no ":" or Barney has first line of an episode
+            
+            # skip because Barney had the first line of the scene
+            if previous_line == csv_separator:
+                continue
+
             # remove the name of the person speaking prior to Barney (and follwing collon and space)
             previous_line_text = previous_line[previous_line.find(":")+2:]
 
