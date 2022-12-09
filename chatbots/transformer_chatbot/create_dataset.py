@@ -21,7 +21,7 @@ MAX_SAMPLES = int(os.environ.get('MAX_SAMPLES'))
 
 datapath = './data/'
 path = f"{datapath}{EPOCHS}EPOCHS_{MAX_SAMPLES}SAMPLES_{MAX_LENGTH}LENGTH/"
-filename = 'Conversations_Ben_Phil.csv'
+filename = 'transformer_data.csv'
 os.mkdir(path)
 
 

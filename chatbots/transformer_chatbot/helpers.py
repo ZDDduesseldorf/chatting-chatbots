@@ -74,7 +74,7 @@ def tokenize_and_filter(inputs, outputs):
         sentence1 = START_TOKEN + tokenizer.encode(sentence1) + END_TOKEN
         sentence2 = START_TOKEN + tokenizer.encode(sentence2) + END_TOKEN
         # check tokenized sentence max length
-        if len(sentence1) <= MAX_LENGTH and len(sentence2) <= MAX_LENGTH:
+        if len(sentence1) <= MAX_LENGTH and len(sentence2) <= MAX_LENGTH :
             tokenized_inputs.append(sentence1)
             tokenized_outputs.append(sentence2)
 
