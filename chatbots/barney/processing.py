@@ -1,6 +1,6 @@
 import os
 import re
-from config import processed_resources_folder_name, scraped_resources_folder_name, csv_separator
+from config import processed_resources_folder_name, scraped_resources_folder_name, csv_separator, csv_quotechar
 import csv
 
 for file_name in sorted(os.listdir(scraped_resources_folder_name)):
@@ -27,14 +27,16 @@ for file_name in sorted(os.listdir(scraped_resources_folder_name)):
                 continue
 
             # remove the name of the person speaking prior to Barney (and follwing collon and space)
-            previous_line_text = previous_line[previous_line.find(":")+2:]
+            # don't cut text if there is no collon
+            text_start = previous_line.find(":") + 2 if previous_line.find(":") > 0 else 0
+            previous_line_text = previous_line[text_start:]
 
             # remove Barney's name and the folowing collon and space
             questions_and_answers[previous_line_text] = line[len("Barney: "):]
 
     output_path = os.path.join(processed_resources_folder_name, file_name + ".csv")
     with open(output_path, "w", newline="") as file:
-        writer = csv.writer(file, delimiter=csv_separator, quotechar="\"", quoting=csv.QUOTE_ALL)
+        writer = csv.writer(file, delimiter=csv_separator, quotechar=csv_quotechar, quoting=csv.QUOTE_ALL)
         writer.writerow(["prior_message","barney_message"])
         writer.writerows(questions_and_answers.items())
 # for key, value in questions_and_answers.items():
