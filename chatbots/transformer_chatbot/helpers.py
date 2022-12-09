@@ -57,10 +57,14 @@ def load_conversations(datapath, filename):
     progress = tqdm(range(len(input_list) - 1))
     for index in progress:
         progress.set_description('Reading from csv')
-        if type(input_list[index]) == str and type(output_list[index]) == str:
-            preprocessed_inputs.append(preprocess_sentence(input_list[index]))
-            preprocessed_outputs.append(
-                preprocess_sentence(output_list[index]))
+        input = input_list[index]
+        output = output_list[index]
+        
+        if type(input) == str and type(output) == str:
+            # first preprocess then check for length?!
+            if len(input.split()) <= MAX_LENGTH and len(output.split()) <= MAX_LENGTH:
+                preprocessed_inputs.append(preprocess_sentence(input))
+                preprocessed_outputs.append(preprocess_sentence(output))
     return preprocessed_inputs, preprocessed_outputs
 
 
@@ -73,10 +77,8 @@ def tokenize_and_filter(inputs, outputs):
         # tokenize sentence
         sentence1 = START_TOKEN + tokenizer.encode(sentence1) + END_TOKEN
         sentence2 = START_TOKEN + tokenizer.encode(sentence2) + END_TOKEN
-        # check tokenized sentence max length
-        if len(sentence1) <= MAX_LENGTH and len(sentence2) <= MAX_LENGTH :
-            tokenized_inputs.append(sentence1)
-            tokenized_outputs.append(sentence2)
+        tokenized_inputs.append(sentence1)
+        tokenized_outputs.append(sentence2)
 
         # pad tokenized sentences
     tokenized_inputs = tf.keras.preprocessing.sequence.pad_sequences(

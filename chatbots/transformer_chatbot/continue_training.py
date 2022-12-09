@@ -56,6 +56,6 @@ val_dataset = helpers.load_dataset("val")
 logdir =f"logs/scalars/COMBINED_{EPOCHS}EPOCHS_{MAX_SAMPLES}SAMPLES_{MAX_LENGTH}LENGTH"
 tensorboard_callback = ks.callbacks.TensorBoard(log_dir=logdir)
 
-model.fit(train_dataset, epochs=20, validation_data=val_dataset)
+model.fit(train_dataset, epochs=10, validation_data=val_dataset, initial_epoch=10)
 
 model.save_weights(path)
