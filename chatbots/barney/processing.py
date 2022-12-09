@@ -1,6 +1,7 @@
 import os
 import re
 from config import processed_resources_folder_name, scraped_resources_folder_name, csv_separator
+import csv
 
 for file_name in sorted(os.listdir(scraped_resources_folder_name)):
     input_path = os.path.join(scraped_resources_folder_name, file_name)
@@ -31,9 +32,10 @@ for file_name in sorted(os.listdir(scraped_resources_folder_name)):
             # remove Barney's name and the folowing collon and space
             questions_and_answers[previous_line_text] = line[len("Barney: "):]
 
-    output_path = os.path.join(processed_resources_folder_name, file_name)
-    with open(output_path, "w") as stream:
-        for key, value in questions_and_answers.items():
-                stream.write(key + csv_separator + value + "\n")
+    output_path = os.path.join(processed_resources_folder_name, file_name + ".csv")
+    with open(output_path, "w", newline="") as file:
+        writer = csv.writer(file, delimiter=csv_separator, quotechar="\"", quoting=csv.QUOTE_ALL)
+        writer.writerow(["prior_message","barney_message"])
+        writer.writerows(questions_and_answers.items())
 # for key, value in questions_and_answers.items():
 #     print(key, value, sep="               ", end="\n---------------------")
