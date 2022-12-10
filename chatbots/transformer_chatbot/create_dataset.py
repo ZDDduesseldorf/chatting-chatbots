@@ -1,8 +1,5 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
-import numpy as np
 import tensorflow as tf
-import tensorflow.python.keras as ks
-from nltk.tokenize import word_tokenize
 import tensorflow_datasets as tfds
 from dotenv import load_dotenv
 import os

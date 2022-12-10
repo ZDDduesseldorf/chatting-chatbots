@@ -3,7 +3,6 @@ import transformer
 import helpers
 import os
 from dotenv import load_dotenv
-import datetime
 import tensorflow.python.keras as ks
 
 load_dotenv()

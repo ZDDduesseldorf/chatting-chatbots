@@ -4,7 +4,6 @@ import masks
 import positional_encoding
 import multi_head_attention
 import os
-from dotenv import load_dotenv
 import helpers
 
 ks.backend.clear_session()
