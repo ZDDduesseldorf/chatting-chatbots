@@ -32,5 +32,9 @@ print(f"Following episodes got ignored {ignored_episodes}")
 print(f"{len(ignored_episodes)} of 28 episodes got ignored. That is {round(len(ignored_episodes) / 208 * 100)}%")
 print(f"The corpus has {len(questions_and_answers)} pairs")
 
-for key, value in questions_and_answers.items():
-    print(key, value, sep="               ", end="\n---------------------")
+print("first 10 pairs are:") 
+for index, (key, value) in enumerate(questions_and_answers.items()):
+    if index == 5:
+        break
+    print(f"prior message: {key}" )
+    print(f"barney's message: {value}")
