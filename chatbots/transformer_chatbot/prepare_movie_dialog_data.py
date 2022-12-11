@@ -3,7 +3,7 @@ import re
 import csv
 
 
-OUTPUT_PATH = "transformer_data.csv"
+OUTPUT_PATH = "data/transformer_data.csv"
 
 def extract_line_data():
     with open("data/movie_dialog_corpus/movie_lines.tsv", encoding="utf-8") as file:
