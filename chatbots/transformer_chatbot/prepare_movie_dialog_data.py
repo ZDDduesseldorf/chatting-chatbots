@@ -54,7 +54,7 @@ inputs, outputs = extract_samples()
 
 print('> Writing data to "{}" ...'.format(OUTPUT_PATH))
 
-with open(OUTPUT_PATH, "w") as file:
-    writer = csv.writer(file)
+with open(OUTPUT_PATH, "w", encoding="utf-8") as file:
+    writer = csv.writer(file, lineterminator='\n', delimiter=';')
     writer.writerow(["Input", "Output"])
     writer.writerows(zip(inputs, outputs))
