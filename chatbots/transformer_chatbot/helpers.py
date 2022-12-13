@@ -6,6 +6,7 @@ import pandas as pd
 from dotenv import load_dotenv
 import os
 import pickle
+from halo import Halo
 load_dotenv()
 
 
@@ -23,6 +24,7 @@ DROPOUT = float(os.environ.get('DROPOUT'))
 
 print(f"Dropout {DROPOUT}")
 print(f"VOCAB_SIZE {VOCAB_SIZE}")
+print(f"EPOCHS {EPOCHS}")
 
 def checkAndCreateDirectory(dir):
   if os.path.exists(dir):
@@ -36,9 +38,9 @@ def checkAndCreateDirectory(dir):
 
 
 directory = f"./data/"
-dataset_path = f"{directory}/{os.environ.get('DATASET')}/"
-tokenizer_path = f"{dataset_path}/{MAX_SAMPLES}Samples_{VOCAB_SIZE}VocabSize_Tokenizer"
-model_path = f"{dataset_path}{MAX_SAMPLES}Samples_{VOCAB_SIZE}VocabSize_{MAX_LENGTH}Length_{BATCH_SIZE}Batch_{BUFFER_SIZE}Buffer_{NUM_LAYERS}Layers_{NUM_HEADS}Heads"
+dataset_path = f"{directory}{os.environ.get('DATASET')}/"
+tokenizer_path = f"{dataset_path}/{MAX_SAMPLES}Smp_{VOCAB_SIZE}VocabSize_Tokenizer"
+model_path = f"{dataset_path}{MAX_SAMPLES}Smp_{VOCAB_SIZE}Voc_{MAX_LENGTH}Len_{BATCH_SIZE}Bat_{BUFFER_SIZE}Buf_{NUM_LAYERS}Lay_{NUM_HEADS}Hed"
 checkAndCreateDirectory(directory)
 checkAndCreateDirectory(dataset_path)
 checkAndCreateDirectory(model_path)
@@ -116,7 +118,21 @@ def get_vocab_size():
 
 
 def get_tokenizer():
-    return tfds.deprecated.text.SubwordTextEncoder.load_from_file(tokenizer_path)
+    if os.path.exists(f"{tokenizer_path}.subwords"):
+        spinner = Halo(text=f"Loading Tokenizer from {tokenizer_path}", spinner='dots')
+        spinner.start()
+        tokenizer = tfds.deprecated.text.SubwordTextEncoder.load_from_file(tokenizer_path)
+    else:
+        # Build tokenizer using tfds for both questions and answers
+        questions, answers = load_conversations()
+        spinner = Halo(text='Creating tokenizer and vocabulary ...', spinner='dots')
+        spinner.start()
+        tokenizer = tfds.deprecated.text.SubwordTextEncoder.build_from_corpus(questions + answers, target_vocab_size=VOCAB_SIZE)
+        tokenizer.save_to_file(tokenizer_path)
+
+    spinner.stop()
+
+    return tokenizer
 
 
 def create_and_save_dataset(x, y, name):
@@ -135,13 +151,49 @@ def create_and_save_dataset(x, y, name):
     dataset = dataset.shuffle(BUFFER_SIZE)
     dataset = dataset.batch(BATCH_SIZE)
     dataset = dataset.prefetch(tf.data.experimental.AUTOTUNE)
-    tf.data.experimental.save(
-        dataset, f"{model_path}/{EPOCHS}Epochs_{name}"
-    )
-    with open(f"{model_path}/{EPOCHS}Epochs_{name}/element_spec", 'wb') as out_:
+    dataset_save = f"{model_path}/{name}" 
+    checkAndCreateDirectory(dataset_save)
+    tf.data.experimental.save(dataset, dataset_save)
+    with open(f"{dataset_save}/element_spec", 'wb') as out_:
         pickle.dump(dataset.element_spec, out_)
 
 def load_dataset(name):
-    with open(f"{model_path}/{EPOCHS}Epochs_{name}" + '/element_spec', 'rb') as in_:
+    dataset_save = f"{model_path}/{name}" 
+    with open(f"{dataset_save}/element_spec", 'rb') as in_:
         es = pickle.load(in_)
-    return tf.data.experimental.load(f"{model_path}/{EPOCHS}Epochs_{name}", es)
+    return tf.data.experimental.load(dataset_save, es)
+
+
+def create_dataset():
+    print("Num GPUs Available: ", len(tf.config.list_physical_devices('GPU')))
+    load_dotenv()
+
+    loadWeights = checkAndCreateDirectory(model_path)
+
+    questions, answers = load_conversations()
+
+    tokenizer = get_tokenizer()
+
+    spinner = Halo(text='Tokenize and filter dataset sentences ...', spinner='dots')
+    spinner.start()
+
+    #split dataset 70:30
+    val_split=int(len(questions)*(2/3))
+    train_questions, train_answers = tokenize_and_filter(questions[:val_split], answers[:val_split], tokenizer)
+    val_questions, val_answers = tokenize_and_filter(questions[val_split:], answers[val_split:], tokenizer)
+
+    # split into train and test data
+    spinner.stop()
+
+    # decoder inputs use the previous target as input
+    # remove START_TOKEN from targets
+    spinner = Halo(text='Create tensors from dataset ...', spinner='dots')
+    spinner.start()
+    train_dataset = create_and_save_dataset(train_questions, train_answers, "train")
+    val_dataset = create_and_save_dataset(val_questions, val_answers, "val")
+    spinner.stop()
+
+    print('Size training samples:', len(train_questions))
+    print('Size val samples:', len(val_questions))
+
+    return train_dataset, val_dataset

@@ -8,14 +8,6 @@ import helpers
 
 ks.backend.clear_session()
 
-VOCAB_SIZE = helpers.get_vocab_size()
-NUM_LAYERS = int(os.environ.get('NUM_LAYERS'))
-UNITS = int(os.environ.get('UNITS'))
-D_MODEL = int(os.environ.get('D_MODEL'))
-NUM_HEADS = int(os.environ.get('NUM_HEADS'))
-DROPOUT = float(os.environ.get('DROPOUT'))
-MAX_LENGTH = int(os.environ.get('MAX_LENGTH'))
-
 
 def encoder_layer(units, d_model, num_heads, dropout, name="encoder_layer"):
     inputs = tf.keras.Input(shape=(None, d_model), name="inputs")
@@ -208,7 +200,7 @@ class CustomSchedule(tf.keras.optimizers.schedules.LearningRateSchedule):
 
 
 def loss_function(y_true, y_pred):
-    y_true = tf.reshape(y_true, shape=(-1, MAX_LENGTH - 1))
+    y_true = tf.reshape(y_true, shape=(-1, helpers.MAX_LENGTH - 1))
 
     loss = tf.keras.losses.SparseCategoricalCrossentropy(
         from_logits=True, reduction='none')(y_true, y_pred)
