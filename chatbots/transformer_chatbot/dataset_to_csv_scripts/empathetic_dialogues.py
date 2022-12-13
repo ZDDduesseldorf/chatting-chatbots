@@ -2,7 +2,7 @@ from datasets import load_dataset
 import pandas as pd
 from tqdm import tqdm
 
-split = "train"
+split = "test"
 
 dataset = load_dataset("empathetic_dialogues", split=split)
 
