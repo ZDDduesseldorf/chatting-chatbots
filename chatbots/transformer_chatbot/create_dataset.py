@@ -10,19 +10,11 @@ tf.random.set_seed(1234)
 print("Num GPUs Available: ", len(tf.config.list_physical_devices('GPU')))
 load_dotenv()
 
-BATCH_SIZE = int(os.environ.get('BATCH_SIZE'))
-BUFFER_SIZE = int(os.environ.get('BUFFER_SIZE'))
-EPOCHS = int(os.environ.get('EPOCHS'))
-MAX_LENGTH = int(os.environ.get('MAX_LENGTH'))
-MAX_SAMPLES = int(os.environ.get('MAX_SAMPLES'))
-
-datapath = './data/'
-path = f"{datapath}{EPOCHS}EPOCHS_{MAX_SAMPLES}SAMPLES_{MAX_LENGTH}LENGTH/"
 filename = 'transformer_data.csv'
-os.mkdir(path)
+os.mkdir(helpers.path)
 
 
-questions, answers = helpers.load_conversations(datapath, filename)
+questions, answers = helpers.load_conversations(filename)
 
 spinner = Halo(text='Creating tokenizer and vocabulary ...',
                spinner='dots')
@@ -31,7 +23,7 @@ tokenizer = tfds.deprecated.text.SubwordTextEncoder.build_from_corpus(
     questions + answers, target_vocab_size=2**14)
 VOCAB_SIZE = tokenizer.vocab_size + 2
 tokenizer.save_to_file(
-    filename_prefix=f"{path}tokenizer")
+    filename_prefix=f"{helpers.path}tokenizer")
 spinner.stop()
 
 spinner = Halo(text='Tokenize and filter dataset sentences ...',

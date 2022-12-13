@@ -41,8 +41,8 @@ def preprocess_sentence(sentence):
     return sentence
 
 
-def load_conversations(datapath, filename):
-    df = pd.read_csv(datapath+filename, sep=';')
+def load_conversations(filename):
+    df = pd.read_csv(directory + filename, sep=';')
     input_df = df['Input']
     output_df = df['Output']
 
