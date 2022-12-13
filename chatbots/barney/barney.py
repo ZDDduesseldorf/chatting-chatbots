@@ -2,8 +2,13 @@ import os
 import config
 import csv
 from config import csv_quotechar, csv_separator
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
+import numpy as np
+import pandas
 
-questions_and_answers = {}
+
+corpus = {}
 ignored_episodes = []
 
 for file_name in os.listdir(config.processed_resources_folder_name):
@@ -26,15 +31,31 @@ for file_name in os.listdir(config.processed_resources_folder_name):
             # skip header
             if reader.line_num == 1:
                 continue
-            questions_and_answers[prior_message] = barney_message
+            corpus[prior_message] = barney_message
 
 print(f"Following episodes got ignored {ignored_episodes}")
-print(f"{len(ignored_episodes)} of 28 episodes got ignored. That is {round(len(ignored_episodes) / 208 * 100)}%")
-print(f"The corpus has {len(questions_and_answers)} pairs")
+print(f"{len(ignored_episodes)} of 208 episodes got ignored. That means {round(len(ignored_episodes) / 208 * 100)}% got ignored")
+print(f"The corpus has {len(corpus)} pairs")
 
-print("first 10 pairs are:") 
-for index, (key, value) in enumerate(questions_and_answers.items()):
+print("first 5 pairs are:") 
+for index, (key, value) in enumerate(corpus.items()):
     if index == 5:
         break
     print(f"prior message: {key}" )
     print(f"barney's message: {value}")
+
+
+tfidf = TfidfVectorizer(min_df=2, max_df = 0.5, ngram_range=(1, 1))
+features = tfidf.fit_transform(corpus.keys())
+print(features.shape)
+
+
+def respond(input):
+    input_tfidf = tfidf.transform([input])
+    similarities = cosine_similarity(input_tfidf, features)
+    idx = np.argsort(similarities)[0][-1]
+    print(idx)
+
+    return
+
+print(respond("test"))
