@@ -34,23 +34,24 @@ optimizer = tf.keras.optimizers.Adam(
     learning_rate, beta_1=0.9, beta_2=0.98, epsilon=1e-9)
 
 
-def accuracy(y_true, y_pred):
-    # ensure labels have shape (batch_size, MAX_LENGTH - 1)
-    y_true = tf.reshape(y_true, shape=(-1, MAX_LENGTH - 1))
-    # -- DEBUG -- original code: accuracy = tf.metrics.SparseCategoricalAccuracy()(y_true, y_pred) --------------- DEBUG -------------
-    accuracy = tf.losses.SparseCategoricalCrossentropy()(y_true, y_pred)
-    return accuracy
-
-
 model.compile(optimizer=optimizer,
-              loss=transformer.loss_function, metrics=[accuracy])
+              loss=transformer.loss_function, metrics=['accuracy'])
 
 train_dataset = helpers.load_dataset("train")
 val_dataset = helpers.load_dataset("val")
 
+# Only for pretrained models!
+# path_pretrained_model = "./models/10EPOCHS_0SAMPLES_10LENGTH/best_model"
+# model = model.load_weights(path_pretrained_model)
+
+path_pretrained = "./models/10EPOCHS_0SAMPLES_10LENGTH/"
+
+model.load_weights(path_pretrained)
+
 logdir =f"logs/scalars/{EPOCHS}EPOCHS_{MAX_SAMPLES}SAMPLES_{MAX_LENGTH}LENGTH"
 tensorboard_callback = ks.callbacks.TensorBoard(log_dir=logdir)
-
-model.fit(train_dataset, epochs=EPOCHS, validation_data=val_dataset)
+checkpoint_callback = ks.callbacks.ModelCheckpoint(f"{path}best_model", save_best_only=True, save_weights_only= True)
+stop_early_callback = ks.callbacks.EarlyStopping(monitor='val_loss', patience=3)
+model.fit(train_dataset, epochs=EPOCHS, validation_data=val_dataset, callbacks=[tensorboard_callback, stop_early_callback])
 
 model.save_weights(path)

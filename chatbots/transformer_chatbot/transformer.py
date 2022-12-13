@@ -208,7 +208,7 @@ class CustomSchedule(tf.keras.optimizers.schedules.LearningRateSchedule):
 
 
 def loss_function(y_true, y_pred):
-    y_true = tf.reshape(y_true, shape=(-1, MAX_LENGTH - 1))
+    y_true = tf.reshape(y_true, shape=(-1, 52 - 1))
 
     loss = tf.keras.losses.SparseCategoricalCrossentropy(
         from_logits=True, reduction='none')(y_true, y_pred)

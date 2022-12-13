@@ -29,9 +29,12 @@ model = transformer.transformer(
     num_heads=NUM_HEADS,
     dropout=DROPOUT)
 
+# path = f"./models/{EPOCHS}EPOCHS_{MAX_SAMPLES}SAMPLES_{MAX_LENGTH}LENGTH/best_model"
+
 path = f"./models/{EPOCHS}EPOCHS_{MAX_SAMPLES}SAMPLES_{MAX_LENGTH}LENGTH/"
 
 model.load_weights(path)
+
 
 
 def evaluate(sentence):

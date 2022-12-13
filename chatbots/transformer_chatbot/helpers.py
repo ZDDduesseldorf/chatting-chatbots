@@ -13,6 +13,7 @@ BUFFER_SIZE = int(os.environ.get('BUFFER_SIZE'))
 BATCH_SIZE = int(os.environ.get('BATCH_SIZE'))
 MAX_SAMPLES = int(os.environ.get('MAX_SAMPLES'))
 MAX_LENGTH = int(os.environ.get('MAX_LENGTH'))
+MIN_LENGTH = int(os.environ.get('MIN_LENGTH'))
 EPOCHS = int(os.environ.get('EPOCHS'))
 directory = './data/'
 path = f"{directory}{EPOCHS}EPOCHS_{MAX_SAMPLES}SAMPLES_{MAX_LENGTH}LENGTH/"
@@ -62,7 +63,8 @@ def load_conversations(datapath, filename):
         
         if type(input) == str and type(output) == str:
             # first preprocess then check for length?!
-            if len(input.split()) <= MAX_LENGTH and len(output.split()) <= MAX_LENGTH:
+            if (len(input.split()) <= MAX_LENGTH and len(output.split()) <= MAX_LENGTH and 
+            len(output.split()) > MIN_LENGTH and len(output.split()) > MIN_LENGTH):
                 preprocessed_inputs.append(preprocess_sentence(input))
                 preprocessed_outputs.append(preprocess_sentence(output))
     return preprocessed_inputs, preprocessed_outputs
@@ -82,15 +84,15 @@ def tokenize_and_filter(inputs, outputs):
 
         # pad tokenized sentences
     tokenized_inputs = tf.keras.preprocessing.sequence.pad_sequences(
-        tokenized_inputs, maxlen=MAX_LENGTH, padding='post')
+        tokenized_inputs, maxlen=50 + 2, padding='post')
     tokenized_outputs = tf.keras.preprocessing.sequence.pad_sequences(
-        tokenized_outputs, maxlen=MAX_LENGTH, padding='post')
+        tokenized_outputs, maxlen=50 + 2, padding='post')
 
     return tokenized_inputs, tokenized_outputs
 
 
 def get_tokenizer():
-    return tfds.deprecated.text.SubwordTextEncoder.load_from_file(filename_prefix=f"{path}tokenizer")
+    return tfds.deprecated.text.SubwordTextEncoder.load_from_file(filename_prefix="god_tokenizer")
 
 def create_and_save_dataset(x, y, name):
     #set validation dataset
