@@ -18,12 +18,12 @@ skipIndex = 0
 
 for i in tqdm(range(len(pdDataset)-1)):    
     if pdDataset.loc[i][0] == pdDataset.loc[i+1][0]:
-        data = {'Input': [pdDataset.loc[i][5]], 
-                'Output': [pdDataset.loc[i+1][5]],
+        data = {'Input': [pdDataset.loc[i][5].replace("_comma_", ",")], 
+                'Output': [pdDataset.loc[i+1][5].replace("_comma_", ",")],
                }
         df2 = pd.DataFrame(data, index=[i - skipIndex])
         df = pd.concat([df, df2])
     else:
         skipIndex += 1
 
-df.to_csv(f"D:\Programmierung\StudyProjects\empathetic_dialogues\empathetic_dialogues_{split}.csv", index=False)
+df.to_csv(rf"C:\Users\User\Desktop\transformer\chatting-chatbots\chatting-chatbots\chatbots\transformer_chatbot\data\empathetic_dialogues_{split}.csv", index=False, sep=';')
