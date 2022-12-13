@@ -1,4 +1,3 @@
-
 from tqdm import tqdm
 import tensorflow_datasets as tfds
 import tensorflow as tf
@@ -9,23 +8,40 @@ import os
 import pickle
 load_dotenv()
 
-BUFFER_SIZE = int(os.environ.get('BUFFER_SIZE'))
-BATCH_SIZE = int(os.environ.get('BATCH_SIZE'))
+
 MAX_SAMPLES = int(os.environ.get('MAX_SAMPLES'))
+VOCAB_SIZE = 2**int(os.environ.get('VOCAB_SIZE_EXPONENT'))
 MAX_LENGTH = int(os.environ.get('MAX_LENGTH'))
+BATCH_SIZE = int(os.environ.get('BATCH_SIZE'))
+BUFFER_SIZE = int(os.environ.get('BUFFER_SIZE'))
+NUM_LAYERS = int(os.environ.get('NUM_LAYERS'))
+NUM_HEADS = int(os.environ.get('NUM_HEADS'))
 EPOCHS = int(os.environ.get('EPOCHS'))
-directory = './data/'
-path = f"{directory}{EPOCHS}EPOCHS_{MAX_SAMPLES}SAMPLES_{MAX_LENGTH}LENGTH/"
+D_MODEL = int(os.environ.get('D_MODEL'))
+UNITS = int(os.environ.get('UNITS'))
+DROPOUT = float(os.environ.get('DROPOUT'))
+
+print(f"Dropout {DROPOUT}")
+print(f"VOCAB_SIZE {VOCAB_SIZE}")
+
+def checkAndCreateDirectory(dir):
+  if os.path.exists(dir):
+      print(f"Directory {dir} already exitsts")
+      return True
+  else:
+      print(f"Directory {dir} created")
+      os.mkdir(dir)
+      
+      return False
 
 
-def get_start_and_end_tokens():
-    tokenizer = get_tokenizer()
-    return [tokenizer.vocab_size], [tokenizer.vocab_size + 1]
-
-
-def get_vocab_size():
-    tokenizer = get_tokenizer()
-    return tokenizer.vocab_size + 2
+directory = f"./data/"
+dataset_path = f"{directory}/{os.environ.get('DATASET')}/"
+tokenizer_path = f"{dataset_path}/{MAX_SAMPLES}Samples_{VOCAB_SIZE}VocabSize_Tokenizer"
+model_path = f"{dataset_path}{MAX_SAMPLES}Samples_{VOCAB_SIZE}VocabSize_{MAX_LENGTH}Length_{BATCH_SIZE}Batch_{BUFFER_SIZE}Buffer_{NUM_LAYERS}Layers_{NUM_HEADS}Heads"
+checkAndCreateDirectory(directory)
+checkAndCreateDirectory(dataset_path)
+checkAndCreateDirectory(model_path)
 
 
 def preprocess_sentence(sentence):
@@ -41,8 +57,9 @@ def preprocess_sentence(sentence):
     return sentence
 
 
-def load_conversations(filename):
-    df = pd.read_csv(directory + filename, sep=';')
+def load_conversations():
+    print(f"Loading conversations from {directory}{os.environ.get('DATASET')}.csv")
+    df = pd.read_csv(f"{directory}{os.environ.get('DATASET')}.csv", sep=';')
     input_df = df['Input']
     output_df = df['Output']
 
@@ -68,10 +85,9 @@ def load_conversations(filename):
     return preprocessed_inputs, preprocessed_outputs
 
 
-def tokenize_and_filter(inputs, outputs):
-    tokenizer = get_tokenizer()
+def tokenize_and_filter(inputs, outputs, tokenizer):
     tokenized_inputs, tokenized_outputs = [], []
-    START_TOKEN, END_TOKEN = get_start_and_end_tokens()
+    START_TOKEN, END_TOKEN = [tokenizer.vocab_size], [tokenizer.vocab_size + 1]
 
     for (sentence1, sentence2) in zip(inputs, outputs):
         # tokenize sentence
@@ -89,8 +105,19 @@ def tokenize_and_filter(inputs, outputs):
     return tokenized_inputs, tokenized_outputs
 
 
+def get_start_and_end_tokens():
+    tokenizer = get_tokenizer()
+    return [tokenizer.vocab_size], [tokenizer.vocab_size + 1]
+
+
+def get_vocab_size():
+    tokenizer = get_tokenizer()
+    return tokenizer.vocab_size + 2
+
+
 def get_tokenizer():
-    return tfds.deprecated.text.SubwordTextEncoder.load_from_file(filename_prefix=f"{path}tokenizer")
+    return tfds.deprecated.text.SubwordTextEncoder.load_from_file(tokenizer_path)
+
 
 def create_and_save_dataset(x, y, name):
     #set validation dataset
@@ -109,12 +136,12 @@ def create_and_save_dataset(x, y, name):
     dataset = dataset.batch(BATCH_SIZE)
     dataset = dataset.prefetch(tf.data.experimental.AUTOTUNE)
     tf.data.experimental.save(
-        dataset, path + name
+        dataset, f"{model_path}/{EPOCHS}Epochs_{name}"
     )
-    with open(path + name + '/element_spec', 'wb') as out_:
+    with open(f"{model_path}/{EPOCHS}Epochs_{name}/element_spec", 'wb') as out_:
         pickle.dump(dataset.element_spec, out_)
 
 def load_dataset(name):
-    with open(path + name + '/element_spec', 'rb') as in_:
+    with open(f"{model_path}/{EPOCHS}Epochs_{name}" + '/element_spec', 'rb') as in_:
         es = pickle.load(in_)
-    return tf.data.experimental.load(path + name, es)
+    return tf.data.experimental.load(f"{model_path}/{EPOCHS}Epochs_{name}", es)

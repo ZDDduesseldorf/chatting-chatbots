@@ -38,16 +38,8 @@ optimizer = tf.keras.optimizers.Adam(
     learning_rate, beta_1=0.9, beta_2=0.98, epsilon=1e-9)
 
 
-def accuracy(y_true, y_pred):
-    # ensure labels have shape (batch_size, MAX_LENGTH - 1)
-    y_true = tf.reshape(y_true, shape=(-1, MAX_LENGTH - 1))
-    # -- DEBUG -- original code: accuracy = tf.metrics.SparseCategoricalAccuracy()(y_true, y_pred) --------------- DEBUG -------------
-    accuracy = tf.losses.SparseCategoricalCrossentropy()(y_true, y_pred)
-    return accuracy
-
-
 model.compile(optimizer=optimizer,
-              loss=transformer.loss_function, metrics=[accuracy])
+              loss=transformer.loss_function)
 
 train_dataset = helpers.load_dataset("train")
 val_dataset = helpers.load_dataset("val")
