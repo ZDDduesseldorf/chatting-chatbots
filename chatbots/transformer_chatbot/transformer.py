@@ -3,7 +3,6 @@ import tensorflow.python.keras as ks
 import masks
 import positional_encoding
 import multi_head_attention
-import os
 import helpers
 
 ks.backend.clear_session()

@@ -1,8 +1,6 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 import tensorflow as tf
-import tensorflow_datasets as tfds
 from dotenv import load_dotenv
-import os
 import helpers
 from halo import Halo
 
@@ -10,19 +8,22 @@ tf.random.set_seed(1234)
 print("Num GPUs Available: ", len(tf.config.list_physical_devices('GPU')))
 load_dotenv()
 
-loadWeights = helpers.checkAndCreateDirectory(helpers.model_path)
+helpers.checkAndCreateDirectory(helpers.model_path)
 
 questions, answers = helpers.load_conversations()
 
 tokenizer = helpers.get_tokenizer()
 
-spinner = Halo(text='Tokenize and filter dataset sentences ...', spinner='dots')
+spinner = Halo(
+    text='Tokenize and filter dataset sentences ...', spinner='dots')
 spinner.start()
 
-#split dataset 70:30
-val_split=int(len(questions)*(2/3))
-train_questions, train_answers = helpers.tokenize_and_filter(questions[:val_split], answers[:val_split], tokenizer)
-val_questions, val_answers = helpers.tokenize_and_filter(questions[val_split:], answers[val_split:], tokenizer)
+# split dataset 70:30
+val_split = int(len(questions)*(2/3))
+train_questions, train_answers = helpers.tokenize_and_filter(
+    questions[:val_split], answers[:val_split], tokenizer)
+val_questions, val_answers = helpers.tokenize_and_filter(
+    questions[val_split:], answers[val_split:], tokenizer)
 
 # split into train and test data
 spinner.stop()
@@ -31,33 +32,36 @@ spinner.stop()
 # remove START_TOKEN from targets
 spinner = Halo(text='Create tensors from dataset ...', spinner='dots')
 spinner.start()
-train_dataset = helpers.create_and_save_dataset(train_questions, train_answers, "train")
-val_dataset = helpers.create_and_save_dataset(val_questions, val_answers, "val")
+train_dataset = helpers.create_and_save_dataset(
+    train_questions, train_answers, "train")
+val_dataset = helpers.create_and_save_dataset(
+    val_questions, val_answers, "val")
 spinner.stop()
 
 print('Size training samples:', len(train_questions))
 print('Size val samples:', len(val_questions))
 
 
-
-
 def create_dataset():
     print("Num GPUs Available: ", len(tf.config.list_physical_devices('GPU')))
     load_dotenv()
 
-    loadWeights = helpers.checkAndCreateDirectory(helpers.model_path)
+    helpers.checkAndCreateDirectory(helpers.model_path)
 
     questions, answers = helpers.load_conversations()
 
     tokenizer = helpers.get_tokenizer()
 
-    spinner = Halo(text='Tokenize and filter dataset sentences ...', spinner='dots')
+    spinner = Halo(
+        text='Tokenize and filter dataset sentences ...', spinner='dots')
     spinner.start()
 
-    #split dataset 70:30
-    val_split=int(len(questions)*(2/3))
-    train_questions, train_answers = helpers.tokenize_and_filter(questions[:val_split], answers[:val_split], tokenizer)
-    val_questions, val_answers = helpers.tokenize_and_filter(questions[val_split:], answers[val_split:], tokenizer)
+    # split dataset 70:30
+    val_split = int(len(questions)*(2/3))
+    train_questions, train_answers = helpers.tokenize_and_filter(
+        questions[:val_split], answers[:val_split], tokenizer)
+    val_questions, val_answers = helpers.tokenize_and_filter(
+        questions[val_split:], answers[val_split:], tokenizer)
 
     # split into train and test data
     spinner.stop()
