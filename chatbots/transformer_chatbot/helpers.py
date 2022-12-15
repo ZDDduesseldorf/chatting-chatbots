@@ -53,18 +53,18 @@ def load_conversations(datapath, filename):
     else:
         input_list = input_df.values.tolist()[:MAX_SAMPLES]
         output_list = output_df.values.tolist()[:MAX_SAMPLES]
-    
+
     preprocessed_inputs, preprocessed_outputs = [], []
     progress = tqdm(range(len(input_list) - 1))
     for index in progress:
         progress.set_description('Reading from csv')
         input = input_list[index]
         output = output_list[index]
-        
+
         if type(input) == str and type(output) == str:
-            # first preprocess then check for length?!
-            if (len(input.split()) <= MAX_LENGTH and len(output.split()) <= MAX_LENGTH and 
-            len(output.split()) > MIN_LENGTH and len(output.split()) > MIN_LENGTH):
+            max_sentence_length = MAX_LENGTH - 2
+            if (len(input.split()) <= max_sentence_length and len(output.split()) <= max_sentence_length
+                    and len(output.split()) > MIN_LENGTH and len(output.split()) > MIN_LENGTH):
                 preprocessed_inputs.append(preprocess_sentence(input))
                 preprocessed_outputs.append(preprocess_sentence(output))
     return preprocessed_inputs, preprocessed_outputs
@@ -84,18 +84,26 @@ def tokenize_and_filter(inputs, outputs):
 
         # pad tokenized sentences
     tokenized_inputs = tf.keras.preprocessing.sequence.pad_sequences(
-        tokenized_inputs, maxlen=50 + 2, padding='post')
+        tokenized_inputs, maxlen=MAX_LENGTH, padding='post')
     tokenized_outputs = tf.keras.preprocessing.sequence.pad_sequences(
-        tokenized_outputs, maxlen=50 + 2, padding='post')
+        tokenized_outputs, maxlen=MAX_LENGTH, padding='post')
 
     return tokenized_inputs, tokenized_outputs
 
 
 def get_tokenizer():
-    return tfds.deprecated.text.SubwordTextEncoder.load_from_file(filename_prefix="god_tokenizer")
+    return tfds.deprecated.text.SubwordTextEncoder.load_from_file(filename_prefix=f"{path}tokenizer")
+
+
+def create_tokenizer(questions, answers):
+    tokenizer = tfds.deprecated.text.SubwordTextEncoder.build_from_corpus(
+        questions + answers, target_vocab_size=2**14)
+    tokenizer.save_to_file(filename_prefix=f"{path}tokenizer")
+    return tokenizer
+
 
 def create_and_save_dataset(x, y, name):
-    #set validation dataset
+    # set validation dataset
     dataset = tf.data.Dataset.from_tensor_slices((
         {
             'inputs': x,
@@ -115,6 +123,7 @@ def create_and_save_dataset(x, y, name):
     )
     with open(path + name + '/element_spec', 'wb') as out_:
         pickle.dump(dataset.element_spec, out_)
+
 
 def load_dataset(name):
     with open(path + name + '/element_spec', 'rb') as in_:

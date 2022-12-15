@@ -22,22 +22,34 @@ filename = 'transformer_data.csv'
 os.mkdir(path)
 
 questions, answers = helpers.load_conversations(datapath, filename)
-tokenizer = helpers.get_tokenizer()
 
-#split dataset 70:30
-val_split=int(len(questions)*(2/3))
-train_questions, train_answers = helpers.tokenize_and_filter(questions[:val_split], answers[:val_split])
-val_questions, val_answers = helpers.tokenize_and_filter(questions[val_split:], answers[val_split:])
+spinner = Halo(text='Creating tokenizer and vocabulary ...',
+               spinner='monkey')
+spinner.start()
+helpers.create_tokenizer(questions, answers)
+spinner.stop()
+
+spinner = Halo(text='Tokenize and filter dataset sentences ...',
+               spinner='monkey')
+spinner.start()
+# split dataset 70:30
+val_split = int(len(questions)*(2/3))
+train_questions, train_answers = helpers.tokenize_and_filter(
+    questions[:val_split], answers[:val_split])
+val_questions, val_answers = helpers.tokenize_and_filter(
+    questions[val_split:], answers[val_split:])
+spinner.stop()
 
 # decoder inputs use the previous target as input
 # remove START_TOKEN from targets
 spinner = Halo(text='Create tensors from dataset ...',
-               spinner='dots')
+               spinner='monkey')
 spinner.start()
-train_dataset = helpers.create_and_save_dataset(train_questions, train_answers, "train")
-val_dataset = helpers.create_and_save_dataset(val_questions, val_answers, "val")
+train_dataset = helpers.create_and_save_dataset(
+    train_questions, train_answers, "train")
+val_dataset = helpers.create_and_save_dataset(
+    val_questions, val_answers, "val")
 spinner.stop()
 
 print('Size training samples:', len(train_questions))
 print('Size val samples:', len(val_questions))
-

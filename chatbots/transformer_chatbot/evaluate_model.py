@@ -29,12 +29,9 @@ model = transformer.transformer(
     num_heads=NUM_HEADS,
     dropout=DROPOUT)
 
-# path = f"./models/{EPOCHS}EPOCHS_{MAX_SAMPLES}SAMPLES_{MAX_LENGTH}LENGTH/best_model"
-
-path = f"./models/{EPOCHS}EPOCHS_{MAX_SAMPLES}SAMPLES_{MAX_LENGTH}LENGTH/"
+path = f"./models/{EPOCHS}EPOCHS_{MAX_SAMPLES}SAMPLES_{MAX_LENGTH}LENGTH/best_model"
 
 model.load_weights(path)
-
 
 
 def evaluate(sentence):
@@ -43,7 +40,7 @@ def evaluate(sentence):
     sentence = tf.expand_dims(
         START_TOKEN + tokenizer.encode(sentence) + END_TOKEN, axis=0)
 
-    output = tf.expand_dims(START_TOKEN, 0)
+    output = tf.expand_dims(START_TOKEN, axis=0)
 
     for i in range(MAX_LENGTH):
         predictions = model(
@@ -75,4 +72,4 @@ def predict(sentence):
 
 while (True):
     inp = input('Say something: ')
-    print('Jimmy: ', predict(inp))
+    print('Freddy: ', predict(inp))

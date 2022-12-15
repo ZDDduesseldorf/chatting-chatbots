@@ -33,25 +33,19 @@ learning_rate = transformer.CustomSchedule(D_MODEL)
 optimizer = tf.keras.optimizers.Adam(
     learning_rate, beta_1=0.9, beta_2=0.98, epsilon=1e-9)
 
-
 model.compile(optimizer=optimizer,
               loss=transformer.loss_function, metrics=['accuracy'])
 
 train_dataset = helpers.load_dataset("train")
 val_dataset = helpers.load_dataset("val")
 
-# Only for pretrained models!
-# path_pretrained_model = "./models/10EPOCHS_0SAMPLES_10LENGTH/best_model"
-# model = model.load_weights(path_pretrained_model)
-
-path_pretrained = "./models/10EPOCHS_0SAMPLES_10LENGTH/"
-
-model.load_weights(path_pretrained)
-
-logdir =f"logs/scalars/{EPOCHS}EPOCHS_{MAX_SAMPLES}SAMPLES_{MAX_LENGTH}LENGTH"
+logdir = f"logs/scalars/{EPOCHS}EPOCHS_{MAX_SAMPLES}SAMPLES_{MAX_LENGTH}LENGTH"
 tensorboard_callback = ks.callbacks.TensorBoard(log_dir=logdir)
-checkpoint_callback = ks.callbacks.ModelCheckpoint(f"{path}best_model", save_best_only=True, save_weights_only= True)
-stop_early_callback = ks.callbacks.EarlyStopping(monitor='val_loss', patience=3)
-model.fit(train_dataset, epochs=EPOCHS, validation_data=val_dataset, callbacks=[tensorboard_callback, stop_early_callback])
+checkpoint_callback = ks.callbacks.ModelCheckpoint(
+    f"{path}best_model", save_best_only=True, save_weights_only=True)
+stop_early_callback = ks.callbacks.EarlyStopping(
+    monitor='val_loss', patience=3)
+model.fit(train_dataset, epochs=EPOCHS, validation_data=val_dataset,
+          callbacks=[tensorboard_callback, checkpoint_callback, stop_early_callback])
 
-model.save_weights(path)
+model.save_weights(f"{path}final_model")
