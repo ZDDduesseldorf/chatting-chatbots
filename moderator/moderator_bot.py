@@ -1,4 +1,3 @@
-import websockets
 from websockets import server
 from websockets.legacy.server import WebSocketServerProtocol
 import asyncio
@@ -8,6 +7,8 @@ from typing import List
 import datetime
 import csv
 import os
+# from evaluate import check_sentence_simularity
+# from mock_conversation import all_possible_message, full_conversation
 
 connections = []
 shutdown_event = None
@@ -22,6 +23,7 @@ class Message():
         self.__message = message
         self.__bot_id = bot_id
         self.__bot_name = bot_name
+        self.__ranking_number = 0.0
 
     @property
     def message(self):
@@ -34,7 +36,15 @@ class Message():
     @property
     def bot_name(self):
         return self.__bot_name
-
+    
+    @property
+    def ranking_number(self):
+        return self.__ranking_number
+    
+    @ranking_number.setter
+    def ranking_number(self, value):
+        self.__ranking_number = value
+        
     def toJSON_event_string(self) -> str:
         return json.dumps(
             {   
@@ -47,8 +57,10 @@ class Message():
 
 conversation: List[Message] = [] 
 
+async def choose_next_message(full_conversation: List[Message], possible_next_messages: List[Message]):
+    
+    #list_of_ranked_messages = check_sentence_simularity(full_conversation, possible_next_messages)
 
-async def chose_next_message(possible_next_messages: List[Message]):
     #placeholder. currently a random answer is chosen as the next sentece
     next_message = possible_next_messages[random.randint(0, len(possible_next_messages)-1)]
     return next_message
@@ -85,9 +97,9 @@ async def handler(websocket: WebSocketServerProtocol):
                     response_raw = json.loads(await connection["websocket"].recv())
                     response = Message(response_raw["message"],response_raw["bot_id"], response_raw["bot_name"])
                     responses.append(response)
-                next_message = await chose_next_message(responses)
+                next_message = await choose_next_message(conversation, responses)
                 conversation.append(next_message)
-                print(f"conersation is {len(conversation)} long")
+                print(f"conversation is {len(conversation)} long")
                 print(f"last line in conversation: {conversation[-1]} from {conversation}")
 
             shutdown_event.set()
@@ -112,6 +124,7 @@ async def handler(websocket: WebSocketServerProtocol):
             shutdown_event.clear()
             conversation = []
 
+
 async def main():
     global shutdown_event
     shutdown_event = asyncio.Event()
@@ -120,3 +133,7 @@ async def main():
 
 asyncio.run(main())
 
+# if __name__ == "__main__":
+#     # Testing area
+#     for message in check_sentence_simularity(full_conversation, all_possible_message):
+#         print(f'Message: {message.message}, Ranking: {message.ranking_number}, BotID: {message.bot_id} ')
