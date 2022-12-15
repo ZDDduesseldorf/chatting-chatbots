@@ -9,7 +9,6 @@ import numpy as np
 
 
 corpus = {}
-ignored_episodes = []
 
 for file_name in os.listdir(config.processed_resources_folder_name):
     path = os.path.join(config.processed_resources_folder_name, file_name)
@@ -21,58 +20,26 @@ for file_name in os.listdir(config.processed_resources_folder_name):
     with open(path, "r") as file:
         lines = file.readlines()
         if len(lines) < 15:
-            ignored_episodes.append(file_name)
             continue
 
     with open(path, "r") as csvfile:
         reader = csv.reader(csvfile, delimiter=csv_separator, quotechar=csv_quotechar)
         
-        for prior_message, barney_message in reader:
+        for prior_message, barneys_message in reader:
             # skip header
             if reader.line_num == 1:
                 continue
-            corpus[prior_message] = barney_message
-
-data = pd.DataFrame({'questions': list(questions_and_answers.keys()), 'response': list(questions_and_answers.values())})
-data.head()
-
-tfidf = TfidfVectorizer(min_df=8, max_df = 0.05, ngram_range=(1, 1))
-features = tfidf.fit_transform(data.questions + data.response)
-question_vectors = tfidf.transform(data.questions)
-
-user_input = input(">>> ")
-while "exit" not in user_input.lower():
-    user_input_tfidf = tfidf.transform([user_input])
-
-    similarities = cosine_similarity(user_input_tfidf, question_vectors)
-    idx = np.argsort(similarities)[0][-1]
-    print(data.loc[idx, "response"])
-    user_input = input(">>> ")
-
-
-# print(f"Following episodes got ignored {ignored_episodes}")
-# print(f"{len(ignored_episodes)} of 28 episodes got ignored. That is {round(len(ignored_episodes) / 208 * 100)}%")
-# print(f"The corpus has {len(questions_and_answers)} pairs")
-
-print("first 5 pairs are:") 
-for index, (key, value) in enumerate(corpus.items()):
-    if index == 5:
-        break
-    print(f"prior message: {key}" )
-    print(f"barney's message: {value}")
-
-
-tfidf = TfidfVectorizer(min_df=2, max_df = 0.5, ngram_range=(1, 1))
-features = tfidf.fit_transform(corpus.keys())
-print(features.shape)
-
+            corpus[prior_message] = barneys_message
 
 def respond(input):
+    corpus_df = pd.DataFrame({"prior_message": list(corpus.keys()), "barneys_message": list(corpus.values())})
+
+    tfidf = TfidfVectorizer(min_df=2, max_df = 0.5, ngram_range=(1, 2))
+    prior_messages_tfidf = tfidf.fit_transform(corpus_df.prior_message)
     input_tfidf = tfidf.transform([input])
-    similarities = cosine_similarity(input_tfidf, features)
+
+    similarities = cosine_similarity(input_tfidf, prior_messages_tfidf)
     idx = np.argsort(similarities)[0][-1]
-    print(idx)
-
-    return
-
-print(respond("test"))
+    sorted_values = np.sort(similarities)
+    print(len(tfidf.get_feature_names_out()))
+    return corpus_df.loc[idx, "barneys_message"]
