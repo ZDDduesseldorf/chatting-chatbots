@@ -7,31 +7,19 @@ import transformer
 
 ks.backend.clear_session()
 
-VOCAB_SIZE = helpers.get_vocab_size()
-NUM_LAYERS = int(os.environ.get('NUM_LAYERS'))
-UNITS = int(os.environ.get('UNITS'))
-D_MODEL = int(os.environ.get('D_MODEL'))
-NUM_HEADS = int(os.environ.get('NUM_HEADS'))
-DROPOUT = float(os.environ.get('DROPOUT'))
-MAX_LENGTH = int(os.environ.get('MAX_LENGTH'))
-MAX_SAMPLES = int(os.environ.get('MAX_SAMPLES'))
-EPOCHS = int(os.environ.get('EPOCHS'))
-
 load_dotenv()
 
 START_TOKEN, END_TOKEN = helpers.get_start_and_end_tokens()
 tokenizer = helpers.get_tokenizer()
 model = transformer.transformer(
-    vocab_size=VOCAB_SIZE,
-    num_layers=NUM_LAYERS,
-    units=UNITS,
-    d_model=D_MODEL,
-    num_heads=NUM_HEADS,
-    dropout=DROPOUT)
+    vocab_size=helpers.VOCAB_SIZE,
+    num_layers=helpers.NUM_LAYERS,
+    units=helpers.UNITS,
+    d_model=helpers.D_MODEL,
+    num_heads=helpers.NUM_HEADS,
+    dropout=helpers.DROPOUT)
 
-path = f"./models/{EPOCHS}EPOCHS_{MAX_SAMPLES}SAMPLES_{MAX_LENGTH}LENGTH/"
-
-model.load_weights(path)
+model.load_weights(f"{helpers.model_path}/{helpers.EPOCHS}Epo_wghts")
 
 
 def evaluate(sentence):
@@ -42,7 +30,7 @@ def evaluate(sentence):
 
     output = tf.expand_dims(START_TOKEN, 0)
 
-    for i in range(MAX_LENGTH):
+    for i in range(helpers.MAX_LENGTH):
         predictions = model(
             inputs=[sentence, output], training=False)
 
@@ -72,4 +60,4 @@ def predict(sentence):
 
 while (True):
     inp = input('Say something: ')
-    print('Jimmy: ', predict(inp))
+    print('Optimus Rhyme: ', predict(inp))
