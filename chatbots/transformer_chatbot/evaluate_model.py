@@ -2,7 +2,6 @@ import tensorflow as tf
 import tensorflow.python.keras as ks
 import helpers
 from dotenv import load_dotenv
-import os
 import transformer
 
 ks.backend.clear_session()
