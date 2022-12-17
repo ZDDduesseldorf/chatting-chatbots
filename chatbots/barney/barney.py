@@ -1,14 +1,15 @@
-import os
-import config
 import csv
+import os
+from typing import Dict
+
+import config
+import numpy as np
+import pandas as pd
 from config import csv_quotechar, csv_separator
-import pandas as pd 
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
-import numpy as np
 
-
-corpus = {}
+corpus: Dict[str,str] = {}
 
 for file_name in os.listdir(config.processed_resources_folder_name):
     path = os.path.join(config.processed_resources_folder_name, file_name)
@@ -17,12 +18,12 @@ for file_name in os.listdir(config.processed_resources_folder_name):
         continue
 
     # check if file is to small
-    with open(path, "r") as file:
+    with open(path, "r", encoding="utf-8") as file:
         lines = file.readlines()
         if len(lines) < 15:
             continue
 
-    with open(path, "r") as csvfile:
+    with open(path, "r", encoding="utf-8") as csvfile:
         reader = csv.reader(csvfile, delimiter=csv_separator, quotechar=csv_quotechar)
         
         for prior_message, barneys_message in reader:
@@ -31,15 +32,13 @@ for file_name in os.listdir(config.processed_resources_folder_name):
                 continue
             corpus[prior_message] = barneys_message
 
-def respond(input):
+def respond(user_input: str) -> str:
     corpus_df = pd.DataFrame({"prior_message": list(corpus.keys()), "barneys_message": list(corpus.values())})
 
     tfidf = TfidfVectorizer(min_df=2, max_df = 0.5, ngram_range=(1, 2))
     prior_messages_tfidf = tfidf.fit_transform(corpus_df.prior_message)
-    input_tfidf = tfidf.transform([input])
+    input_tfidf = tfidf.transform([user_input])
 
     similarities = cosine_similarity(input_tfidf, prior_messages_tfidf)
     idx = np.argsort(similarities)[0][-1]
-    sorted_values = np.sort(similarities)
-    print(len(tfidf.get_feature_names_out()))
     return corpus_df.loc[idx, "barneys_message"]
