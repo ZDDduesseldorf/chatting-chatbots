@@ -1,7 +1,7 @@
 import json
 
 
-class Message():
+class Message:
     def __init__(self, message, bot_id, bot_name):
         self.__message = message
         self.__bot_id = bot_id
@@ -34,6 +34,6 @@ class Message():
                 "type": "message",
                 "message": self.message,
                 "bot_id": self.bot_id,
-                "bot_name": self.bot_name
+                "bot_name": self.bot_name,
             }
         )
