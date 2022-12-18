@@ -23,13 +23,8 @@ D_MODEL = int(os.environ.get('D_MODEL'))
 UNITS = int(os.environ.get('UNITS'))
 DROPOUT = float(os.environ.get('DROPOUT'))
 
-for name in [
-    'DATASET_NAME', 'MAX_SAMPLES', 'TARGET_VOCAB_SIZE',
-    'MAX_LENGTH', 'BATCH_SIZE', 'BUFFER_SIZE',
-    'NUM_LAYERS', 'NUM_HEADS', 'EPOCHS', 'D_MODEL',
-    'UNITS', 'DROPOUT',
-]:
-    exec(f'print(f"{name}: {{{name}}}")')
+with open('.env', 'r') as f:
+    print(f.read())
 
 
 def ensure_dir(dir):
