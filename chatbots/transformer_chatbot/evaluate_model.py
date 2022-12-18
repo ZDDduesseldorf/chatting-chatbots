@@ -55,5 +55,7 @@ def predict(sentence):
 
 
 while (True):
-    inp = input('Say something: ')
-    print('Optimus Rhyme: ', predict(inp))
+    inp = input('> ')
+    if inp in ["q", "quit", "exit"]:
+        break
+    print(predict(inp))
