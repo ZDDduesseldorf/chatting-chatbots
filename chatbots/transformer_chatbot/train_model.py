@@ -34,8 +34,6 @@ model.compile(
     metrics=['accuracy'])
 
 train_dataset, val_dataset = helpers.get_datasets()
-print("DATASET LOADED!!")
-print(train_dataset)
 
 helpers.ensure_dir(helpers.LOGS_DIR)
 tensorboard_callback = ks.callbacks.TensorBoard(log_dir=helpers.LOGS_DIR)
