@@ -1,4 +1,4 @@
-from moderator_bot import Message
+from message import Message
 
 full_conversation = [
     Message("Are you a fan of Google or Microsoft?", "1", "Freddy"),
@@ -6,7 +6,7 @@ full_conversation = [
     Message("I'm not  a huge fan of Google, but I use it a lot because I have to. I think they are a monopoly in some sense.", "3", "Jefrey"),
     Message("Google provides online related services and products, which includes online ads, search engine and cloud computing.", "4", "Tom"),
     Message("Yeah, their services are good. I'm just not a fan of intrusive they can be on our personal lives.", "5", "Lisa"),
-    ]
+]
 
 all_possible_message = [
     Message("Google is leading the alphabet subsidiary and will continue to be the Umbrella company for Alphabet internet interest.", "1", "Freddy"),
@@ -14,4 +14,4 @@ all_possible_message = [
     Message("I like to dance every night.", "3", "Jefrey"),
     Message("Some companies are good, some are bad.", "4", "Tom"),
     Message("Ok, bye", "5", "Lisa")
-    ]
+]
