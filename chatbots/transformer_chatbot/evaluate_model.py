@@ -1,12 +1,9 @@
 import tensorflow as tf
 import tensorflow.python.keras as ks
 import helpers
-from dotenv import load_dotenv
 import transformer
 
 ks.backend.clear_session()
-
-load_dotenv()
 
 START_TOKEN, END_TOKEN = helpers.get_start_and_end_tokens()
 tokenizer = helpers.get_tokenizer()
@@ -18,7 +15,7 @@ model = transformer.transformer(
     num_heads=helpers.NUM_HEADS,
     dropout=helpers.DROPOUT)
 
-model.load_weights(f"{helpers.model_path}/{helpers.EPOCHS}Epo_wghts")
+model.load_weights(helpers.WEIGHTS_PATH)
 
 
 def evaluate(sentence):

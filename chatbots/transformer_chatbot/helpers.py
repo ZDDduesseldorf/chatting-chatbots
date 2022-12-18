@@ -10,9 +10,10 @@ from halo import Halo
 load_dotenv()
 
 
+DATASET_NAME = os.environ.get('DATASET')
 MAX_SAMPLES = int(os.environ.get('MAX_SAMPLES'))
-VOCAB_SIZE = 2**int(os.environ.get('VOCAB_SIZE_EXPONENT'))
 MAX_LENGTH = int(os.environ.get('MAX_LENGTH'))
+VOCAB_SIZE = 2**int(os.environ.get('VOCAB_SIZE_EXPONENT'))
 BATCH_SIZE = int(os.environ.get('BATCH_SIZE'))
 BUFFER_SIZE = int(os.environ.get('BUFFER_SIZE'))
 NUM_LAYERS = int(os.environ.get('NUM_LAYERS'))
@@ -22,29 +23,39 @@ D_MODEL = int(os.environ.get('D_MODEL'))
 UNITS = int(os.environ.get('UNITS'))
 DROPOUT = float(os.environ.get('DROPOUT'))
 
-print(f"Dropout {DROPOUT}")
-print(f"VOCAB_SIZE {VOCAB_SIZE}")
-print(f"EPOCHS {EPOCHS}")
+for name in [
+    'DATASET_NAME', 'MAX_SAMPLES', 'VOCAB_SIZE',
+    'MAX_LENGTH', 'BATCH_SIZE', 'BUFFER_SIZE',
+    'NUM_LAYERS', 'NUM_HEADS', 'EPOCHS', 'D_MODEL',
+    'UNITS', 'DROPOUT',
+]:
+    exec(f'print(f"{name}: {{{name}}}")')
 
 
-def checkAndCreateDirectory(dir):
+def ensure_dir(dir):
     if os.path.exists(dir):
         print(f"Directory {dir} already exitsts")
         return True
     else:
         print(f"Directory {dir} created")
-        os.mkdir(dir)
-
+        os.makedirs(dir)
         return False
 
 
-directory = "./data/"
-dataset_path = f"{directory}{os.environ.get('DATASET')}/"
-tokenizer_path = f"{dataset_path}/{MAX_SAMPLES}Smp_{VOCAB_SIZE}VocabSize_Tokenizer"
-model_path = f"{dataset_path}{MAX_SAMPLES}Smp_{VOCAB_SIZE}Voc_{MAX_LENGTH}Len_{BATCH_SIZE}Bat_{BUFFER_SIZE}Buf_{NUM_LAYERS}Lay_{NUM_HEADS}Hed"
-checkAndCreateDirectory(directory)
-checkAndCreateDirectory(dataset_path)
-checkAndCreateDirectory(model_path)
+DATASET_KEY = f"{DATASET_NAME}/{MAX_SAMPLES}Smp_{MAX_LENGTH}Len"
+MODEL_KEY = f"{DATASET_KEY}/{BATCH_SIZE}Bat_{BUFFER_SIZE}Buf_{NUM_LAYERS}Lay_{NUM_HEADS}Hed_{EPOCHS}Epo"
+LOGS_KEY = MODEL_KEY.replace('/', '__')
+
+DATA_DIR = "data"
+TOKENIZER_DIR = f"{DATA_DIR}/{DATASET_NAME}"
+TOKENIZER_PATH = f"{DATA_DIR}/{DATASET_NAME}/Tokenizer_{VOCAB_SIZE}Voc"
+DATASET_DIR = f"{DATA_DIR}/{DATASET_KEY}"
+MODEL_DIR = f"{DATA_DIR}/{MODEL_KEY}"
+WEIGHTS_PATH = f"{MODEL_DIR}/weights"
+
+LOGS_DIR = f"logs/{LOGS_KEY}"
+
+ensure_dir(DATA_DIR)
 
 
 def preprocess_sentence(sentence):
@@ -60,32 +71,27 @@ def preprocess_sentence(sentence):
     return sentence
 
 
-def load_conversations():
+def load_conversations(max_samples):
     print(
-        f"Loading conversations from {directory}{os.environ.get('DATASET')}.csv")
-    df = pd.read_csv(f"{directory}{os.environ.get('DATASET')}.csv", sep=';')
+        f"Loading conversations from {DATA_DIR}/{DATASET_NAME}.csv")
+    df = pd.read_csv(f"{DATA_DIR}/{DATASET_NAME}.csv", sep=';')
     input_df = df['Input']
     output_df = df['Output']
 
-    if MAX_SAMPLES == 0:
+    if max_samples == 0:
         input_list = input_df.values.tolist()
         output_list = output_df.values.tolist()
     else:
-        input_list = input_df.values.tolist()[:MAX_SAMPLES]
-        output_list = output_df.values.tolist()[:MAX_SAMPLES]
+        input_list = input_df.values.tolist()[:max_samples]
+        output_list = output_df.values.tolist()[:max_samples]
 
     preprocessed_inputs, preprocessed_outputs = [], []
-    progress = tqdm(range(len(input_list) - 1))
+    progress = tqdm(range(len(input_list)))
     for index in progress:
         progress.set_description('Reading from csv')
-        input = input_list[index]
-        output = output_list[index]
+        preprocessed_inputs.append(preprocess_sentence(input_list[index]))
+        preprocessed_outputs.append(preprocess_sentence(output_list[index]))
 
-        if type(input) == str and type(output) == str:
-            # first preprocess then check for length?!
-            if len(input.split()) <= MAX_LENGTH and len(output.split()) <= MAX_LENGTH:
-                preprocessed_inputs.append(preprocess_sentence(input))
-                preprocessed_outputs.append(preprocess_sentence(output))
     return preprocessed_inputs, preprocessed_outputs
 
 
@@ -97,8 +103,9 @@ def tokenize_and_filter(inputs, outputs, tokenizer):
         # tokenize sentence
         sentence1 = START_TOKEN + tokenizer.encode(sentence1) + END_TOKEN
         sentence2 = START_TOKEN + tokenizer.encode(sentence2) + END_TOKEN
-        tokenized_inputs.append(sentence1)
-        tokenized_outputs.append(sentence2)
+        if len(sentence1) <= MAX_LENGTH and len(sentence2) <= MAX_LENGTH:
+            tokenized_inputs.append(sentence1)
+            tokenized_outputs.append(sentence2)
 
         # pad tokenized sentences
     tokenized_inputs = tf.keras.preprocessing.sequence.pad_sequences(
@@ -120,21 +127,22 @@ def get_vocab_size():
 
 
 def get_tokenizer():
-    if os.path.exists(f"{tokenizer_path}.subwords"):
+    if os.path.exists(f"{TOKENIZER_PATH}.subwords"):
         spinner = Halo(
-            text=f"Loading Tokenizer from {tokenizer_path}", spinner='dots')
+            text=f"Loading Tokenizer from {TOKENIZER_PATH}", spinner='dots')
         spinner.start()
         tokenizer = tfds.deprecated.text.SubwordTextEncoder.load_from_file(
-            tokenizer_path)
+            TOKENIZER_PATH)
     else:
+        ensure_dir(TOKENIZER_DIR)
         # Build tokenizer using tfds for both questions and answers
-        questions, answers = load_conversations()
+        questions, answers = load_conversations(0)
         spinner = Halo(
             text='Creating tokenizer and vocabulary ...', spinner='dots')
         spinner.start()
         tokenizer = tfds.deprecated.text.SubwordTextEncoder.build_from_corpus(
             questions + answers, target_vocab_size=VOCAB_SIZE)
-        tokenizer.save_to_file(tokenizer_path)
+        tokenizer.save_to_file(TOKENIZER_PATH)
 
     spinner.stop()
 
@@ -157,27 +165,27 @@ def create_and_save_dataset(x, y, name):
     dataset = dataset.shuffle(BUFFER_SIZE)
     dataset = dataset.batch(BATCH_SIZE)
     dataset = dataset.prefetch(tf.data.experimental.AUTOTUNE)
-    dataset_save = f"{model_path}/{name}"
-    checkAndCreateDirectory(dataset_save)
+
+    dataset_save = f"{DATASET_DIR}/{name}"
+    ensure_dir(dataset_save)
     tf.data.experimental.save(dataset, dataset_save)
     with open(f"{dataset_save}/element_spec", 'wb') as out_:
         pickle.dump(dataset.element_spec, out_)
 
+    return dataset
+
 
 def load_dataset(name):
-    dataset_save = f"{model_path}/{name}"
+    dataset_save = f"{DATASET_DIR}/{name}"
     with open(f"{dataset_save}/element_spec", 'rb') as in_:
         es = pickle.load(in_)
     return tf.data.experimental.load(dataset_save, es)
 
 
-def create_dataset():
-    print("Num GPUs Available: ", len(tf.config.list_physical_devices('GPU')))
-    load_dotenv()
+def init_datasets():
+    tf.random.set_seed(1234)
 
-    checkAndCreateDirectory(model_path)
-
-    questions, answers = load_conversations()
+    questions, answers = load_conversations(MAX_SAMPLES)
 
     tokenizer = get_tokenizer()
 
@@ -201,10 +209,18 @@ def create_dataset():
     spinner.start()
     train_dataset = create_and_save_dataset(
         train_questions, train_answers, "train")
-    val_dataset = create_and_save_dataset(val_questions, val_answers, "val")
+    val_dataset = create_and_save_dataset(
+        val_questions, val_answers, "val")
     spinner.stop()
 
     print('Size training samples:', len(train_questions))
     print('Size val samples:', len(val_questions))
 
     return train_dataset, val_dataset
+
+
+def get_datasets():
+    if ensure_dir(DATASET_DIR):
+        return load_dataset("train"), load_dataset("val")
+    else:
+        return init_datasets()
