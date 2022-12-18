@@ -62,11 +62,37 @@ def load_conversations(datapath, filename):
         output = output_list[index]
 
         if type(input) == str and type(output) == str:
+            input = preprocess_sentence(input)
+            output = preprocess_sentence(output)
             max_sentence_length = MAX_LENGTH - 2
-            if (len(input.split()) <= max_sentence_length and len(output.split()) <= max_sentence_length
-                    and len(output.split()) > MIN_LENGTH and len(output.split()) > MIN_LENGTH):
-                preprocessed_inputs.append(preprocess_sentence(input))
-                preprocessed_outputs.append(preprocess_sentence(output))
+            output_words = output.split()
+            append = True
+            if len(output_words) > max_sentence_length:
+                output_words = output_words[:max_sentence_length-1]
+                append = False
+                if "?" in output_words:
+                    index = output_words.index("?")
+                    if index > 0:
+                        output_words = output_words[:index+1]
+                        output = " ".join(output_words)
+                        append = True
+                else:
+                    if "!" in output_words:
+                        index = output_words.index("!")
+                        if index > 0:
+                            output_words = output_words[:index+1]
+                            output = " ".join(output_words)
+                            append = True
+                    else:
+                        if "." in output_words:
+                            index = output_words.index(".")
+                            if index > 0 and output_words[index-1] != 'www':
+                                output_words = output_words[:index+1]
+                                output = " ".join(output_words)
+                                append = True
+            if append:
+                preprocessed_inputs.append(input)
+                preprocessed_outputs.append(output)
     return preprocessed_inputs, preprocessed_outputs
 
 

@@ -17,7 +17,7 @@ MAX_LENGTH = int(os.environ.get('MAX_LENGTH'))
 MAX_SAMPLES = int(os.environ.get('MAX_SAMPLES'))
 
 datapath = './data/'
-path = f"{datapath}{EPOCHS}EPOCHS_{MAX_SAMPLES}SAMPLES_{MAX_LENGTH}LENGTH/"
+path = f"{datapath}{MAX_LENGTH}LENGTH/"
 filename = 'transformer_data.csv'
 os.mkdir(path)
 
