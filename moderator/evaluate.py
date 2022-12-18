@@ -52,6 +52,7 @@ def check_conversation_shares(full_conversation: List[Message], possible_message
         else:
             bot_message_count[message.bot_id] = 1
 
+    # final message ranking will be factored based on frequency of messages sent by bot_id
     for message in possible_message:
         if message.bot_id in bot_message_count:
             share = (bot_message_count[message.bot_id] /
@@ -63,3 +64,11 @@ def check_conversation_shares(full_conversation: List[Message], possible_message
         ranked_messages.append(message)
 
     return ranked_messages
+
+
+def select_highest_rated_message(ranked_messages: List[Message]):
+    highest_rated_message = ranked_messages[0]
+    for message in ranked_messages[1:]:
+        if message.ranking_number > highest_rated_message.ranking_number:
+            highest_rated_message = message
+    return highest_rated_message

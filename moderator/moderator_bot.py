@@ -7,7 +7,7 @@ from typing import List
 import datetime
 import csv
 import os
-from evaluate import check_sentence_simularity, check_conversation_shares
+from evaluate import check_sentence_simularity, check_conversation_shares, select_highest_rated_message
 from mock_conversation import all_possible_message, full_conversation
 from message import Message
 
@@ -25,17 +25,15 @@ conversation: List[Message] = []
 async def choose_next_message(full_conversation: List[Message], possible_next_messages: List[Message]):
 
     # add ranking points based on sentence simularities
-    list_of_ranked_messages = check_sentence_simularity(
+    messages_ranked_by_simularity = check_sentence_simularity(
         full_conversation, possible_next_messages)
     # factor message rankings based on message frequency
-    list_of_ranked_messages = check_conversation_shares(full_conversation,
-                                                        list_of_ranked_messages)
+    messages_ranked_by_conversation_shares = check_conversation_shares(full_conversation,
+                                                                       messages_ranked_by_simularity)
 
-    for item in list_of_ranked_messages:
-        print(item.message, item.ranking_number, item.bot_name)
-    # placeholder. currently a random answer is chosen as the next sentece
-    next_message = possible_next_messages[random.randint(
-        0, len(possible_next_messages)-1)]
+    # chose message with the higest ranking
+    next_message = select_highest_rated_message(
+        messages_ranked_by_conversation_shares)
     return next_message
 
 
