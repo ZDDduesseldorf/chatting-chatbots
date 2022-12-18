@@ -104,8 +104,6 @@ async def handler(websocket: WebSocketServerProtocol):
 
 
 async def main():
-    await choose_next_message(full_conversation, all_possible_message)
-    exit()
     global shutdown_event
     shutdown_event = asyncio.Event()
     async with server.serve(handler, "", 8080):
