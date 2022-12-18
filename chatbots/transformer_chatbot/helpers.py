@@ -13,7 +13,7 @@ load_dotenv()
 DATASET_NAME = os.environ.get('DATASET')
 MAX_SAMPLES = int(os.environ.get('MAX_SAMPLES'))
 MAX_LENGTH = int(os.environ.get('MAX_LENGTH'))
-VOCAB_SIZE = 2**int(os.environ.get('VOCAB_SIZE_EXPONENT'))
+TARGET_VOCAB_SIZE = 2**int(os.environ.get('VOCAB_SIZE_EXPONENT'))
 BATCH_SIZE = int(os.environ.get('BATCH_SIZE'))
 BUFFER_SIZE = int(os.environ.get('BUFFER_SIZE'))
 NUM_LAYERS = int(os.environ.get('NUM_LAYERS'))
@@ -24,7 +24,7 @@ UNITS = int(os.environ.get('UNITS'))
 DROPOUT = float(os.environ.get('DROPOUT'))
 
 for name in [
-    'DATASET_NAME', 'MAX_SAMPLES', 'VOCAB_SIZE',
+    'DATASET_NAME', 'MAX_SAMPLES', 'TARGET_VOCAB_SIZE',
     'MAX_LENGTH', 'BATCH_SIZE', 'BUFFER_SIZE',
     'NUM_LAYERS', 'NUM_HEADS', 'EPOCHS', 'D_MODEL',
     'UNITS', 'DROPOUT',
@@ -48,7 +48,7 @@ LOGS_KEY = MODEL_KEY.replace('/', '__')
 
 DATA_DIR = "data"
 TOKENIZER_DIR = f"{DATA_DIR}/{DATASET_NAME}"
-TOKENIZER_PATH = f"{DATA_DIR}/{DATASET_NAME}/Tokenizer_{VOCAB_SIZE}Voc"
+TOKENIZER_PATH = f"{DATA_DIR}/{DATASET_NAME}/Tokenizer_{TARGET_VOCAB_SIZE}Voc"
 DATASET_DIR = f"{DATA_DIR}/{DATASET_KEY}"
 MODEL_DIR = f"{DATA_DIR}/{MODEL_KEY}"
 WEIGHTS_PATH = f"{MODEL_DIR}/weights"
@@ -141,7 +141,7 @@ def get_tokenizer():
             text='Creating tokenizer and vocabulary ...', spinner='dots')
         spinner.start()
         tokenizer = tfds.deprecated.text.SubwordTextEncoder.build_from_corpus(
-            questions + answers, target_vocab_size=VOCAB_SIZE)
+            questions + answers, target_vocab_size=TARGET_VOCAB_SIZE)
         tokenizer.save_to_file(TOKENIZER_PATH)
 
     spinner.stop()

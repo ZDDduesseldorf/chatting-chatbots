@@ -8,7 +8,7 @@ ks.backend.clear_session()
 START_TOKEN, END_TOKEN = helpers.get_start_and_end_tokens()
 tokenizer = helpers.get_tokenizer()
 model = transformer.transformer(
-    vocab_size=helpers.VOCAB_SIZE,
+    vocab_size=helpers.get_vocab_size(),
     num_layers=helpers.NUM_LAYERS,
     units=helpers.UNITS,
     d_model=helpers.D_MODEL,

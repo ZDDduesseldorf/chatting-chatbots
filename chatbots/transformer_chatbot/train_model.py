@@ -12,7 +12,7 @@ if len(helpers.WEIGHTS_PATH) >= 91:
 tf.keras.backend.clear_session()
 
 model = transformer.transformer(
-    vocab_size=helpers.VOCAB_SIZE,
+    vocab_size=helpers.get_vocab_size(),
     num_layers=helpers.NUM_LAYERS,
     units=helpers.UNITS,
     d_model=helpers.D_MODEL,
