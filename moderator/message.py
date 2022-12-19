@@ -4,6 +4,7 @@ import json
 class Message():
     def __init__(self, message, bot_id, bot_name):
         self.__message = message
+        self.__message_lemma = message
         self.__bot_id = bot_id
         self.__bot_name = bot_name
         self.__ranking_number = 0.0
@@ -27,6 +28,14 @@ class Message():
     @ranking_number.setter
     def ranking_number(self, value):
         self.__ranking_number = value
+        
+    @property
+    def message_lemma(self):
+        return self.__message_lemma
+    
+    @message_lemma.setter
+    def message_lemma(self, value):
+        self.__message_lemma = value
 
     def to_json_event_string(self) -> str:
         return json.dumps(

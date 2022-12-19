@@ -7,22 +7,16 @@ nlp = spacy.load("en_core_web_lg")
 
 
 def check_sentence_similarity(full_conversation: List[Message], possible_next_messages: List[Message]) -> List[Message]:
-    ###
-    # lematizing? enable is_alpha? ueberpruefen wie man das vor der similarity berechnung enablen kann
-    ###
-
-    print('Quantity of possible answers:', len(possible_next_messages))
     if len(full_conversation) == 0:
         return possible_next_messages
 
     possible_next_messages_ranked: List[Message] = []
-    prev_message = full_conversation[-1].message
+    prev_message = full_conversation[-1].message_lemma
     prev_message_doc = nlp(prev_message)  # spacy nlp
 
     for message in possible_next_messages:
-        message_doc = nlp(message.message)
+        message_doc = nlp(message.message_lemma)
         similarity = prev_message_doc.similarity(message_doc)
-        print('Similarity: ', similarity)
         message.ranking_number += similarity
         # treshhold if sentences are to similar or loop happend
         if similarity > 0.95 or loop_checker(full_conversation, message.message):
@@ -73,3 +67,12 @@ def select_highest_rated_message(ranked_messages: List[Message]):
         if message.ranking_number > highest_rated_message.ranking_number:
             highest_rated_message = message
     return highest_rated_message
+
+
+def lemmatize_messages(possible_messages: List[Message]) -> None:
+    for message in possible_messages:
+        lemmatized_message = ""
+        message_doc = nlp(message.message)
+        for token in message_doc:
+            lemmatized_message = lemmatized_message + token.lemma_ + " "
+        message.message_lemma = lemmatized_message.strip().lower()
