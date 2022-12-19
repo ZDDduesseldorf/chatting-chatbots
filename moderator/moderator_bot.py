@@ -6,7 +6,7 @@ import os
 import random
 from typing import List
 
-from evaluate import (check_conversation_shares, check_sentence_simularity,
+from evaluate import (check_conversation_shares, check_sentence_similarity,
                       select_highest_rated_message)
 from message import Message
 from mock_conversation import all_possible_message, full_conversation
@@ -27,11 +27,11 @@ conversation: List[Message] = []
 async def choose_next_message(full_conversation: List[Message], possible_next_messages: List[Message]):
 
     # add ranking points based on sentence simularities
-    messages_ranked_by_simularity = check_sentence_simularity(
+    messages_ranked_by_similarity = check_sentence_similarity(
         full_conversation, possible_next_messages)
     # factor message rankings based on message frequency
     messages_ranked_by_conversation_shares = check_conversation_shares(full_conversation,
-                                                                       messages_ranked_by_simularity)
+                                                                       messages_ranked_by_similarity)
 
     # chose message with the higest ranking
     next_message = select_highest_rated_message(
@@ -112,5 +112,5 @@ asyncio.run(main())
 
 # if __name__ == "__main__":
 #     # Testing area
-#     for message in check_sentence_simularity(full_conversation, all_possible_message):
+#     for message in check_sentence_similarity(full_conversation, all_possible_message):
 #         print(f'Message: {message.message}, Ranking: {message.ranking_number}, BotID: {message.bot_id} ')

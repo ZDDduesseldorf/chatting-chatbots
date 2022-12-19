@@ -6,9 +6,9 @@ from message import Message
 nlp = spacy.load("en_core_web_lg")
 
 
-def check_sentence_simularity(full_conversation: List[Message], possible_next_messages: List[Message]) -> List[Message]:
+def check_sentence_similarity(full_conversation: List[Message], possible_next_messages: List[Message]) -> List[Message]:
     ###
-    # lematizing? enable is_alpha? ueberpruefen wie man das vor der simularity berechnung enablen kann
+    # lematizing? enable is_alpha? ueberpruefen wie man das vor der similarity berechnung enablen kann
     ###
 
     print('Quantity of possible answers:', len(possible_next_messages))
@@ -21,12 +21,12 @@ def check_sentence_simularity(full_conversation: List[Message], possible_next_me
 
     for message in possible_next_messages:
         message_doc = nlp(message.message)
-        simularity = prev_message_doc.similarity(message_doc)
-        print('Simularity: ', simularity)
-        message.ranking_number += simularity
-        # treshhold if sentences are to simular or loop happend
-        if simularity > 0.95 or loop_checker(full_conversation, message.message):
-            message.ranking_number = -5.0
+        similarity = prev_message_doc.similarity(message_doc)
+        print('Similarity: ', similarity)
+        message.ranking_number += similarity
+        # treshhold if sentences are to similar or loop happend
+        if similarity > 0.95 or loop_checker(full_conversation, message.message):
+            message.ranking_number = -5.0 + similarity
         possible_next_messages_ranked.append(message)
 
     return possible_next_messages_ranked
