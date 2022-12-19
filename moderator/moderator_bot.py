@@ -9,7 +9,7 @@ from typing import List
 from evaluate import (check_conversation_shares, check_sentence_similarity,
                       select_highest_rated_message, lemmatize_messages)
 from message import Message
-from mock_conversation import all_possible_message, full_conversation
+from mock_conversation import all_possible_messages, full_conversation
 from websockets import server
 from websockets.legacy.server import WebSocketServerProtocol
 
@@ -112,8 +112,11 @@ async def main():
 
 asyncio.run(main())
 
-# if __name__ == "__main__":
-#     # Testing area
-#     lemmatize_messages(all_possible_message)
-#     for message in check_sentence_similarity(full_conversation, all_possible_message):
-#         print(f'Message: {message.message}, Lemma: {message.message_lemma}, Ranking: {message.ranking_number}, BotID: {message.bot_id}')
+#from evaluate import check_object_subject_similarity 
+#if __name__ == "__main__":
+#    # Testing area
+#    for message in all_possible_messages:
+#        check_object_subject_similarity(full_conversation, message)
+#    lemmatize_messages(all_possible_messages)
+#    for message in check_sentence_similarity(full_conversation, all_possible_messages):
+#        print(f'Message: {message.message}, Lemma: {message.message_lemma}, Ranking: {message.ranking_number}, BotID: {message.bot_id}')

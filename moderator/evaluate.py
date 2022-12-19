@@ -76,3 +76,62 @@ def lemmatize_messages(possible_messages: List[Message]) -> None:
         for token in message_doc:
             lemmatized_message = lemmatized_message + token.lemma_ + " "
         message.message_lemma = lemmatized_message.strip().lower()
+
+
+def get_subjects_and_objects(sentence):
+    sent = nlp(sentence)
+    ret = []
+    for token in sent:
+        if "nsubj" in token.dep_:
+            subtree = list(token.subtree)
+            start = subtree[0].i
+            end = subtree[-1].i + 1
+            ret.append(str(sent[start:end]).lower())
+            
+        if "dobj" in token.dep_:
+            subtree = list(token.subtree)
+            start = subtree[0].i
+            end = subtree[-1].i + 1
+            ret.append(str(sent[start:end]).lower())
+            
+    return ret
+
+
+def check_object_subject_similarity(full_conversation: List[Message], possible_next_message: Message, window_size: int = 5):
+    # get subjects and objects of message
+    msg_parts = get_subjects_and_objects(possible_next_message.message)
+    
+    # get subjects and objects of conversation
+    conv_parts = []
+    for message in full_conversation[-window_size:]:
+        conv_parts.extend(get_subjects_and_objects(message.message))
+        
+    # remove irrelevant subjects and objects like i or they
+    irrelevant_parts = ["i", "you", "they", "it", "he", "she", "we", "me", "him", "her", "us", "them",
+                        "my", "your", "their", "its", "his", "her", "our", "mine", "yours", "theirs", "ours",
+                        "myself", "yourself", "himself", "herself", "itself", "ourselves", "yourselves", "themselves"]
+    
+    for part in irrelevant_parts:
+        while part in conv_parts:
+            conv_parts.remove(part)
+        while part in msg_parts:
+            msg_parts.remove(part)
+    
+    #print("conv_parts:")
+    #print(conv_parts)
+    #print("msg_parts:")
+    #print(msg_parts)
+    
+    # score sinks further down the conversation. 0 if no match
+    score = 1
+    for conv_part in conv_parts:    
+        for msg_part in msg_parts:
+            if msg_part == conv_part:
+                print("match! with score ", score)
+                print("msg_part = ", msg_part)
+                print("conv_part = ", conv_part)
+                return score
+        score = score * 0.9
+        
+    print("total score = ", 0)
+    return 0
