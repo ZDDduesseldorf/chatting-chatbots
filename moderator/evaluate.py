@@ -78,6 +78,9 @@ def lemmatize_messages(possible_messages: List[Message]) -> None:
         message.message_lemma = lemmatized_message.strip().lower()
 
 
+irrelevant_phrases = ["i", "you", "they", "it", "he", "she", "we", "me", "him", "her", "us", "them",
+                      "my", "your", "their", "its", "his", "her", "our", "mine", "yours", "theirs", "ours",
+                      "myself", "yourself", "himself", "herself", "itself", "ourselves", "yourselves", "themselves"]
 def get_subjects_and_objects(sentence):
     sent = nlp(sentence)
     ret = []
@@ -93,45 +96,32 @@ def get_subjects_and_objects(sentence):
             start = subtree[0].i
             end = subtree[-1].i + 1
             ret.append(str(sent[start:end]).lower())
+
+    # remove irrelevant subjects and objects like i or they
+    for phrase in irrelevant_phrases:
+        while phrase in ret:
+            ret.remove(phrase)
             
     return ret
 
 
 def check_object_subject_similarity(full_conversation: List[Message], possible_next_message: Message, window_size: int = 5):
     # get subjects and objects of message
-    msg_parts = get_subjects_and_objects(possible_next_message.message)
+    msg_phrases = get_subjects_and_objects(possible_next_message.message)
     
     # get subjects and objects of conversation
-    conv_parts = []
+    conv_phrases = []
     for message in full_conversation[-window_size:]:
-        conv_parts.extend(get_subjects_and_objects(message.message))
+        conv_phrases.extend(get_subjects_and_objects(message.message))
+    
+    # relevance sinks further down the conversation
+    relevance = 1
+    for conv_phrase in msg_phrases:
+        for msg_phrase in conv_phrases:
+            sim = nlp(msg_phrase).similarity(nlp(conv_phrase))
+            #print(sim, " for ", msg_phrase, " and ", conv_phrase)
+            if sim >= 0.8:
+                return sim * relevance
+        relevance = relevance * 0.9
         
-    # remove irrelevant subjects and objects like i or they
-    irrelevant_parts = ["i", "you", "they", "it", "he", "she", "we", "me", "him", "her", "us", "them",
-                        "my", "your", "their", "its", "his", "her", "our", "mine", "yours", "theirs", "ours",
-                        "myself", "yourself", "himself", "herself", "itself", "ourselves", "yourselves", "themselves"]
-    
-    for part in irrelevant_parts:
-        while part in conv_parts:
-            conv_parts.remove(part)
-        while part in msg_parts:
-            msg_parts.remove(part)
-    
-    #print("conv_parts:")
-    #print(conv_parts)
-    #print("msg_parts:")
-    #print(msg_parts)
-    
-    # score sinks further down the conversation. 0 if no match
-    score = 1
-    for conv_part in conv_parts:    
-        for msg_part in msg_parts:
-            if msg_part == conv_part:
-                print("match! with score ", score)
-                print("msg_part = ", msg_part)
-                print("conv_part = ", conv_part)
-                return score
-        score = score * 0.9
-        
-    print("total score = ", 0)
     return 0
