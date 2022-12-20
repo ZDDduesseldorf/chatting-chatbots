@@ -8,18 +8,30 @@ KEY = "66736225056eacd969c1"
 SECRET = "dbf65e68e6a3742dde34"
 CLUSTER = "eu"
 
+answers = []
 
-def evaluate_response(data):
-    print(data)
-    answer = input("Message: ")
+
+def evaluate(message):
+    # conversation shares, simalarity, ... calculation
+    ranked_message = message
+    return ranked_message
+
+
+def choose_answer():
+    return answers[0]
+
+
+def evaluate_response(message):
+    ranked_message = evaluate(message)
+    answers.append(ranked_message)
     pusher_client.trigger(
-        channels="chatting-chatbots", event_name="message", data=answer
+        channels="chatting-chatbots", event_name="message", data=choose_answer()
     )
 
 
 def connect_handler(data):
     channel = pysher_client.subscribe("chatting-chatbots")
-
+    # timeout 3s
     channel.bind("response", evaluate_response)
 
 
