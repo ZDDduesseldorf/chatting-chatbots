@@ -85,8 +85,11 @@ def load_conversations(max_samples):
     progress = tqdm(range(len(input_list)))
     for index in progress:
         progress.set_description('Reading from csv')
-        preprocessed_inputs.append(preprocess_sentence(input_list[index]))
-        preprocessed_outputs.append(preprocess_sentence(output_list[index]))
+        input = input_list[index]
+        output = output_list[index]
+        if type(input) == str and type(output) == str:
+            preprocessed_inputs.append(preprocess_sentence(input))
+            preprocessed_outputs.append(preprocess_sentence(output))
 
     return preprocessed_inputs, preprocessed_outputs
 
