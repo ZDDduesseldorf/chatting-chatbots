@@ -6,10 +6,10 @@ import os
 import random
 from typing import List
 
-from evaluate import (check_conversation_shares, check_sentence_simularity,
-                      select_highest_rated_message)
+from evaluate import (check_conversation_shares, check_sentence_similarity,
+                      select_highest_rated_message, lemmatize_messages)
 from message import Message
-from mock_conversation import all_possible_message, full_conversation
+from mock_conversation import all_possible_messages, full_conversation
 from websockets import server
 from websockets.legacy.server import WebSocketServerProtocol
 
@@ -26,12 +26,14 @@ conversation: List[Message] = []
 
 async def choose_next_message(full_conversation: List[Message], possible_next_messages: List[Message]):
 
+    # lemmatize messages
+    lemmatize_messages(possible_next_messages)
     # add ranking points based on sentence simularities
-    messages_ranked_by_simularity = check_sentence_simularity(
+    messages_ranked_by_similarity = check_sentence_similarity(
         full_conversation, possible_next_messages)
     # factor message rankings based on message frequency
     messages_ranked_by_conversation_shares = check_conversation_shares(full_conversation,
-                                                                       messages_ranked_by_simularity)
+                                                                       messages_ranked_by_similarity)
 
     # chose message with the higest ranking
     next_message = select_highest_rated_message(
@@ -110,7 +112,11 @@ async def main():
 
 asyncio.run(main())
 
-# if __name__ == "__main__":
-#     # Testing area
-#     for message in check_sentence_simularity(full_conversation, all_possible_message):
-#         print(f'Message: {message.message}, Ranking: {message.ranking_number}, BotID: {message.bot_id} ')
+#from evaluate import check_object_subject_similarity 
+#if __name__ == "__main__":
+#    # Testing area
+#    for message in all_possible_messages:
+#        check_object_subject_similarity(full_conversation, message)
+#    lemmatize_messages(all_possible_messages)
+#    for message in check_sentence_similarity(full_conversation, all_possible_messages):
+#        print(f'Message: {message.message}, Lemma: {message.message_lemma}, Ranking: {message.ranking_number}, BotID: {message.bot_id}')

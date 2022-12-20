@@ -8,7 +8,7 @@ full_conversation = [
     Message("Yeah, their services are good. I'm just not a fan of intrusive they can be on our personal lives.", "5", "Lisa"),
 ]
 
-all_possible_message = [
+all_possible_messages = [
     Message("Google is leading the alphabet subsidiary and will continue to be the Umbrella company for Alphabet internet interest.", "1", "Freddy"),
     Message("Sorry i don't get it.", "2", "Ben"),
     Message("I like to dance every night.", "3", "Jefrey"),
