@@ -4,11 +4,12 @@ import data
 import transformer
 
 params = helpers.Params()
+loader = data.DataLoader(params)
 
-START_TOKEN, END_TOKEN = data.get_start_and_end_tokens(params)
-tokenizer = data.get_tokenizer(params)
+tokenizer = loader.get_tokenizer()
+START_TOKEN, END_TOKEN = loader.get_start_and_end_tokens()
 
-model = transformer.transformer(params, data.get_vocab_size(params))
+model = transformer.transformer(params, loader.get_vocab_size())
 
 model.load_weights(params.weights_path)
 

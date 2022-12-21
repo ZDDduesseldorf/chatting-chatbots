@@ -5,8 +5,9 @@ import data
 import tensorflow.python.keras as ks
 
 params = helpers.Params()
+loader = data.DataLoader(params)
 
-model = transformer.transformer(params, data.get_vocab_size(params))
+model = transformer.transformer(params, loader.get_vocab_size())
 
 learning_rate = transformer.CustomSchedule(params.d_model)
 
@@ -40,7 +41,7 @@ model.compile(
     loss=loss_function,
     metrics=[accuracy])
 
-train_dataset, val_dataset = data.get_datasets(params)
+train_dataset, val_dataset = loader.get_datasets()
 
 helpers.ensure_dir(params.model_dir)
 helpers.ensure_dir(params.log_dir)
