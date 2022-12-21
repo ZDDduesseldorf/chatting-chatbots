@@ -1,6 +1,7 @@
 import tensorflow as tf
 import transformer
 import helpers
+import data
 import os
 from dotenv import load_dotenv
 import tensorflow.python.keras as ks
@@ -29,7 +30,8 @@ model = transformer.transformer(
     dropout=DROPOUT)
 
 
-model.load_weights(f"./models/{EPOCHS}EPOCHS_{MAX_SAMPLES}SAMPLES_10LENGTH_PERSIST/")
+model.load_weights(
+    f"./models/{EPOCHS}EPOCHS_{MAX_SAMPLES}SAMPLES_10LENGTH_PERSIST/")
 
 
 learning_rate = transformer.CustomSchedule(D_MODEL)
@@ -41,12 +43,13 @@ optimizer = tf.keras.optimizers.Adam(
 model.compile(optimizer=optimizer,
               loss=transformer.loss_function)
 
-train_dataset = helpers.load_dataset("train")
-val_dataset = helpers.load_dataset("val")
+train_dataset = data.load_dataset("train")
+val_dataset = data.load_dataset("val")
 
-logdir =f"logs/scalars/COMBINED_{EPOCHS}EPOCHS_{MAX_SAMPLES}SAMPLES_{MAX_LENGTH}LENGTH"
+logdir = f"logs/scalars/COMBINED_{EPOCHS}EPOCHS_{MAX_SAMPLES}SAMPLES_{MAX_LENGTH}LENGTH"
 tensorboard_callback = ks.callbacks.TensorBoard(log_dir=logdir)
 
-model.fit(train_dataset, epochs=10, validation_data=val_dataset, initial_epoch=10)
+model.fit(train_dataset, epochs=10,
+          validation_data=val_dataset, initial_epoch=10)
 
 model.save_weights(path)

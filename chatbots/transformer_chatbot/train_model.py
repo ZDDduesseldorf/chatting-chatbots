@@ -1,6 +1,7 @@
 import tensorflow as tf
 import transformer
 import helpers
+import data
 import tensorflow.python.keras as ks
 
 print("Num GPUs Available: ", len(tf.config.list_physical_devices('GPU')))
@@ -12,7 +13,7 @@ if len(helpers.WEIGHTS_PATH) >= 91:
 tf.keras.backend.clear_session()
 
 model = transformer.transformer(
-    vocab_size=helpers.get_vocab_size(),
+    vocab_size=data.get_vocab_size(),
     num_layers=helpers.NUM_LAYERS,
     units=helpers.UNITS,
     d_model=helpers.D_MODEL,
@@ -33,7 +34,7 @@ model.compile(
     loss=transformer.loss_function,
     metrics=['accuracy'])
 
-train_dataset, val_dataset = helpers.get_datasets()
+train_dataset, val_dataset = data.get_datasets()
 
 helpers.ensure_dir(helpers.LOGS_DIR)
 tensorboard_callback = ks.callbacks.TensorBoard(log_dir=helpers.LOGS_DIR)
