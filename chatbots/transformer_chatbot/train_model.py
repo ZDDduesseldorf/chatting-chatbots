@@ -18,7 +18,7 @@ MAX_SAMPLES = int(os.environ.get('MAX_SAMPLES'))
 MAX_LENGTH = int(os.environ.get('MAX_LENGTH'))
 EPOCHS = int(os.environ.get('EPOCHS'))
 
-path = f"./models/{EPOCHS}EPOCHS_{MAX_SAMPLES}SAMPLES_{MAX_LENGTH}LENGTH/"
+path = f"./models/merged/{EPOCHS}EPOCHS_{NUM_LAYERS}LAYERS_{NUM_HEADS}HEADS_{UNITS}UNITS_{D_MODEL}DMODEL_{MAX_LENGTH}MAX_LENGTH/"
 
 model = transformer.transformer(
     vocab_size=VOCAB_SIZE,
@@ -39,7 +39,7 @@ model.compile(optimizer=optimizer,
 train_dataset = helpers.load_dataset("train")
 val_dataset = helpers.load_dataset("val")
 
-logdir = f"logs/scalars/{EPOCHS}EPOCHS_{MAX_SAMPLES}SAMPLES_{MAX_LENGTH}LENGTH"
+logdir = f"logs/merged/scalars/{EPOCHS}EPOCHS_{NUM_LAYERS}LAYERS_{NUM_HEADS}HEADS_{UNITS}UNITS_{D_MODEL}DMODEL_{MAX_LENGTH}MAX_LENGTH"
 tensorboard_callback = ks.callbacks.TensorBoard(log_dir=logdir)
 checkpoint_callback = ks.callbacks.ModelCheckpoint(
     f"{path}best_model", save_best_only=True, save_weights_only=True)

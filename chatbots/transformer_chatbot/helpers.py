@@ -15,8 +15,8 @@ MAX_SAMPLES = int(os.environ.get('MAX_SAMPLES'))
 MAX_LENGTH = int(os.environ.get('MAX_LENGTH'))
 MIN_LENGTH = int(os.environ.get('MIN_LENGTH'))
 EPOCHS = int(os.environ.get('EPOCHS'))
-directory = './data/'
-path = f"{directory}{EPOCHS}EPOCHS_{MAX_SAMPLES}SAMPLES_{MAX_LENGTH}LENGTH/"
+directory = './data/merged/'
+path = f"{directory}{MAX_LENGTH}LENGTH/"
 
 
 def get_start_and_end_tokens():
@@ -38,7 +38,9 @@ def preprocess_sentence(sentence):
     # replacing everything with space except (a-z, A-Z, ".", "?", "!", ",")
     sentence = re.sub(r"[^a-zA-Z?.!,]+", " ", sentence)
     sentence = sentence.strip()
-    # adding a start and an end token to the sentence
+    # set dot at the end of sentence if there is no ?.!
+    if re.search('[.!?]$',sentence) is None:
+        sentence = sentence + '.'
     return sentence
 
 
