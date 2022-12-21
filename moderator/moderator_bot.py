@@ -3,13 +3,12 @@ import csv
 import datetime
 import json
 import os
-import random
 from typing import List
 
 from evaluate import (check_conversation_shares, check_sentence_similarity, check_topic_similarity,
                       select_highest_rated_message, lemmatize_messages)
 from message import Message
-from mock_conversation import all_possible_messages, full_conversation
+#from mock_conversation import all_possible_messages, full_conversation
 from websockets import server
 from websockets.legacy.server import WebSocketServerProtocol
 
