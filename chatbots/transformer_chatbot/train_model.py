@@ -45,18 +45,18 @@ train_dataset, val_dataset = data.get_datasets()
 helpers.ensure_dir(helpers.LOGS_DIR)
 tensorboard_callback = ks.callbacks.TensorBoard(log_dir=helpers.LOGS_DIR)
 
-#checkpoint_callback = ks.callbacks.ModelCheckpoint(
-#    f"{helpers.WEIGHTS_PATH}_best", save_best_only=True, save_weights_only=True)
+checkpoint_callback = ks.callbacks.ModelCheckpoint(
+    f"{helpers.WEIGHTS_PATH}_best", save_best_only=True, save_weights_only=True)
 
-#stop_early_callback = ks.callbacks.EarlyStopping(
-#    monitor='val_loss', patience=3)
+stop_early_callback = ks.callbacks.EarlyStopping(
+    monitor='val_loss', patience=3)
 
 
 model.fit(
     train_dataset,
     epochs=helpers.EPOCHS,
     validation_data=val_dataset,
-    callbacks=[tensorboard_callback])#, checkpoint_callback, stop_early_callback])
+    callbacks=[tensorboard_callback, checkpoint_callback, stop_early_callback])
 
 print(f"Saving model to path: {helpers.WEIGHTS_PATH}")
 
