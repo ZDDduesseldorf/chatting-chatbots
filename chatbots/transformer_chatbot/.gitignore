@@ -4,3 +4,4 @@ train_model.ipynb
 tokenizer.subwords
 ipynb_checkpoints/
 logs/
+.env

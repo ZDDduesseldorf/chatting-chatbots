@@ -1,22 +1,16 @@
 import tensorflow as tf
-import tensorflow.python.keras as ks
 import helpers
 import data
 import transformer
 
-ks.backend.clear_session()
+params = helpers.Params()
 
-START_TOKEN, END_TOKEN = data.get_start_and_end_tokens()
-tokenizer = data.get_tokenizer()
-model = transformer.transformer(
-    vocab_size=data.get_vocab_size(),
-    num_layers=helpers.NUM_LAYERS,
-    units=helpers.UNITS,
-    d_model=helpers.D_MODEL,
-    num_heads=helpers.NUM_HEADS,
-    dropout=helpers.DROPOUT)
+START_TOKEN, END_TOKEN = data.get_start_and_end_tokens(params)
+tokenizer = data.get_tokenizer(params)
 
-model.load_weights(helpers.WEIGHTS_PATH)
+model = transformer.transformer(params, data.get_vocab_size(params))
+
+model.load_weights(params.weights_path)
 
 
 def evaluate(sentence):
@@ -27,7 +21,7 @@ def evaluate(sentence):
 
     output = tf.expand_dims(START_TOKEN, 0)
 
-    for i in range(helpers.MAX_LENGTH):
+    for _ in range(params.max_length):
         predictions = model(
             inputs=[sentence, output], training=False)
 
@@ -56,7 +50,7 @@ def predict(sentence):
 
 
 while (True):
-    inp = input('> ')
+    inp = input('>> ')
     if inp in ["q", "quit", "exit"]:
         break
     print(predict(inp))

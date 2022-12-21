@@ -1,4 +1,5 @@
 import helpers
+from helpers import Params
 from tqdm import tqdm
 import tensorflow_datasets as tfds
 import tensorflow as tf
@@ -9,7 +10,7 @@ import pickle
 from halo import Halo
 
 
-def preprocess_sentence(sentence):
+def preprocess_sentence(sentence: str):
     sentence = sentence.lower().strip()
     # creating a space between a word and the punctuation following it
     # eg: "he is a boy." => "he is a boy ."
@@ -22,10 +23,13 @@ def preprocess_sentence(sentence):
     return sentence
 
 
-def load_conversations(max_samples):
-    print(
-        f"Loading conversations from {helpers.DATA_DIR}/{helpers.DATASET_NAME}.csv")
-    df = pd.read_csv(f"{helpers.DATA_DIR}/{helpers.DATASET_NAME}.csv", sep=';')
+def load_conversations(params: Params, max_samples: int = None):
+    if (max_samples == None):
+        max_samples = params.max_samples
+
+    path = f"{params.data_root}/{params.dataset}.csv"
+    print(f"Loading conversations from {path}")
+    df = pd.read_csv(path, sep=';')
     input_df = df['Input']
     output_df = df['Output']
 
@@ -49,7 +53,7 @@ def load_conversations(max_samples):
     return preprocessed_inputs, preprocessed_outputs
 
 
-def tokenize_and_filter(inputs, outputs, tokenizer):
+def tokenize_and_filter(params: Params, inputs, outputs, tokenizer):
     tokenized_inputs, tokenized_outputs = [], []
     START_TOKEN, END_TOKEN = [tokenizer.vocab_size], [tokenizer.vocab_size + 1]
 
@@ -57,102 +61,94 @@ def tokenize_and_filter(inputs, outputs, tokenizer):
         # tokenize sentence
         sentence1 = START_TOKEN + tokenizer.encode(sentence1) + END_TOKEN
         sentence2 = START_TOKEN + tokenizer.encode(sentence2) + END_TOKEN
-        if len(sentence1) <= helpers.MAX_LENGTH and len(sentence2) <= helpers.MAX_LENGTH:
+        if len(sentence1) <= params.max_length and len(sentence2) <= params.max_length:
             tokenized_inputs.append(sentence1)
             tokenized_outputs.append(sentence2)
 
         # pad tokenized sentences
     tokenized_inputs = tf.keras.preprocessing.sequence.pad_sequences(
-        tokenized_inputs, maxlen=helpers.MAX_LENGTH, padding='post')
+        tokenized_inputs, maxlen=params.max_length, padding='post')
     tokenized_outputs = tf.keras.preprocessing.sequence.pad_sequences(
-        tokenized_outputs, maxlen=helpers.MAX_LENGTH, padding='post')
+        tokenized_outputs, maxlen=params.max_length, padding='post')
 
     return tokenized_inputs, tokenized_outputs
 
 
-def get_start_and_end_tokens():
-    tokenizer = get_tokenizer()
+def get_start_and_end_tokens(params: Params):
+    tokenizer = get_tokenizer(params)
     return [tokenizer.vocab_size], [tokenizer.vocab_size + 1]
 
 
-def get_vocab_size():
-    tokenizer = get_tokenizer()
-    return tokenizer.vocab_size + 2
+def get_vocab_size(params: Params):
+    return get_tokenizer(params).vocab_size + 2
 
 
-def get_tokenizer():
-    if os.path.exists(f"{helpers.TOKENIZER_PATH}.subwords"):
+def get_tokenizer(params: Params):
+    if os.path.exists(f"{params.tokenizer_path}.subwords"):
         spinner = Halo(
-            text=f"Loading Tokenizer from {helpers.TOKENIZER_PATH}", spinner='dots')
+            text=f"Loading Tokenizer from {params.tokenizer_path}", spinner='dots')
         spinner.start()
         tokenizer = tfds.deprecated.text.SubwordTextEncoder.load_from_file(
-            helpers.TOKENIZER_PATH)
+            params.tokenizer_path)
     else:
-        helpers.ensure_dir(helpers.TOKENIZER_DIR)
+        helpers.ensure_dir(params.tokenizer_dir)
         # Build tokenizer using tfds for both questions and answers
-        questions, answers = load_conversations(0)
+        questions, answers = load_conversations(params, 0)
         spinner = Halo(
             text='Creating tokenizer and vocabulary ...', spinner='dots')
         spinner.start()
         tokenizer = tfds.deprecated.text.SubwordTextEncoder.build_from_corpus(
-            questions + answers, target_vocab_size=helpers.TARGET_VOCAB_SIZE)
-        tokenizer.save_to_file(helpers.TOKENIZER_PATH)
+            questions + answers, target_vocab_size=params.target_vocab_size)
+        tokenizer.save_to_file(params.tokenizer_path)
 
     spinner.stop()
 
     return tokenizer
 
 
-def create_and_save_dataset(x, y, name):
+def create_and_save_dataset(params: Params, x, y, name):
     # set validation dataset
-    dataset = tf.data.Dataset.from_tensor_slices((
-        {
-            'inputs': x,
-            'dec_inputs': y[:, :-1]
-        },
-        {
-            'outputs': y[:, 1:]
-        },
-    ))
+    dataset = tf.data.Dataset.from_tensor_slices(
+        ({'inputs': x, 'dec_inputs': y[:, :-1]}, {'outputs': y[:, 1:]}))
 
     dataset = dataset.cache()
-    dataset = dataset.shuffle(helpers.BUFFER_SIZE)
-    dataset = dataset.batch(helpers.BATCH_SIZE)
+    dataset = dataset.shuffle(params.buffer_size)
+    dataset = dataset.batch(params.batch_size)
     dataset = dataset.prefetch(tf.data.experimental.AUTOTUNE)
 
-    dataset_save = f"{helpers.DATASET_DIR}/{name}"
-    helpers.ensure_dir(dataset_save)
-    tf.data.experimental.save(dataset, dataset_save)
-    with open(f"{dataset_save}/element_spec", 'wb') as out_:
+    dir = f"{params.dataset_dir}/{name}"
+    helpers.ensure_dir(dir)
+    tf.data.experimental.save(dataset, dir)
+    with open(f"{dir}/element_spec", 'wb') as out_:
         pickle.dump(dataset.element_spec, out_)
 
     return dataset
 
 
-def load_dataset(name):
-    dataset_save = f"{helpers.DATASET_DIR}/{name}"
-    with open(f"{dataset_save}/element_spec", 'rb') as in_:
+def load_dataset(params: Params, name):
+    dir = f"{params.dataset_dir}/{name}"
+    with open(f"{dir}/element_spec", 'rb') as in_:
         es = pickle.load(in_)
-    return tf.data.experimental.load(dataset_save, es)
+    return tf.data.experimental.load(dir, es)
 
 
-def init_datasets():
+def init_datasets(params: Params):
     tf.random.set_seed(1234)
 
-    questions, answers = load_conversations(helpers.MAX_SAMPLES)
+    questions, answers = load_conversations(params)
 
-    tokenizer = get_tokenizer()
+    tokenizer = get_tokenizer(params)
 
     spinner = Halo(
         text='Tokenize and filter dataset sentences ...', spinner='dots')
     spinner.start()
 
     # split dataset 70:30
-    val_split = int(len(questions)*(2/3))
+    val_split = int(len(questions)*(9/10))
     train_questions, train_answers = tokenize_and_filter(
-        questions[:val_split], answers[:val_split], tokenizer)
+        params, questions[:val_split], answers[:val_split], tokenizer)
     val_questions, val_answers = tokenize_and_filter(
-        questions[val_split:], answers[val_split:], tokenizer)
+        params, questions[val_split:], answers[val_split:], tokenizer)
 
     # split into train and test data
     spinner.stop()
@@ -162,9 +158,9 @@ def init_datasets():
     spinner = Halo(text='Create tensors from dataset ...', spinner='dots')
     spinner.start()
     train_dataset = create_and_save_dataset(
-        train_questions, train_answers, "train")
+        params, train_questions, train_answers, "train")
     val_dataset = create_and_save_dataset(
-        val_questions, val_answers, "val")
+        params, val_questions, val_answers, "val")
     spinner.stop()
 
     print('Size training samples:', len(train_questions))
@@ -173,8 +169,8 @@ def init_datasets():
     return train_dataset, val_dataset
 
 
-def get_datasets():
-    if os.path.exists(helpers.DATASET_DIR):
-        return load_dataset("train"), load_dataset("val")
+def get_datasets(params: Params):
+    if os.path.exists(params.dataset_dir):
+        return load_dataset(params, "train"), load_dataset(params, "val")
     else:
-        return init_datasets()
+        return init_datasets(params)
