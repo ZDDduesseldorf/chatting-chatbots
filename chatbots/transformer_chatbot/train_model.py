@@ -1,7 +1,6 @@
 import helpers
 import tensorflow as tf
 import transformer
-import helpers
 import data
 import tensorflow.python.keras as ks
 

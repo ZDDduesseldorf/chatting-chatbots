@@ -24,7 +24,7 @@ def preprocess_sentence(sentence: str):
 
 
 def load_conversations(params: Params, max_samples: int = None):
-    if (max_samples == None):
+    if (max_samples is None):
         max_samples = params.max_samples
 
     path = f"{params.data_root}/{params.dataset}.csv"
