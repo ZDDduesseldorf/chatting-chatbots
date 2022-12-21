@@ -174,7 +174,7 @@ def init_datasets():
 
 
 def get_datasets():
-    if helpers.ensure_dir(helpers.DATASET_DIR):
+    if os.path.exists(helpers.DATASET_DIR):
         return load_dataset("train"), load_dataset("val")
     else:
         return init_datasets()
