@@ -37,18 +37,3 @@ __pycache__/
 
 # conda build directory
 /_build
-.vs/ProjectSettings.json
-.vs/PythonSettings.json
-.vs/slnx.sqlite
-.vs/VSWorkspaceState.json
-.vs/chatting-chatbots/FileContentIndex/0a9d1f48-a8eb-48d3-a03f-272ab0b76dca.vsidx
-.vs/chatting-chatbots/FileContentIndex/59ae215c-dcf8-458c-8ea8-941e746d85fa.vsidx
-.vs/chatting-chatbots/FileContentIndex/727a8d74-014c-48ea-992c-82c303f1b1ca.vsidx
-.vs/chatting-chatbots/FileContentIndex/da5542b4-7e67-4877-8395-1aabe58e2d3a.vsidx
-.vs/chatting-chatbots/FileContentIndex/read.lock
-.vs/chatting-chatbots/v17/.wsuo
-chatbots/transformer_chatbot/.vs/ProjectSettings.json
-chatbots/transformer_chatbot/.vs/PythonSettings.json
-chatbots/transformer_chatbot/.vs/slnx.sqlite
-chatbots/transformer_chatbot/.vs/VSWorkspaceState.json
-moderator/test.py
