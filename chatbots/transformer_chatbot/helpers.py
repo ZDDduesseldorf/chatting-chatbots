@@ -1,4 +1,5 @@
 from dotenv import load_dotenv
+from pathlib import Path
 import os
 
 load_dotenv()
@@ -21,16 +22,6 @@ with open('.env', 'r') as f:
     print(f.read())
 
 
-def ensure_dir(dir):
-    if os.path.exists(dir):
-        print(f"Directory {dir} already exitsts")
-        return True
-    else:
-        print(f"Directory {dir} created")
-        os.makedirs(dir)
-        return False
-
-
 TOKENIZER_KEY = f"{DATASET_NAME}/{TARGET_VOCAB_SIZE}Voc"
 DATASET_KEY = f"{TOKENIZER_KEY}/{MAX_SAMPLES}Smp_{MAX_LENGTH}Len_{BATCH_SIZE}Bat_{BUFFER_SIZE}Buf"
 MODEL_KEY = f"{DATASET_KEY}/{NUM_LAYERS}Lay_{NUM_HEADS}Hed_{EPOCHS}Epo"
@@ -45,4 +36,6 @@ WEIGHTS_PATH = f"{MODEL_DIR}/weights"
 
 LOGS_DIR = f"logs/{LOGS_KEY}"
 
-ensure_dir(DATA_DIR)
+
+def ensure_dir(dir):
+    Path(dir).mkdir(parents=True, exist_ok=True)
