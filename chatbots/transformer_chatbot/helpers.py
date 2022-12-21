@@ -31,16 +31,17 @@ def get_vocab_size():
 
 def preprocess_sentence(sentence):
     sentence = sentence.lower().strip()
+    # set dot at the end of sentence if there is no ?.!
+    if re.search('[.!?]$',sentence) is None:
+        sentence = sentence + '.'
     # creating a space between a word and the punctuation following it
     # eg: "he is a boy." => "he is a boy ."
     sentence = re.sub(r"([?.!,])", r" \1 ", sentence)
     sentence = re.sub(r'[" "]+', " ", sentence)
     # replacing everything with space except (a-z, A-Z, ".", "?", "!", ",")
-    sentence = re.sub(r"[^a-zA-Z?.!,]+", " ", sentence)
+    sentence = re.sub(r"[^a-zA-Z0-9?.!,]+", " ", sentence)
     sentence = sentence.strip()
-    # set dot at the end of sentence if there is no ?.!
-    if re.search('[.!?]$',sentence) is None:
-        sentence = sentence + '.'
+    
     return sentence
 
 
@@ -68,31 +69,56 @@ def load_conversations(datapath, filename):
             output = preprocess_sentence(output)
             max_sentence_length = MAX_LENGTH - 2
             output_words = output.split()
-            append = True
+            input_words = input.split()
+            appendOutput = True
+            appendInput = True
             if len(output_words) > max_sentence_length:
                 output_words = output_words[:max_sentence_length-1]
-                append = False
+                appendOutput = False
                 if "?" in output_words:
                     index = output_words.index("?")
                     if index > 0:
                         output_words = output_words[:index+1]
                         output = " ".join(output_words)
-                        append = True
+                        appendOutput = True
                 else:
                     if "!" in output_words:
                         index = output_words.index("!")
                         if index > 0:
                             output_words = output_words[:index+1]
                             output = " ".join(output_words)
-                            append = True
+                            appendOutput = True
                     else:
                         if "." in output_words:
                             index = output_words.index(".")
                             if index > 0 and output_words[index-1] != 'www':
                                 output_words = output_words[:index+1]
                                 output = " ".join(output_words)
-                                append = True
-            if append:
+                                appendOutput = True
+            if len(input_words) > max_sentence_length:
+                input_words = input_words[:max_sentence_length-1]
+                appendInput = False
+                if "?" in input_words:
+                    index = input_words.index("?")
+                    if index > 0:
+                        input_words = input_words[:index+1]
+                        input = " ".join(input_words)
+                        appendInput = True
+                else:
+                    if "!" in input_words:
+                        index = input_words.index("!")
+                        if index > 0:
+                            input_words = input_words[:index+1]
+                            input = " ".join(input_words)
+                            appendInput = True
+                    else:
+                        if "." in input_words:
+                            index = input_words.index(".")
+                            if index > 0 and input_words[index-1] != 'www':
+                                input_words = input_words[:index+1]
+                                input = " ".join(input_words)
+                                appendInput = True                                
+            if appendOutput and appendInput:
                 preprocessed_inputs.append(input)
                 preprocessed_outputs.append(output)
     return preprocessed_inputs, preprocessed_outputs

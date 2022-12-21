@@ -32,7 +32,7 @@ spinner.stop()
 spinner = Halo(text='Tokenize and filter dataset sentences ...',
                spinner='monkey')
 spinner.start()
-# split dataset 70:30
+# split dataset 9:10
 val_split = int(len(questions)*(9/10))
 train_questions, train_answers = helpers.tokenize_and_filter(
     questions[:val_split], answers[:val_split])
