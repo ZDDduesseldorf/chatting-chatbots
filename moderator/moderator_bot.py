@@ -6,7 +6,7 @@ import os
 import random
 from typing import List
 
-from evaluate import (check_conversation_shares, check_sentence_similarity,
+from evaluate import (check_conversation_shares, check_sentence_similarity, check_topic_similarity,
                       select_highest_rated_message, lemmatize_messages)
 from message import Message
 from mock_conversation import all_possible_messages, full_conversation
@@ -28,16 +28,16 @@ async def choose_next_message(full_conversation: List[Message], possible_next_me
 
     # lemmatize messages
     lemmatize_messages(possible_next_messages)
-    # add ranking points based on sentence simularities
-    messages_ranked_by_similarity = check_sentence_similarity(
-        full_conversation, possible_next_messages)
-    # factor message rankings based on message frequency
-    messages_ranked_by_conversation_shares = check_conversation_shares(full_conversation,
-                                                                       messages_ranked_by_similarity)
 
-    # chose message with the higest ranking
-    next_message = select_highest_rated_message(
-        messages_ranked_by_conversation_shares)
+    # calculate scores
+    for message in possible_next_messages:
+        # message.similarity_score = check_sentence_similarity(full_conversation, message)
+        # message.share_score = check_conversation_shares(full_conversation, messages)
+        message.topic_score = check_topic_similarity(full_conversation, message)
+        message.calculate_ranking_number()
+
+    # choose message with the higest ranking
+    next_message = select_highest_rated_message(possible_next_messages)
     return next_message
 
 
