@@ -30,9 +30,10 @@ async def choose_next_message(full_conversation: List[Message], possible_next_me
 
     # calculate scores
     for message in possible_next_messages:
-        # message.similarity_score = check_sentence_similarity(full_conversation, message)
-        # message.share_score = check_conversation_shares(full_conversation, messages)
-        message.topic_score = check_topic_similarity(full_conversation, message)
+        # scores could be set to the message object in the check function or returned to be set here
+        #check_sentence_similarity(full_conversation, message)
+        #message.share_score = check_conversation_shares(full_conversation, message)
+        check_topic_similarity(full_conversation, message)
         message.calculate_ranking_number()
 
     # choose message with the higest ranking
