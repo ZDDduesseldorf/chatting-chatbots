@@ -29,21 +29,34 @@ optimizer = tf.keras.optimizers.Adam(
     epsilon=1e-9)
 
 
+def accuracy(y_true, y_pred):
+    # ensure labels have shape (batch_size, MAX_LENGTH - 1)
+    y_true = tf.reshape(y_true, shape=(-1, helpers.MAX_LENGTH - 1))
+    return tf.keras.metrics.sparse_categorical_accuracy(y_true, y_pred)
+
+
 model.compile(
     optimizer=optimizer,
     loss=transformer.loss_function,
-    metrics=['accuracy'])
+    metrics=[accuracy])
 
 train_dataset, val_dataset = data.get_datasets()
 
 helpers.ensure_dir(helpers.LOGS_DIR)
 tensorboard_callback = ks.callbacks.TensorBoard(log_dir=helpers.LOGS_DIR)
 
+#checkpoint_callback = ks.callbacks.ModelCheckpoint(
+#    f"{helpers.WEIGHTS_PATH}_best", save_best_only=True, save_weights_only=True)
+
+#stop_early_callback = ks.callbacks.EarlyStopping(
+#    monitor='val_loss', patience=3)
+
+
 model.fit(
     train_dataset,
     epochs=helpers.EPOCHS,
     validation_data=val_dataset,
-    callbacks=[tensorboard_callback])
+    callbacks=[tensorboard_callback])#, checkpoint_callback, stop_early_callback])
 
 print(f"Saving model to path: {helpers.WEIGHTS_PATH}")
 
