@@ -1,5 +1,6 @@
 import argparse
 from pathlib import Path
+from os.path import abspath
 
 
 def ensure_dir(dir: str):
@@ -52,9 +53,9 @@ class Params:
         dataset_key = f"{tokenizer_key}/{self.max_samples}Smp_{self.max_length}Len_{self.batch_size}Bat_{self.buffer_size}Buf"
         model_key = f"{dataset_key}/{self.num_layers}Lay_{self.num_heads}Hed_{self.epochs}Epo"
 
-        self.tokenizer_dir = f"{self.data_root}/{tokenizer_key}"
-        self.tokenizer_path = f"{self.tokenizer_dir}/tokenizer"
-        self.dataset_dir = f"{self.data_root}/{dataset_key}"
-        self.model_dir = f"{self.data_root}/{model_key}"
-        self.weights_path = f"{self.model_dir}/weights"
-        self.log_dir = f"logs/{model_key.replace('/', '__')}"
+        self.tokenizer_dir = abspath(f"{self.data_root}/{tokenizer_key}")
+        self.tokenizer_path = abspath(f"{self.tokenizer_dir}/tokenizer")
+        self.dataset_dir = abspath(f"{self.data_root}/{dataset_key}")
+        self.model_dir = abspath(f"{self.data_root}/{model_key}")
+        self.weights_path = abspath(f"{self.model_dir}/weights")
+        self.log_dir = abspath(f"logs/{model_key.replace('/', '__')}")
