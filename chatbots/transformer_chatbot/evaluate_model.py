@@ -1,14 +1,15 @@
 import tensorflow as tf
 import tensorflow.python.keras as ks
 import helpers
+import data
 import transformer
 
 ks.backend.clear_session()
 
-START_TOKEN, END_TOKEN = helpers.get_start_and_end_tokens()
-tokenizer = helpers.get_tokenizer()
+START_TOKEN, END_TOKEN = data.get_start_and_end_tokens()
+tokenizer = data.get_tokenizer()
 model = transformer.transformer(
-    vocab_size=helpers.get_vocab_size(),
+    vocab_size=data.get_vocab_size(),
     num_layers=helpers.NUM_LAYERS,
     units=helpers.UNITS,
     d_model=helpers.D_MODEL,
@@ -19,7 +20,7 @@ model.load_weights(helpers.WEIGHTS_PATH)
 
 
 def evaluate(sentence):
-    sentence = helpers.preprocess_sentence(sentence)
+    sentence = data.preprocess_sentence(sentence)
 
     sentence = tf.expand_dims(
         START_TOKEN + tokenizer.encode(sentence) + END_TOKEN, axis=0)
