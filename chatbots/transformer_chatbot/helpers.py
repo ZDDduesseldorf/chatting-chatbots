@@ -1,6 +1,14 @@
 import argparse
 from pathlib import Path
+import os
 from os.path import abspath
+import dotenv
+
+dotenv.load_dotenv()
+
+
+def env(name: str, default: str):
+    return os.environ.get(name, default)
 
 
 def ensure_dir(dir: str):
@@ -13,19 +21,33 @@ class Params:
 
         parser.add_argument("--data-root", default="data", type=str)
 
-        parser.add_argument("--dataset", default="merged", type=str)
-        parser.add_argument("--target-vocab-size-exp", default=14, type=int)
-        parser.add_argument("--max-samples", default=0, type=int)
-        parser.add_argument("--max-length", default=30, type=int)
-        parser.add_argument("--buffer-size", default=20000, type=int)
-        parser.add_argument("--batch-size", default=64, type=int)
-        parser.add_argument("--epochs", default=15, type=int)
+        parser.add_argument(
+            "--dataset", default=env("DATASET_NAME", "merged"), type=str)
+        parser.add_argument(
+            "--target-vocab-size-exp",
+            default=int(env("TARGET_VOCAB_SIZE_EXP", "14")),
+            type=int)
+        parser.add_argument(
+            "--max-samples", default=int(env("MAX_SAMPLES", "0")), type=int)
+        parser.add_argument(
+            "--max-length", default=int(env("MAX_LENGTH", "30")), type=int)
+        parser.add_argument(
+            "--buffer-size", default=int(env("BUFFER_SIZE", "20000")), type=int)
+        parser.add_argument(
+            "--batch-size", default=int(env("BATCH_SIZE", "64")), type=int)
+        parser.add_argument(
+            "--epochs", default=int(env("EPOCHS", "15")), type=int)
 
-        parser.add_argument("--num-layers", default=2, type=int)
-        parser.add_argument("--num-units", default=512, type=int)
-        parser.add_argument("--d-model", default=256, type=int)
-        parser.add_argument("--num-heads", default=8, type=int)
-        parser.add_argument("--dropout", default=0.1, type=float)
+        parser.add_argument(
+            "--num-layers", default=int(env("NUM_LAYERS", "2")), type=int)
+        parser.add_argument(
+            "--num-units", default=int(env("UNITS", "512")), type=int)
+        parser.add_argument(
+            "--d-model", default=int(env("D_MODEL", "256")), type=int)
+        parser.add_argument(
+            "--num-heads", default=int(env("NUM_HEADS", "8")), type=int)
+        parser.add_argument(
+            "--dropout", default=float(env("DROPOUT", "0.1")), type=float)
         parser.add_argument("--activation", default="relu", type=str)
 
         args = parser.parse_args()
