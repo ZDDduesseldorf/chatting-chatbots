@@ -1,5 +1,6 @@
 astroid==2.12.13
 beautifulsoup4==4.11.1
+black==22.12.0
 blis==0.7.9
 bs4==0.0.1
 catalogue==2.0.8
@@ -19,9 +20,11 @@ lazy-object-proxy==1.8.0
 MarkupSafe==2.1.1
 mccabe==0.7.0
 murmurhash==1.0.9
+mypy-extensions==0.4.3
 numpy==1.23.5
 packaging==22.0
 pandas==1.5.2
+pathspec==0.10.3
 pathy==0.10.1
 pkg_resources==0.0.0
 platformdirs==2.6.0

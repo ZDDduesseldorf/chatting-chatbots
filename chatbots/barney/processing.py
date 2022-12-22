@@ -2,9 +2,12 @@ import csv
 import os
 import re
 
-from config import (csv_quotechar, csv_separator,
-                    processed_resources_folder_name,
-                    scraped_resources_folder_name)
+from config import (
+    csv_quotechar,
+    csv_separator,
+    processed_resources_folder_name,
+    scraped_resources_folder_name,
+)
 
 for file_name in sorted(os.listdir(scraped_resources_folder_name)):
     input_path = os.path.join(scraped_resources_folder_name, file_name)
@@ -23,7 +26,7 @@ for file_name in sorted(os.listdir(scraped_resources_folder_name)):
     for line_index, line in enumerate(lines):
         index = line.find("Barney:")
         if index == 0:
-            previous_line = lines[line_index-1]
+            previous_line = lines[line_index - 1]
 
             # skip because Barney had the first line of the scene
             if previous_line == csv_separator:
@@ -31,11 +34,13 @@ for file_name in sorted(os.listdir(scraped_resources_folder_name)):
 
             # remove the name of the person speaking prior to Barney (and follwing collon and space)
             # don't cut text if there is no collon
-            text_start = previous_line.find(":") + 2 if previous_line.find(":") > 0 else 0
+            text_start = (
+                previous_line.find(":") + 2 if previous_line.find(":") > 0 else 0
+            )
             previous_line_text = previous_line[text_start:]
 
             # remove Barney's name and the folowing collon and space
-            questions_and_answers[previous_line_text] = line[len("Barney: "):]
+            questions_and_answers[previous_line_text] = line[len("Barney: ") :]
 
     output_path = os.path.join(processed_resources_folder_name, file_name + ".csv")
     with open(output_path, "w", newline="", encoding="utf-8") as file:
@@ -43,8 +48,7 @@ for file_name in sorted(os.listdir(scraped_resources_folder_name)):
             file,
             delimiter=csv_separator,
             quotechar=csv_quotechar,
-            quoting=csv.QUOTE_ALL
-            )
-        writer.writerow(["prior_message","barney_message"])
+            quoting=csv.QUOTE_ALL,
+        )
+        writer.writerow(["prior_message", "barney_message"])
         writer.writerows(questions_and_answers.items())
-        
