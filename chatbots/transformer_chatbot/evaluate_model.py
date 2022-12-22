@@ -7,7 +7,7 @@ params = helpers.Params()
 loader = data.DataLoader(params)
 
 tokenizer = loader.get_tokenizer()
-START_TOKEN, END_TOKEN = loader.get_start_and_end_tokens()
+START_TOKEN, END_TOKEN = [tokenizer.start_token], [tokenizer.end_token]
 
 model = transformer.transformer(params, loader.get_vocab_size())
 
@@ -23,8 +23,7 @@ def evaluate(sentence):
     output = tf.expand_dims(START_TOKEN, 0)
 
     for _ in range(params.max_length):
-        predictions = model(
-            inputs=[sentence, output], training=False)
+        predictions = model(inputs=[sentence, output], training=False)
 
         # select the last word from the seq_len dimension
         predictions = predictions[:, -1:, :]
@@ -45,7 +44,7 @@ def predict(sentence):
     prediction = evaluate(sentence)
 
     predicted_sentence = tokenizer.decode(
-        [i for i in prediction if i < tokenizer.vocab_size])
+        [i for i in prediction if i < tokenizer.corpus_vocab_size])
 
     return predicted_sentence
 

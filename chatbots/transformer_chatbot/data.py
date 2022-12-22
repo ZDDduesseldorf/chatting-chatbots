@@ -1,7 +1,7 @@
 import helpers
 from helpers import Params
+from lib.tokenizer import TransformerTokenizer
 from tqdm import tqdm
-import tensorflow_datasets as tfds
 import tensorflow as tf
 import re
 import pandas as pd
@@ -48,42 +48,49 @@ class DataLoader:
     def __init__(self, params: Params):
         self.params = params
         self._datasets: dict[str, tf.data.Dataset] = {}
-        self._tokenizer: any = None
+        self._tokenizer: TransformerTokenizer = None
         self._conversations: tuple[list, list] = None
         self._samples: int = None
 
-    def _create_or_load_tokenizer(self):
-        if os.path.exists(f"{self.params.tokenizer_path}.subwords"):
-            spinner = Halo(
-                text=f"Loading Tokenizer from {self.params.tokenizer_path}", spinner='dots')
-            spinner.start()
-            tokenizer = tfds.deprecated.text.SubwordTextEncoder.load_from_file(
-                self.params.tokenizer_path)
-            spinner.stop()
-            return tokenizer
-        else:
-            helpers.ensure_dir(self.params.tokenizer_dir)
-            # Build tokenizer using tfds for both questions and answers
-            questions, answers = self.get_conversations(0)
-            spinner = Halo(
-                text='Creating tokenizer and vocabulary ...', spinner='dots')
-            spinner.start()
-            tokenizer = tfds.deprecated.text.SubwordTextEncoder.build_from_corpus(
-                questions + answers, target_vocab_size=self.params.target_vocab_size)
-            tokenizer.save_to_file(self.params.tokenizer_path)
-            spinner.stop()
-            return tokenizer
+    def _load_tokenizer(self):
+        spinner = Halo(
+            text=f"Loading Tokenizer from {self.params.tokenizer_path}", spinner='dots')
+        spinner.start()
+
+        self._tokenizer = TransformerTokenizer.load_from_file(
+            self.params.tokenizer_path)
+
+        spinner.stop()
+
+    def _build_tokenizer(self):
+        inputs, outputs = self.get_conversations(0)
+
+        spinner = Halo(
+            text='Creating tokenizer and vocabulary ...',
+            spinner='dots')
+        spinner.start()
+
+        self._tokenizer = TransformerTokenizer.build_from_corpus(
+            inputs + outputs,
+            self.params.target_vocab_size)
+
+        helpers.ensure_dir(self.params.tokenizer_dir)
+        self._tokenizer.save_to_file(self.params.tokenizer_path)
+
+        spinner.stop()
 
     def get_tokenizer(self):
         if self._tokenizer is None:
-            self._tokenizer = self._create_or_load_tokenizer()
+            if os.path.exists(f"{self.params.tokenizer_path}.subwords"):
+                self._load_tokenizer()
+            else:
+                self._build_tokenizer()
         return self._tokenizer
 
     def _tokenize_and_filter(self, inputs, outputs):
         tokenizer = self.get_tokenizer()
         tokenized_inputs, tokenized_outputs = [], []
-        START_TOKEN, END_TOKEN = [tokenizer.vocab_size], [
-            tokenizer.vocab_size + 1]
+        START_TOKEN, END_TOKEN = [tokenizer.start_token], [tokenizer.end_token]
 
         for (sentence1, sentence2) in zip(inputs, outputs):
             # tokenize sentence
@@ -161,18 +168,14 @@ class DataLoader:
             text='Tokenize and filter dataset sentences ...', spinner='dots')
         spinner.start()
 
-        # split dataset 70:30
         val_split = int(len(questions)*(9/10))
         train_questions, train_answers = self._tokenize_and_filter(
             questions[:val_split], answers[:val_split])
         val_questions, val_answers = self._tokenize_and_filter(
             questions[val_split:], answers[val_split:])
 
-        # split into train and test data
         spinner.stop()
 
-        # decoder inputs use the previous target as input
-        # remove START_TOKEN from targets
         spinner = Halo(text='Create tensors from dataset ...', spinner='dots')
         spinner.start()
         train_dataset = self._create_and_save_dataset(
@@ -199,10 +202,3 @@ class DataLoader:
             return self.get_dataset("train"), self.get_dataset("val")
         else:
             return self._init_datasets()
-
-    def get_start_and_end_tokens(self):
-        tokenizer = self.get_tokenizer()
-        return [tokenizer.vocab_size], [tokenizer.vocab_size + 1]
-
-    def get_vocab_size(self) -> int:
-        return self.get_tokenizer().vocab_size + 2

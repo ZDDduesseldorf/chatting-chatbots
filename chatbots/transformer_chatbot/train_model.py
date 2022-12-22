@@ -7,6 +7,7 @@ import tensorflow.python.keras as ks
 
 params = helpers.Params()
 loader = data.DataLoader(params)
+tokenizer = loader.get_tokenizer()
 
 
 class CustomSchedule(tf.keras.optimizers.schedules.LearningRateSchedule):
@@ -22,7 +23,7 @@ class CustomSchedule(tf.keras.optimizers.schedules.LearningRateSchedule):
         return tf.math.rsqrt(self.d_model) * tf.math.minimum(arg1, arg2)
 
 
-model = transformer.transformer(params, loader.get_vocab_size())
+model = transformer.transformer(params, tokenizer.vocab_size)
 learning_rate = CustomSchedule(params.d_model)
 
 optimizer = tf.keras.optimizers.Adam(
