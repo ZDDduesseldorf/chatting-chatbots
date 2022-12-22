@@ -9,8 +9,7 @@ loader = data.DataLoader(params)
 tokenizer = loader.get_tokenizer()
 START_TOKEN, END_TOKEN = [tokenizer.start_token], [tokenizer.end_token]
 
-model = transformer.transformer(params, loader.get_vocab_size())
-
+model = transformer.transformer(params, tokenizer.vocab_size)
 model.load_weights(params.weights_path)
 
 
