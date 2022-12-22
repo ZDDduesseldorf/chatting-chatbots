@@ -30,10 +30,7 @@ class Params:
 
         args = parser.parse_args()
 
-        for k in vars(args).keys():
-            print(f"{k}: {vars(args)[k]}")
-
-        self.data_root: str = args.data_root
+        self.data_root: str = abspath(args.data_root)
         self.dataset: str = args.dataset
         self.target_vocab_size: int = 2 ** args.target_vocab_size_exp
         self.max_samples: int = args.max_samples
@@ -59,3 +56,7 @@ class Params:
         self.model_dir = abspath(f"{self.data_root}/{model_key}")
         self.weights_path = abspath(f"{self.model_dir}/weights")
         self.log_dir = abspath(f"logs/{model_key.replace('/', '__')}")
+
+        d = self.__dict__
+        for k in d.keys():
+            print(f"{k}: {d[k]}")
