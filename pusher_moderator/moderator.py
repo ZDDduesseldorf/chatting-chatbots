@@ -3,6 +3,7 @@ import random
 import time
 from threading import Timer
 
+import evaluate
 import pusher
 import pysher
 from bot import Bot
@@ -26,6 +27,7 @@ class Moderator:
         self.elapsed = False
         self.answers = []
         self.bots = []
+        self.conversation = []
         self.init_connection()
 
     def make_elapsed(self):
@@ -37,33 +39,37 @@ class Moderator:
         selected = random.choice(self.answers)
         self.emit_message(selected)
 
-    def wait_for_responses(self, data):
-        data = json.loads(data)
-        timeout = len(data["message"].split())
-        self.channel.bind("chatbot_response", self.evaluate_response)
+    def wait_for_responses(self, message):
+        timeout = len(message.message.split())
+        self.channel.bind("chatbot_response", self.add_response)
         Timer(timeout, self.make_elapsed).start()
 
-    def emit_message(self, data):
+    def emit_message(self, message: Message):
         self.pusher_client.trigger(
-            channels="chatting-chatbots", event_name="moderator_message", data=data
+            channels="chatting-chatbots",
+            event_name="moderator_message",
+            data=message.to_json_event_string(),
         )
+        self.conversation.append(message)
         self.answers.clear()
         self.elapsed = False
-        self.wait_for_responses(data)
+        self.wait_for_responses(message)
 
-    def evaluate_response(self, data):
+    def add_response(self, data):
+        data = json.loads(data)
+        message = Message(
+            bot_id=data["bot_id"],
+            bot_name=data["bot_name"],
+            message=data["message"],
+        )
         if self.elapsed is False:
-            self.answers.append(data)
+            self.answers.append(message)
         else:
-            self.emit_message(data)
+            self.emit_message(message)
 
     def init_chat(self):
         first_message = input("Message:")
-        self.emit_message(
-            Message(
-                bot_id=0, bot_name="Starti", message=first_message
-            ).to_json_event_string()
-        )
+        self.emit_message(Message(bot_id=0, bot_name="Starti", message=first_message))
 
     def register_chatbot(self, data):
         data = json.loads(data)
