@@ -2,6 +2,7 @@ import json
 import random
 import time
 from threading import Timer
+from typing import List
 
 import evaluate
 import pusher
@@ -30,14 +31,28 @@ class Moderator:
         self.conversation = []
         self.init_connection()
 
+    def choose_next_message(self):
+
+        # lemmatize messages
+        evaluate.lemmatize_messages(self.answers)
+
+        # calculate scores
+        for message in self.answers:
+            # scores could be set to the message object in the check function or returned to be set here
+            # check_sentence_similarity(full_conversation, message)
+            # message.share_score = check_conversation_shares(full_conversation, message)
+            evaluate.check_topic_similarity(self.conversation, message)
+            message.calculate_ranking_number()
+
+        # choose message with the higest ranking
+        next_message = evaluate.select_highest_rated_message(self.answers)
+        print(next_message.ranking_number)
+        return next_message
+
     def make_elapsed(self):
         self.elapsed = True
         if len(self.answers) > 0:
-            self.choose_answer()
-
-    def choose_answer(self):
-        selected = random.choice(self.answers)
-        self.emit_message(selected)
+            self.emit_message(self.choose_next_message())
 
     def wait_for_responses(self, message):
         timeout = len(message.message.split())
