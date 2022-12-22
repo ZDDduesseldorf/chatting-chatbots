@@ -72,6 +72,16 @@ def check_conversation_shares(
     return ranked_messages
 
 
+def select_highest_rated_message(ranked_messages: List[Message]):
+    highest_rated_message = ranked_messages[0]
+    for message in ranked_messages[1:]:
+        if message.ranking_number > highest_rated_message.ranking_number:
+            highest_rated_message = message
+
+    print(type(highest_rated_message))
+    return highest_rated_message
+
+
 def lemmatize_messages(possible_messages: List[Message]) -> None:
     """Lemmatize Messages"""
     for message in possible_messages:
@@ -116,7 +126,7 @@ irrelevant_phrases = [
     "themselves",
 ]
 
-
+# based on: https://stackoverflow.com/questions/28618400/how-to-identify-the-subject-of-a-sentence
 def get_subjects_and_objects(sentence):
     """Get Subject and Objects"""
     sent = nlp(sentence)
@@ -142,28 +152,31 @@ def get_subjects_and_objects(sentence):
     return ret
 
 
-def check_object_subject_similarity(
+# this does not really check for topics in the classic nlp way, but if sentence subjects or objects of a message fit the ones in the past conversation
+def check_topic_similarity(
     full_conversation: List[Message],
     possible_next_message: Message,
     window_size: int = 5,
 ):
-    """Check Object Subject Similarity"""
-    # get subjects and objects of message
+    # get subjects and objects of message and conversation
     msg_phrases = get_subjects_and_objects(possible_next_message.message)
-
-    # get subjects and objects of conversation
     conv_phrases = []
     for message in full_conversation[-window_size:]:
         conv_phrases.extend(get_subjects_and_objects(message.message))
 
-    # relevance sinks further down the conversation
     relevance = 1
-    for conv_phrase in msg_phrases:
-        for msg_phrase in conv_phrases:
+    for conv_phrase in conv_phrases:
+        for msg_phrase in msg_phrases:
+            # calculate 'topic' similarity between a possible messsage and a conversation message
             sim = nlp(msg_phrase).similarity(nlp(conv_phrase))
-            # print(sim, " for ", msg_phrase, " and ", conv_phrase)
+            # print("Similarity is ",sim, " for '", msg_phrase, "' and '", conv_phrase, "'")
             if sim >= 0.8:
-                return sim * relevance
+                possible_next_message.topic_score = sim * relevance
+                # no need to check further, because relevance will shrink the outcome anyway
+                return
+
+        # relevance shrinks further down the conversation
         relevance = relevance * 0.9
 
-    return 0
+    # no match. Score is zero.
+    possible_next_message.topic_score = 0
