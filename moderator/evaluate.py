@@ -6,7 +6,10 @@ from message import Message
 nlp = spacy.load("en_core_web_lg")
 
 
-def check_sentence_similarity(full_conversation: List[Message], possible_next_messages: List[Message]) -> List[Message]:
+def check_sentence_similarity(
+    full_conversation: List[Message], possible_next_messages: List[Message]
+) -> List[Message]:
+    """Check Conversation Shares"""
     if len(full_conversation) == 0:
         return possible_next_messages
 
@@ -25,9 +28,13 @@ def check_sentence_similarity(full_conversation: List[Message], possible_next_me
 
     return possible_next_messages_ranked
 
-# checks if message was already found in conversation (depends on window_size)
-def loop_checker(full_conversation: List[Message], possible_next_message: Message, window_size: int = 3):
 
+def loop_checker(
+    full_conversation: List[Message],
+    possible_next_message: Message,
+    window_size: int = 3,
+):
+    """Checks if message was already found in conversation (depends on window_size)"""
     for message in full_conversation[-window_size:]:
         if message.message == possible_next_message:
             return True
@@ -35,7 +42,10 @@ def loop_checker(full_conversation: List[Message], possible_next_message: Messag
     return False
 
 
-def check_conversation_shares(full_conversation: List[Message], possible_message: List[Message]):
+def check_conversation_shares(
+    full_conversation: List[Message], possible_message: List[Message]
+):
+    """Check Conversation Shares"""
     ranked_messages: List[Message] = []
 
     conversation_message_count = len(full_conversation)
@@ -50,8 +60,9 @@ def check_conversation_shares(full_conversation: List[Message], possible_message
     # final message ranking will be factored based on frequency of messages sent by bot_id
     for message in possible_message:
         if message.bot_id in bot_message_count:
-            share = (bot_message_count[message.bot_id] /
-                     conversation_message_count) * 100
+            share = (
+                bot_message_count[message.bot_id] / conversation_message_count
+            ) * 100
             normalized = 1 - (share / 100)
             message.ranking_number = message.ranking_number * normalized
         else:
@@ -66,12 +77,13 @@ def select_highest_rated_message(ranked_messages: List[Message]):
     for message in ranked_messages[1:]:
         if message.ranking_number > highest_rated_message.ranking_number:
             highest_rated_message = message
-    
+
     print(type(highest_rated_message))
     return highest_rated_message
 
 
 def lemmatize_messages(possible_messages: List[Message]) -> None:
+    """Lemmatize Messages"""
     for message in possible_messages:
         lemmatized_message = ""
         message_doc = nlp(message.message)
@@ -80,12 +92,43 @@ def lemmatize_messages(possible_messages: List[Message]) -> None:
         message.message_lemma = lemmatized_message.strip().lower()
 
 
-irrelevant_phrases = ["i", "you", "they", "it", "he", "she", "we", "me", "him", "her", "us", "them",
-                      "my", "your", "their", "its", "his", "her", "our", "mine", "yours", "theirs", "ours",
-                      "myself", "yourself", "himself", "herself", "itself", "ourselves", "yourselves", "themselves"]
+irrelevant_phrases = [
+    "i",
+    "you",
+    "they",
+    "it",
+    "he",
+    "she",
+    "we",
+    "me",
+    "him",
+    "her",
+    "us",
+    "them",
+    "my",
+    "your",
+    "their",
+    "its",
+    "his",
+    "her",
+    "our",
+    "mine",
+    "yours",
+    "theirs",
+    "ours",
+    "myself",
+    "yourself",
+    "himself",
+    "herself",
+    "itself",
+    "ourselves",
+    "yourselves",
+    "themselves",
+]
 
 # based on: https://stackoverflow.com/questions/28618400/how-to-identify-the-subject-of-a-sentence
 def get_subjects_and_objects(sentence):
+    """Get Subject and Objects"""
     sent = nlp(sentence)
     ret = []
     for token in sent:
@@ -94,7 +137,7 @@ def get_subjects_and_objects(sentence):
             start = subtree[0].i
             end = subtree[-1].i + 1
             ret.append(str(sent[start:end]).lower())
-            
+
         if "dobj" in token.dep_:
             subtree = list(token.subtree)
             start = subtree[0].i
@@ -105,31 +148,35 @@ def get_subjects_and_objects(sentence):
     for phrase in irrelevant_phrases:
         while phrase in ret:
             ret.remove(phrase)
-            
+
     return ret
 
 
 # this does not really check for topics in the classic nlp way, but if sentence subjects or objects of a message fit the ones in the past conversation
-def check_topic_similarity(full_conversation: List[Message], possible_next_message: Message, window_size: int = 5):
+def check_topic_similarity(
+    full_conversation: List[Message],
+    possible_next_message: Message,
+    window_size: int = 5,
+):
     # get subjects and objects of message and conversation
     msg_phrases = get_subjects_and_objects(possible_next_message.message)
     conv_phrases = []
     for message in full_conversation[-window_size:]:
-        conv_phrases.extend(get_subjects_and_objects(message.message))    
-    
+        conv_phrases.extend(get_subjects_and_objects(message.message))
+
     relevance = 1
     for conv_phrase in conv_phrases:
         for msg_phrase in msg_phrases:
             # calculate 'topic' similarity between a possible messsage and a conversation message
             sim = nlp(msg_phrase).similarity(nlp(conv_phrase))
-            #print("Similarity is ",sim, " for '", msg_phrase, "' and '", conv_phrase, "'")
+            # print("Similarity is ",sim, " for '", msg_phrase, "' and '", conv_phrase, "'")
             if sim >= 0.8:
                 possible_next_message.topic_score = sim * relevance
                 # no need to check further, because relevance will shrink the outcome anyway
                 return
-            
+
         # relevance shrinks further down the conversation
         relevance = relevance * 0.9
-    
+
     # no match. Score is zero.
     possible_next_message.topic_score = 0

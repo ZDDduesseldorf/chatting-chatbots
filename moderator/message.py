@@ -1,7 +1,7 @@
 import json
 
 
-class Message():
+class Message:
     def __init__(self, message, bot_id, bot_name):
         self.__message = message
         self.__message_lemma = message
@@ -29,6 +29,7 @@ class Message():
     def ranking_number(self):
         return self.__ranking_number
 
+<<<<<<< HEAD
     @property
     def similarity_score(self):
         return self.__similarity_score
@@ -41,10 +42,17 @@ class Message():
     def topic_score(self):
         return self.__topic_score
         
+=======
+    @ranking_number.setter
+    def ranking_number(self, value):
+        self.__ranking_number = value
+
+>>>>>>> moderator
     @property
     def message_lemma(self):
         return self.__message_lemma
 
+<<<<<<< HEAD
     #endregion
 
     
@@ -65,6 +73,8 @@ class Message():
     def topic_score(self, value):
         self.__topic_score = value
     
+=======
+>>>>>>> moderator
     @message_lemma.setter
     def message_lemma(self, value):
         self.__message_lemma = value
@@ -83,6 +93,6 @@ class Message():
                 "type": "message",
                 "message": self.message,
                 "bot_id": self.bot_id,
-                "bot_name": self.bot_name
+                "bot_name": self.bot_name,
             }
         )
