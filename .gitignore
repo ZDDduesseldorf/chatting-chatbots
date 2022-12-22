@@ -37,3 +37,8 @@ __pycache__/
 
 # conda build directory
 /_build
+
+# visual studio project files
+.vs
+chatbots/transformer_chatbot/.vs
+moderator/test.py
