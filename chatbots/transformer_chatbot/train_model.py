@@ -17,8 +17,9 @@ DROPOUT = float(os.environ.get('DROPOUT'))
 MAX_SAMPLES = int(os.environ.get('MAX_SAMPLES'))
 MAX_LENGTH = int(os.environ.get('MAX_LENGTH'))
 EPOCHS = int(os.environ.get('EPOCHS'))
+BATCH_SIZE = int(os.environ.get('BATCH_SIZE'))
 
-path = f"./models/merged/{EPOCHS}EPOCHS_{NUM_LAYERS}LAYERS_{NUM_HEADS}HEADS_{UNITS}UNITS_{D_MODEL}DMODEL_{MAX_LENGTH}MAX_LENGTH/"
+path = f"./models/merged/{EPOCHS}EPOCHS_{NUM_LAYERS}LAYERS_{NUM_HEADS}HEADS_{UNITS}UNITS_{D_MODEL}DMODEL_{MAX_LENGTH}MAXLENGTH_{BATCH_SIZE}BATCHSIZE/"
 
 model = transformer.transformer(
     vocab_size=VOCAB_SIZE,
@@ -34,12 +35,12 @@ optimizer = tf.keras.optimizers.Adam(
     learning_rate, beta_1=0.9, beta_2=0.98, epsilon=1e-9)
 
 model.compile(optimizer=optimizer,
-              loss=transformer.loss_function, metrics=['accuracy'])
+              loss=transformer.loss_function, metrics=[transformer.accuracy])
 
 train_dataset = helpers.load_dataset("train")
 val_dataset = helpers.load_dataset("val")
 
-logdir = f"logs/merged/scalars/{EPOCHS}EPOCHS_{NUM_LAYERS}LAYERS_{NUM_HEADS}HEADS_{UNITS}UNITS_{D_MODEL}DMODEL_{MAX_LENGTH}MAX_LENGTH"
+logdir = f"logs/merged/scalars/{EPOCHS}EPOCHS_{NUM_LAYERS}LAYERS_{NUM_HEADS}HEADS_{UNITS}UNITS_{D_MODEL}DMODEL_{MAX_LENGTH}MAXLENGTH_{BATCH_SIZE}BATCHSIZE"
 tensorboard_callback = ks.callbacks.TensorBoard(log_dir=logdir)
 checkpoint_callback = ks.callbacks.ModelCheckpoint(
     f"{path}best_model", save_best_only=True, save_weights_only=True)

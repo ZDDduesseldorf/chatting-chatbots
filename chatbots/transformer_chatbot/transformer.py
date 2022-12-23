@@ -217,3 +217,8 @@ def loss_function(y_true, y_pred):
     loss = tf.multiply(loss, mask)
 
     return tf.reduce_mean(loss)
+
+def accuracy(y_true, y_pred):
+    # ensure labels have shape (batch_size, MAX_LENGTH - 1)
+    y_true = tf.reshape(y_true, shape=(-1, MAX_LENGTH - 1))
+    return tf.keras.metrics.sparse_categorical_accuracy(y_true, y_pred)
