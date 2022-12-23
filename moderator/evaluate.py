@@ -8,25 +8,22 @@ nlp = spacy.load("en_core_web_lg")
 
 def check_sentence_similarity(
     full_conversation: List[Message], possible_next_messages: List[Message]
-) -> List[Message]:
+) -> None:
     """Check Conversation Shares"""
     if len(full_conversation) == 0:
         return possible_next_messages
 
-    possible_next_messages_ranked: List[Message] = []
     prev_message = full_conversation[-1].message_lemma
     prev_message_doc = nlp(prev_message)  # spacy nlp
 
     for message in possible_next_messages:
         message_doc = nlp(message.message_lemma)
         similarity = prev_message_doc.similarity(message_doc)
-        message.ranking_number += similarity
+        message.similarity_score += similarity
         # treshhold if sentences are to similar or loop happend
         if similarity > 0.95 or loop_checker(full_conversation, message.message):
-            message.ranking_number = -5.0 + similarity
-        possible_next_messages_ranked.append(message)
+            message.similarity_score = -5.0 + similarity
 
-    return possible_next_messages_ranked
 
 
 def loop_checker(
@@ -82,14 +79,13 @@ def select_highest_rated_message(ranked_messages: List[Message]):
     return highest_rated_message
 
 
-def lemmatize_messages(possible_messages: List[Message]) -> None:
+def lemmatize_messages(possible_message: Message) -> None:
     """Lemmatize Messages"""
-    for message in possible_messages:
-        lemmatized_message = ""
-        message_doc = nlp(message.message)
-        for token in message_doc:
-            lemmatized_message = lemmatized_message + token.lemma_ + " "
-        message.message_lemma = lemmatized_message.strip().lower()
+    lemmatized_message = ""
+    message_doc = nlp(possible_message)
+    for token in message_doc:
+        lemmatized_message = lemmatized_message + token.lemma_ + " "
+    possible_message.message_lemma = lemmatized_message.strip().lower()
 
 
 irrelevant_phrases = [
