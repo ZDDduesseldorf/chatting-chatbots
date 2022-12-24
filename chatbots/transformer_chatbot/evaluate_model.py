@@ -33,6 +33,8 @@ def testing():
 
     df.to_csv(f"{params.logdir}/test_chat_log.csv")
 
+testing()
+
 while (True):
     inp = input('Input: ')
     if inp in ["q", "quit", "exit"]:
