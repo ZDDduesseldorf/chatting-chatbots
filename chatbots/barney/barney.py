@@ -7,6 +7,7 @@ import config
 import numpy as np
 import pandas as pd
 import spacy
+from chatbotsclient.chatbot import Chatbot, Message
 from config import csv_quotechar, csv_separator
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
@@ -35,12 +36,29 @@ for file_name in os.listdir(config.processed_resources_folder_name):
             corpus[prior_message] = barneys_message
 
 
-def replace_entity(message: str, new_entity: str) -> str:
-    nlp = spacy.load("en_core_web_lg")
-    nlp.add_pipe("merge_entities")
-    doc = nlp(message)
+def get_best_reply_from_corpus(message: Message) -> str:
+    corpus_df = pd.DataFrame(
+        {"prior_message": list(corpus.keys()), "barneys_message": list(corpus.values())}
+    )
 
-    response = message
+    tfidf = TfidfVectorizer(min_df=2, max_df=0.5, ngram_range=(1, 2))
+    prior_messages_tfidf = tfidf.fit_transform(corpus_df.prior_message)
+    message_tfidf = tfidf.transform([message.message])
+
+    similarities = cosine_similarity(message_tfidf, prior_messages_tfidf)
+    idx = np.argsort(similarities)[0][-1]
+    return corpus_df.loc[idx, "barneys_message"]
+
+
+def replace_entity(reply: str, new_entity: str) -> str:
+    nlp = spacy.load("en_core_web_lg")
+
+    ruler = nlp.add_pipe("entity_ruler", before="ner")
+    patterns = [{"label": "PERSON", "pattern": "Lily"}]
+    ruler.add_patterns(patterns)
+    # nlp.add_pipe("merge_entities") Probably not needed
+    doc = nlp(reply)
+
     ent_to_replace = None
     for ent in doc.ents:
         if ent.label_ == "PERSON":
@@ -48,28 +66,23 @@ def replace_entity(message: str, new_entity: str) -> str:
             break
 
     if ent_to_replace:
-        response = re.sub(ent_to_replace.text, new_entity, message)
-    return response
+        return re.sub(ent_to_replace.text, new_entity, reply)
+
+    return reply
 
 
-def respond(user_input: str) -> str:
-    corpus_df = pd.DataFrame(
-        {"prior_message": list(corpus.keys()), "barneys_message": list(corpus.values())}
-    )
+def respond(message: Message, conversation: List[Message]) -> str:
 
-    tfidf = TfidfVectorizer(min_df=2, max_df=0.5, ngram_range=(1, 2))
-    prior_messages_tfidf = tfidf.fit_transform(corpus_df.prior_message)
-    input_tfidf = tfidf.transform([user_input])
-
-    similarities = cosine_similarity(input_tfidf, prior_messages_tfidf)
-    idx = np.argsort(similarities)[0][-1]
-    return corpus_df.loc[idx, "barneys_message"]
+    reply = get_best_reply_from_corpus(message)
+    reply = replace_entity(reply, message.bot_name)
+    return reply
 
 
 if __name__ == "__main__":
+    # Chatbot(respond, "Barney")
     user_input = input()
     while user_input != "exit":
-        response = respond(user_input)
-        response_replaced = replace_entity(response, "replaced name")
-        print(response_replaced)
+        user_input_as_message = Message(user_input, 1, "user")
+        response = respond(user_input_as_message, conversation={})
+        print(response)
         user_input = input()
