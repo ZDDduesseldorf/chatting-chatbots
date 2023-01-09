@@ -1,13 +1,16 @@
 import helpers
 import tensorflow as tf
+import pandas as pd
 import transformer
 import data
 import tensorflow.python.keras as ks
 
-
 params = helpers.Params()
 loader = data.DataLoader(params)
 tokenizer = loader.get_tokenizer()
+# use these for initial training of multiple trainings
+#from lib.tokenizer import TransformerTokenizer
+#tokenizer = TransformerTokenizer.load_from_file('D:/Programmierung/StudyProjects/chatting-chatbots/chatbots/transformer_chatbot/data/super-tokenizer')
 
 
 class CustomSchedule(tf.keras.optimizers.schedules.LearningRateSchedule):
@@ -58,6 +61,9 @@ train_dataset, val_dataset = loader.get_datasets()
 
 helpers.ensure_dir(params.model_dir)
 helpers.ensure_dir(params.log_dir)
+
+df = pd.DataFrame([vars(params)])
+df.to_csv(f"{params.log_dir}/training_params.csv")
 
 tensorboard_callback = ks.callbacks.TensorBoard(log_dir=params.log_dir)
 

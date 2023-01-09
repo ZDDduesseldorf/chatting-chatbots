@@ -52,13 +52,17 @@ class DataLoader:
         self._conversations: tuple[list, list] = None
         self._samples: int = None
 
-    def _load_tokenizer(self):
+    def _load_tokenizer(self, load_super_tokenizer = False):
+        if load_super_tokenizer:
+            tokenizer_path = 'D:/Programmierung/StudyProjects/chatting-chatbots/chatbots/transformer_chatbot/data/super-tokenizer' # needs to be adjusted
+        else:
+            tokenizer_path = self.params.tokenizer_path
+
         spinner = Halo(
-            text=f"Loading Tokenizer from {self.params.tokenizer_path}", spinner='dots')
+            text=f"Loading Tokenizer from {tokenizer_path}", spinner='dots')
         spinner.start()
 
-        self._tokenizer = TransformerTokenizer.load_from_file(
-            self.params.tokenizer_path)
+        self._tokenizer = TransformerTokenizer.load_from_file(tokenizer_path)
 
         spinner.stop()
 

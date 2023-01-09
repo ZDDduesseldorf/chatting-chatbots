@@ -3,7 +3,6 @@ from pathlib import Path
 import os
 from os.path import abspath
 import dotenv
-import sys
 
 dotenv.load_dotenv()
 
@@ -17,7 +16,7 @@ def ensure_dir(dir: str):
 
 
 class Params:
-    def __init__(self):
+    def __init__(self, ignore_shell_args=False, training_stage=0):
         parser = argparse.ArgumentParser()
 
         parser.add_argument("--data-root", default="data", type=str)
@@ -51,7 +50,15 @@ class Params:
             "--dropout", default=float(env("DROPOUT", "0.1")), type=float)
         parser.add_argument("--activation", default="relu", type=str)
 
-        args = parser.parse_args()
+        parser.add_argument(
+            "--stage", default=int(env("STAGE", "0")), type=int)
+        parser.add_argument(
+            "--super-tokenizer", default=0, type=int)
+
+        if ignore_shell_args:
+            args = parser.parse_args([])
+        else:
+            args = parser.parse_args()
 
         self.data_root: str = abspath(args.data_root)
         self.dataset: str = args.dataset
@@ -69,9 +76,17 @@ class Params:
         self.dropout: float = args.dropout
         self.activation: str = args.activation
 
+        if training_stage < 0:
+            self.stage: int = args.stage            
+        else:
+            self.stage = training_stage
+
         tokenizer_key = f"{self.dataset}/{self.target_vocab_size}Voc"
         dataset_key = f"{tokenizer_key}/{self.max_samples}Smp_{self.max_length}Len_{self.batch_size}Bat_{self.buffer_size}Buf"
-        model_key = f"{dataset_key}/{self.num_layers}Lay_{self.num_heads}Hed_{self.epochs}Epo"
+        if self.stage == 0:
+            model_key = f"{dataset_key}/{self.num_layers}Lay_{self.num_heads}Hed_{self.epochs}Epo"
+        else:
+            model_key = f"stage{self.stage}/{dataset_key}/{self.num_layers}Lay_{self.num_heads}Hed_{self.epochs}Epo"
 
         self.tokenizer_dir = abspath(f"{self.data_root}/{tokenizer_key}")
         self.tokenizer_path = abspath(f"{self.tokenizer_dir}/tokenizer")
@@ -81,52 +96,10 @@ class Params:
         self.log_dir = abspath(f"logs/{model_key.replace('/', '__')}")
 
         d = self.__dict__
-        print('\033[93m Model Parameters: \033[0m')
-        for k in d.keys():
-            print(f"{k}: {d[k]}")
-        print()
-
-
-class Base_Model_Params:
-    def __init__(self):
-        self.data_root: str = abspath("data")
-        self.dataset: str = env("DATASET_NAME", "merged")
-        self.target_vocab_size: int = 2 ** int(env("TARGET_VOCAB_SIZE_EXP", "14"))
-        self.max_samples: int = int(env("MAX_SAMPLES", "0"))
-        self.max_length: int = int(env("MAX_LENGTH", "25"))
-        self.buffer_size: int = int(env("BUFFER_SIZE", "1000000"))
-        self.batch_size: int = int(env("BATCH_SIZE", "512"))
-        self.epochs: int = int(env("EPOCHS", "20"))
-
-        self.num_layers: int = int(env("NUM_LAYERS", "2"))
-        self.num_units: int = int(env("UNITS", "512"))
-        self.d_model: int = int(env("D_MODEL", "256"))
-        self.num_heads: int = int(env("NUM_HEADS", "8"))
-        self.dropout: float = float(env("DROPOUT", "0.1"))
-        self.activation: str = "relu"
-
-        tokenizer_key = f"{self.dataset}/{self.target_vocab_size}Voc"
-        dataset_key = f"{tokenizer_key}/{self.max_samples}Smp_{self.max_length}Len_{self.batch_size}Bat_{self.buffer_size}Buf"
-        model_key = f"{dataset_key}/{self.num_layers}Lay_{self.num_heads}Hed_{self.epochs}Epo"
-
-        self.tokenizer_dir = abspath(f"{self.data_root}/{tokenizer_key}")
-        self.tokenizer_path = abspath(f"{self.tokenizer_dir}/tokenizer")
-        self.dataset_dir = abspath(f"{self.data_root}/{dataset_key}")
-        self.model_dir = abspath(f"{self.data_root}/{model_key}")
-        self.weights_path = abspath(f"{self.model_dir}/weights")
-        self.log_dir = abspath(f"logs/{model_key.replace('/', '__')}")
-
-        args_string = ''
-        for i in range(1, len(sys.argv)):
-            args_string += sys.argv[i] + '+'
-
-        self.combined_dir = abspath(f"{self.model_dir}/{args_string}")
-        ensure_dir(self.combined_dir)
-
-        d = self.__dict__
-        print('Continuing Training based on the model specified in .env file.')
-        print(f'Saving combined model to: {self.combined_dir}')
-        print('\033[93m Base model Parameters: \033[0m')
+        if ignore_shell_args:
+            print('\033[93m Ignoring shell-Arguments for these model parameters: \033[0m')
+        else:
+            print('\033[93m Model Parameters: \033[0m')
         for k in d.keys():
             print(f"{k}: {d[k]}")
         print()
