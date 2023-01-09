@@ -12,6 +12,8 @@ from config import csv_quotechar, csv_separator
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
+from templates import *
+
 corpus: Dict[str, str] = {}
 
 for file_name in os.listdir(config.processed_resources_folder_name):
@@ -35,21 +37,30 @@ for file_name in os.listdir(config.processed_resources_folder_name):
                 continue
             corpus[prior_message] = barneys_message
 
-
 def get_best_reply_from_corpus(message: Message) -> str:
     corpus_df = pd.DataFrame(
         {"prior_message": list(corpus.keys()), "barneys_message": list(corpus.values())}
     )
 
+    # TODO: Tokenize und am besten spacy nutzen statt die Gewichtung vom Corpus (evt. bessere Ergebnisse, da der Corpus noch zu klein ist)
     tfidf = TfidfVectorizer(min_df=2, max_df=0.5, ngram_range=(1, 2))
     prior_messages_tfidf = tfidf.fit_transform(corpus_df.prior_message)
     message_tfidf = tfidf.transform([message.message])
 
     similarities = cosine_similarity(message_tfidf, prior_messages_tfidf)
-    idx = np.argsort(similarities)[0][-1]
-    return corpus_df.loc[idx, "barneys_message"]
+    idx = np.argsort(similarities)[0][-1] # 2226.00 -> max value
+    sim = np.sort(similarities)[0][-1] # 0.61
+    print(sim)
 
+    if(template(message.message) != None):
+        return str(template(message.message))
 
+    if(sim > 0.5):
+       return corpus_df.loc[idx, "barneys_message"]
+        
+    else:
+        return str(np.random.choice(FAILS_RESPONSES))
+    
 def replace_entity(reply: str, new_entity: str) -> str:
     nlp = spacy.load("en_core_web_lg")
 
@@ -73,10 +84,30 @@ def replace_entity(reply: str, new_entity: str) -> str:
 
 def respond(message: Message, conversation: List[Message]) -> str:
 
+    if(greet(message.message) != None):
+        return greet(message.message)
+        
     reply = get_best_reply_from_corpus(message)
     reply = replace_entity(reply, message.bot_name)
     return reply
 
+def greet(sentence: str) -> str:
+    """
+    If user's input is a greeting, return a greeting response
+    """
+
+    for word in sentence.split():
+        if word.lower() in GREET_INPUTS:
+            return np.random.choice(GREET_RESPONSES)
+            
+def template(sentence: str) -> str:
+    """
+    If user's input is a greeting, return a greeting response
+    """
+
+    for question in questions:
+        if sentence in question["question"]:
+            return np.random.choice(question["answers"])
 
 if __name__ == "__main__":
     # Chatbot(respond, "Barney")
