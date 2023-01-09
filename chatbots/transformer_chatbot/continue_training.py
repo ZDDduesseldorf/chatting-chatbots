@@ -1,38 +1,27 @@
 import tensorflow as tf
 import transformer
 import helpers
+import data
 import os
 from dotenv import load_dotenv
 import tensorflow.python.keras as ks
+from train_model import CustomSchedule, loss_function
 
 load_dotenv()
 print("Num GPUs Available: ", len(tf.config.list_physical_devices('GPU')))
 
-VOCAB_SIZE = helpers.get_vocab_size()
-NUM_LAYERS = int(os.environ.get('NUM_LAYERS'))
-UNITS = int(os.environ.get('UNITS'))
-D_MODEL = int(os.environ.get('D_MODEL'))
-NUM_HEADS = int(os.environ.get('NUM_HEADS'))
-DROPOUT = float(os.environ.get('DROPOUT'))
-MAX_SAMPLES = int(os.environ.get('MAX_SAMPLES'))
-MAX_LENGTH = int(os.environ.get('MAX_LENGTH'))
-EPOCHS = int(os.environ.get('EPOCHS'))
+new_params = helpers.Params()
+new_loader = data.DataLoader(new_params)
 
-path = f"./models/COMBINED_{EPOCHS}EPOCHS_{MAX_SAMPLES}SAMPLES_{MAX_LENGTH}LENGTH/"
+base_params = helpers.Base_Model_Params()
+base_loader = data.DataLoader(base_params)
+base_tokenizer = base_loader.get_tokenizer()
 
-model = transformer.transformer(
-    vocab_size=VOCAB_SIZE,
-    num_layers=NUM_LAYERS,
-    units=UNITS,
-    d_model=D_MODEL,
-    num_heads=NUM_HEADS,
-    dropout=DROPOUT)
+# new model with new parameters, but old tokenizer and weights
+new_model = transformer.transformer(new_params, base_tokenizer.vocab_size)
+new_model.load_weights(base_params.weights_path)
 
-
-model.load_weights(f"./models/{EPOCHS}EPOCHS_{MAX_SAMPLES}SAMPLES_10LENGTH_PERSIST/")
-
-
-learning_rate = transformer.CustomSchedule(D_MODEL)
+learning_rate = CustomSchedule(new_params.d_model)
 
 optimizer = tf.keras.optimizers.Adam(
     learning_rate, beta_1=0.9, beta_2=0.98, epsilon=1e-9)
@@ -40,21 +29,19 @@ optimizer = tf.keras.optimizers.Adam(
 
 def accuracy(y_true, y_pred):
     # ensure labels have shape (batch_size, MAX_LENGTH - 1)
-    y_true = tf.reshape(y_true, shape=(-1, MAX_LENGTH - 1))
-    # -- DEBUG -- original code: accuracy = tf.metrics.SparseCategoricalAccuracy()(y_true, y_pred) --------------- DEBUG -------------
-    accuracy = tf.losses.SparseCategoricalCrossentropy()(y_true, y_pred)
-    return accuracy
+    y_true = tf.reshape(y_true, shape=(-1, new_params.max_length - 1))
+    return tf.keras.metrics.sparse_categorical_accuracy(y_true, y_pred)
 
 
-model.compile(optimizer=optimizer,
-              loss=transformer.loss_function, metrics=[accuracy])
+new_model.compile(optimizer=optimizer,
+              loss=loss_function, metrics=[accuracy])
 
-train_dataset = helpers.load_dataset("train")
-val_dataset = helpers.load_dataset("val")
+# load new datasets
+train_dataset, val_dataset = new_loader.get_datasets()
 
-logdir =f"logs/scalars/COMBINED_{EPOCHS}EPOCHS_{MAX_SAMPLES}SAMPLES_{MAX_LENGTH}LENGTH"
-tensorboard_callback = ks.callbacks.TensorBoard(log_dir=logdir)
+tensorboard_callback = ks.callbacks.TensorBoard(log_dir=new_params.log_dir)
 
-model.fit(train_dataset, epochs=10, validation_data=val_dataset, initial_epoch=10)
+new_model.fit(train_dataset, epochs=10, validation_data=val_dataset, initial_epoch=10)
 
-model.save_weights(path)
+# save new weights inside base folder under 
+new_model.save_weights(f'{base_params.combined_dir}/combined_weights')

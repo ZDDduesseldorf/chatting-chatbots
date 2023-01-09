@@ -31,7 +31,7 @@ def testing():
         print("Sara Lacoste: ", answer)
         df.loc[index] = question, answer
 
-    df.to_csv(f"{params.logdir}/test_chat_log.csv")
+    df.to_csv(f"{params.log_dir}/test_chat_log.csv")
 
 testing()
 
