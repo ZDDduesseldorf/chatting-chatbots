@@ -13,7 +13,8 @@ print("Num GPUs Available: ", len(tf.config.list_physical_devices('GPU')))
 
 base_params = helpers.Params(ignore_shell_args=True)
 base_loader = data.DataLoader(base_params)
-super_tokenizer = TransformerTokenizer.load_from_file('D:/Programmierung/StudyProjects/chatting-chatbots/chatbots/transformer_chatbot/data/super-tokenizer')#base_loader.get_tokenizer()
+super_tokenizer = TransformerTokenizer.load_from_file(
+    'C:/Users/User/Desktop/chatting-chatbots/chatbots/transformer_chatbot/data/merged/16384Voc/tokenizer')  # base_loader.get_tokenizer()
 
 stage = base_params.stage + 1
 new_params = helpers.Params(training_stage=stage)
@@ -37,14 +38,15 @@ def accuracy(y_true, y_pred):
 
 
 new_model.compile(optimizer=optimizer,
-              loss=loss_function, metrics=[accuracy])
+                  loss=loss_function, metrics=[accuracy])
 
 # load new datasets
 train_dataset, val_dataset = new_loader.get_datasets()
 
 tensorboard_callback = ks.callbacks.TensorBoard(log_dir=new_params.log_dir)
 
-new_model.fit(train_dataset, epochs=10, validation_data=val_dataset, initial_epoch=10)
+new_model.fit(train_dataset, epochs=10,
+              validation_data=val_dataset, initial_epoch=10)
 
 helpers.ensure_dir(new_params.model_dir)
 helpers.ensure_dir(new_params.log_dir)

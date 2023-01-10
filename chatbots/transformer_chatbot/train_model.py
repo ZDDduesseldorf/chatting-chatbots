@@ -1,3 +1,4 @@
+from lib.tokenizer import TransformerTokenizer
 import helpers
 import tensorflow as tf
 import pandas as pd
@@ -9,8 +10,8 @@ params = helpers.Params()
 loader = data.DataLoader(params)
 tokenizer = loader.get_tokenizer()
 # use these for initial training of multiple trainings
-#from lib.tokenizer import TransformerTokenizer
-#tokenizer = TransformerTokenizer.load_from_file('D:/Programmierung/StudyProjects/chatting-chatbots/chatbots/transformer_chatbot/data/super-tokenizer')
+# tokenizer = TransformerTokenizer.load_from_file(
+#     'C:/Users/User/Desktop/chatting-chatbots/chatbots/transformer_chatbot/data/merged/16384Voc/tokenizer')
 
 
 class CustomSchedule(tf.keras.optimizers.schedules.LearningRateSchedule):
@@ -68,7 +69,7 @@ df.to_csv(f"{params.log_dir}/training_params.csv")
 tensorboard_callback = ks.callbacks.TensorBoard(log_dir=params.log_dir)
 
 checkpoint_callback = ks.callbacks.ModelCheckpoint(
-    f"{params.weights_path}_best", save_best_only=True, save_weights_only=True)
+    params.best_weights_path, save_best_only=True, save_weights_only=True)
 
 stop_early_callback = ks.callbacks.EarlyStopping(
     monitor='val_loss', patience=3)

@@ -77,7 +77,7 @@ class Params:
         self.activation: str = args.activation
 
         if training_stage < 0:
-            self.stage: int = args.stage            
+            self.stage: int = args.stage
         else:
             self.stage = training_stage
 
@@ -92,12 +92,14 @@ class Params:
         self.tokenizer_path = abspath(f"{self.tokenizer_dir}/tokenizer")
         self.dataset_dir = abspath(f"{self.data_root}/{dataset_key}")
         self.model_dir = abspath(f"{self.data_root}/{model_key}")
+        self.best_weights_path = abspath(f"{self.model_dir}/weights_best")
         self.weights_path = abspath(f"{self.model_dir}/weights")
         self.log_dir = abspath(f"logs/{model_key.replace('/', '__')}")
 
         d = self.__dict__
         if ignore_shell_args:
-            print('\033[93m Ignoring shell-Arguments for these model parameters: \033[0m')
+            print(
+                '\033[93m Ignoring shell-Arguments for these model parameters: \033[0m')
         else:
             print('\033[93m Model Parameters: \033[0m')
         for k in d.keys():
