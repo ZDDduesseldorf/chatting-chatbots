@@ -1,0 +1,7 @@
+models/
+data/
+train_model.ipynb
+tokenizer.subwords
+ipynb_checkpoints/
+logs/
+chatbot_model/
