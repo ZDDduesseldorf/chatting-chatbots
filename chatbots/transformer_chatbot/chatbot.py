@@ -1,19 +1,9 @@
-import random
 import re
-from sys import platform
 from typing import List
-
 import pyttsx3
 import transformer as model
-from AppKit import NSSpeechSynthesizer
 from chatbotsclient.chatbot import Chatbot
 from chatbotsclient.message import Message
-
-
-def isMac():
-    if platform == "darwin":
-        return True
-    return False
 
 
 def handle_following_appostrophs(sentence):
@@ -32,7 +22,7 @@ def replace_after_sentence_sign(sentence):
                 sentence = (
                     sentence[: index + 2]
                     + sentence[index + 2].upper()
-                    + sentence[index + 3 :]
+                    + sentence[index + 3:]
                 )
     return sentence
 
@@ -52,19 +42,6 @@ class TransformerChatbot:
     def __init__(self):
         self.conversation = []
         self.engine = pyttsx3.init()
-        self.voices = []
-        if isMac():
-            for voice in NSSpeechSynthesizer.availableVoices():
-                if "en-GB" in voice or "en-US" in voice:
-                    self.voices.append(voice)
-            self.voices.append("com.apple.speech.synthesis.voice.Whisper")
-            selected_voice = random.choice(self.voices)
-            self.engine.setProperty("voice", selected_voice)
-        self.engine.setProperty("rate", 160)
-
-    def speak(self, sentence):
-        self.engine.say(sentence)
-        self.engine.runAndWait()
 
     def process(self, sentence):
         """Process sentence."""
@@ -87,18 +64,10 @@ class TransformerChatbot:
     ):
         """Respond to input."""
         output = self.process(model.predict(sentence))
-        print("Theo:", output)
-        self.conversation.append(input)
-        self.conversation.append(output)
-        self.speak(output)
         return output
 
 
 transformer = TransformerChatbot()
-
-while True:
-    inp = input("Message: ")
-    transformer.respond(inp)
 
 
 def respond(message: Message, conversation: List[Message]):
