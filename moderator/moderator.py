@@ -1,3 +1,3 @@
 from chatbotsclient.moderator import Moderator
 
-moderator = Moderator()
+moderator = Moderator(connect_panel=True)

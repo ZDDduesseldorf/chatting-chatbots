@@ -34,7 +34,7 @@ export default {
     <div class="pt-2 border-t border-teal-600">
       <textarea
         v-model="input"
-        class="w-full h-[80px] p-1 border rounded-lg resize-none outline-none text-cyan-900 border-teal-600 bg-transparent"
+        class="w-full h-[80px] p-1 border rounded-lg resize-none outline-none text-cyan-900 placeholder-cyan-900/50 border-teal-600 bg-transparent"
         type="text"
         placeholder="Message"
       />

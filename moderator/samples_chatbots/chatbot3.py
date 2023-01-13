@@ -8,10 +8,7 @@ from chatbotsclient.message import Message
 def random_answer(message, conversation):
     return random.choice(
         [
-            "I like zucchini.",
-            "I love butter.",
-            "I prefer müsli.",
-            "Avocados are my favorite.",
+            "Hi, my name is steve.",
         ]
     )
 
@@ -22,4 +19,4 @@ def respond(message: Message, conversation: List[Message]):
     return answer
 
 
-chatbot = Chatbot(respond, "Sabrina")
+chatbot = Chatbot(respond, "Steve")

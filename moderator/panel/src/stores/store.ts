@@ -70,5 +70,27 @@ export const useStore = defineStore('store', {
       rankedResponses.reverse();
 
     },
+    downloadRankings() {
+      let csvString = 'Message;Total;Similarity;Share;Topic\n';  
+      this.rankings.forEach(function(entry) {  
+        csvString += `${entry.message.message};;;;`
+        csvString += "\n";  
+        entry.ranked_responses.forEach(function(response) { 
+          csvString += `${response.message};${response.ranking_number};${response.similarity_score};${response.share_score};${response.topic_score}\n`
+        });
+      });
+      const blob = new Blob([csvString], {type: "octet-stream"})
+      const href = URL.createObjectURL(blob);
+      const a = Object.assign(document.createElement("a"), {
+        href,
+        style: "display:none",
+        download: `${Date.now()}_conversation.csv`,
+      })
+
+      document.body.appendChild(a);
+      a.click();
+      URL.revokeObjectURL(href)
+      a.remove();
+    }
   },
 })
