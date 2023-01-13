@@ -1,6 +1,5 @@
 import re
 from typing import List
-import pyttsx3
 import transformer as model
 from chatbotsclient.chatbot import Chatbot
 from chatbotsclient.message import Message
@@ -41,7 +40,6 @@ def remove_repetitions(sentence):
 class TransformerChatbot:
     def __init__(self):
         self.conversation = []
-        self.engine = pyttsx3.init()
 
     def process(self, sentence):
         """Process sentence."""
