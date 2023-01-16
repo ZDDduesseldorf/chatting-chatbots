@@ -1,6 +1,7 @@
 import csv
 import os
 import re
+from typing import Dict
 
 from config import (
     csv_quotechar,
@@ -9,40 +10,51 @@ from config import (
     scraped_resources_folder_name,
 )
 
-for file_name in sorted(os.listdir(scraped_resources_folder_name)):
-    input_path = os.path.join(scraped_resources_folder_name, file_name)
-    with open(input_path, "r", encoding="uft-8") as stream:
-        lines = stream.read().splitlines()
 
-    # remove lines with instructions
-    lines = filter(lambda line: False if re.search(r"^\(.*\)$", line) else True, lines)
+def process_scraped_files() -> Dict[str, str]:
+    """process the scraped raw script files"""
+    messages_and_responses = {}
 
-    # remove instructions in the middle of text and the space in front of it
-    lines = list(map(lambda line: re.sub(r" \(.*\)", "", line), lines))
+    for file_name in sorted(os.listdir(scraped_resources_folder_name)):
+        input_path = os.path.join(scraped_resources_folder_name, file_name)
+        with open(input_path, "r", encoding="utf-8") as stream:
+            lines = stream.read().splitlines()
 
-    lines = list(map(lambda line: re.sub(r"^\[.*\]$", csv_separator, line), lines))
+        # remove lines with instructions
+        lines = filter(
+            lambda line: False if re.search(r"^\(.*\)$", line) else True, lines
+        )
 
-    questions_and_answers = {}
-    for line_index, line in enumerate(lines):
-        index = line.find("Barney:")
-        if index == 0:
-            previous_line = lines[line_index - 1]
+        # remove instructions in the middle of text and the space in front of it
+        lines = list(map(lambda line: re.sub(r" \(.*\)", "", line), lines))
 
-            # skip because Barney had the first line of the scene
-            if previous_line == csv_separator:
-                continue
+        lines = list(map(lambda line: re.sub(r"^\[.*\]$", csv_separator, line), lines))
 
-            # remove the name of the person speaking prior to Barney (and follwing collon and space)
-            # don't cut text if there is no collon
-            text_start = (
-                previous_line.find(":") + 2 if previous_line.find(":") > 0 else 0
-            )
-            previous_line_text = previous_line[text_start:]
+        for line_index, line in enumerate(lines):
+            index = line.find("Barney:")
+            if index == 0:
+                previous_line = lines[line_index - 1]
 
-            # remove Barney's name and the folowing collon and space
-            questions_and_answers[previous_line_text] = line[len("Barney: ") :]
+                # skip because Barney had the first line of the scene
+                if previous_line == csv_separator:
+                    continue
 
-    output_path = os.path.join(processed_resources_folder_name, file_name + ".csv")
+                # remove name of the person speaking prior to Barney (and follwing collon and space)
+                # don't cut text if there is no collon
+                text_start = (
+                    previous_line.find(":") + 2 if previous_line.find(":") > 0 else 0
+                )
+                previous_line_text = previous_line[text_start:]
+
+                # remove Barney's name and the folowing collon and space
+                messages_and_responses[previous_line_text] = line[len("Barney: ") :]
+
+    return messages_and_responses
+
+
+def save_corpus(processed_files: Dict[str, str]):
+    """Save corpus as single csv"""
+    output_path = os.path.join(processed_resources_folder_name, "corpus.csv")
     with open(output_path, "w", newline="", encoding="utf-8") as file:
         writer = csv.writer(
             file,
@@ -51,4 +63,9 @@ for file_name in sorted(os.listdir(scraped_resources_folder_name)):
             quoting=csv.QUOTE_ALL,
         )
         writer.writerow(["prior_message", "barney_message"])
-        writer.writerows(questions_and_answers.items())
+        writer.writerows(processed_files.items())
+
+
+if __name__ == "__main__":
+    proccessed_text = process_scraped_files()
+    save_corpus(proccessed_text)
