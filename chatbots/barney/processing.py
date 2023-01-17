@@ -4,9 +4,9 @@ import re
 from typing import Dict
 
 from config import (
-    csv_quotechar,
-    csv_separator,
-    processed_resources_folder_name,
+    CSV_QUOTECHAR,
+    CSV_SEPERATOR,
+    corpus_path,
     scraped_resources_folder_name,
 )
 
@@ -26,9 +26,9 @@ def process_scraped_files() -> Dict[str, str]:
         )
 
         # remove instructions in the middle of text and the space in front of it
-        lines = list(map(lambda line: re.sub(r" \(.*\)", "", line), lines))
+        lines = list(map(lambda line: re.sub(r" \(.*?\)", "", line), lines))
 
-        lines = list(map(lambda line: re.sub(r"^\[.*\]$", csv_separator, line), lines))
+        lines = list(map(lambda line: re.sub(r"^\[.*\]$", CSV_SEPERATOR, line), lines))
 
         for line_index, line in enumerate(lines):
             index = line.find("Barney:")
@@ -36,7 +36,7 @@ def process_scraped_files() -> Dict[str, str]:
                 previous_line = lines[line_index - 1]
 
                 # skip because Barney had the first line of the scene
-                if previous_line == csv_separator:
+                if previous_line == CSV_SEPERATOR:
                     continue
 
                 # remove name of the person speaking prior to Barney (and follwing collon and space)
@@ -54,15 +54,14 @@ def process_scraped_files() -> Dict[str, str]:
 
 def save_corpus(processed_files: Dict[str, str]):
     """Save corpus as single csv"""
-    output_path = os.path.join(processed_resources_folder_name, "corpus.csv")
+    output_path = os.path.join(corpus_path)
     with open(output_path, "w", newline="", encoding="utf-8") as file:
         writer = csv.writer(
             file,
-            delimiter=csv_separator,
-            quotechar=csv_quotechar,
+            delimiter=CSV_SEPERATOR,
+            quotechar=CSV_QUOTECHAR,
             quoting=csv.QUOTE_ALL,
         )
-        writer.writerow(["prior_message", "barney_message"])
         writer.writerows(processed_files.items())
 
 
