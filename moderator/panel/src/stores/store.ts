@@ -16,6 +16,8 @@ export type Message = {
   topic_score: number;
   similarity_score: number;
   share_score: number;
+  polarity_score: number;
+  conversation_partner_score: number;
 };
 
 export type Bot = {
@@ -71,13 +73,14 @@ export const useStore = defineStore('store', {
 
     },
     downloadRankings() {
-      let csvString = 'Message;Total;Similarity;Share;Topic\n';  
+      let csvString = 'Bot;Message;Total;Similarity;Share;Topic;Polarity;Partner\n';  
       this.rankings.forEach(function(entry) {  
-        csvString += `${entry.message.message};;;;`
+        csvString += `${entry.message.bot_name};${entry.message.message};;;;;`
         csvString += "\n";  
         entry.ranked_responses.forEach(function(response) { 
-          csvString += `${response.message};${response.ranking_number};${response.similarity_score};${response.share_score};${response.topic_score}\n`
+          csvString += `${response.bot_name};${response.message};${response.ranking_number};${response.similarity_score};${response.share_score};${response.topic_score};${response.polarity_score};${response.conversation_partner_score}\n`
         });
+        csvString += "\n";  
       });
       const blob = new Blob([csvString], {type: "octet-stream"})
       const href = URL.createObjectURL(blob);

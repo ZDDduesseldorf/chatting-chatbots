@@ -73,4 +73,4 @@ def respond(message: Message, conversation: List[Message]):
     return answer
 
 
-chatbot = Chatbot(respond, "Theo")
+chatbot = Chatbot(respond, "Fridolin")

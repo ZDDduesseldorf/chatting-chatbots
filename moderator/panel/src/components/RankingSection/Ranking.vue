@@ -30,7 +30,9 @@ export default {
             <small class="text-[12px] text-white">
               Similarity: {{ message.similarity_score.toFixed(2) }} - Share:
               {{ message.share_score.toFixed(2) }} - Topic:
-              {{ message.topic_score.toFixed(2) }}</small
+              {{ message.topic_score.toFixed(2) }} - Polarity:
+              {{ message.polarity_score.toFixed(2) }} - Partner:
+              {{ message.conversation_partner_score.toFixed(2) }}</small
             >
           </div>
         </div>
