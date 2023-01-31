@@ -1,15 +1,13 @@
 import os
 
-import helpers
-import masks
-import multi_head_attention
-import positional_encoding
+import data_utils
+import layers
 import tensorflow as tf
 import tensorflow.python.keras as ks
 
 ks.backend.clear_session()
 
-VOCAB_SIZE = helpers.get_vocab_size()
+VOCAB_SIZE = data_utils.get_vocab_size()
 NUM_LAYERS = int(os.environ.get("NUM_LAYERS"))
 UNITS = int(os.environ.get("UNITS"))
 D_MODEL = int(os.environ.get("D_MODEL"))
@@ -18,11 +16,12 @@ DROPOUT = float(os.environ.get("DROPOUT"))
 MAX_LENGTH = int(os.environ.get("MAX_LENGTH"))
 
 
+
 def encoder_layer(units, d_model, num_heads, dropout, name="encoder_layer"):
     inputs = tf.keras.Input(shape=(None, d_model), name="inputs")
     padding_mask = tf.keras.Input(shape=(1, 1, None), name="padding_mask")
 
-    attention = multi_head_attention.MultiHeadAttention(
+    attention = layers.MultiHeadAttention(
         d_model, num_heads, name="attention"
     )({"query": inputs, "key": inputs, "value": inputs, "mask": padding_mask})
     attention = tf.keras.layers.Dropout(rate=dropout)(attention)
@@ -41,7 +40,7 @@ def encoder(vocab_size, num_layers, units, d_model, num_heads, dropout, name="en
 
     embeddings = tf.keras.layers.Embedding(vocab_size, d_model)(inputs)
     embeddings *= tf.math.sqrt(tf.cast(d_model, tf.float32))
-    embeddings = positional_encoding.PositionalEncoding(vocab_size, d_model)(embeddings)
+    embeddings = layers.PositionalEncoding(vocab_size, d_model)(embeddings)
 
     outputs = tf.keras.layers.Dropout(rate=dropout)(embeddings)
 
@@ -63,12 +62,12 @@ def decoder_layer(units, d_model, num_heads, dropout, name="decoder_layer"):
     look_ahead_mask = tf.keras.Input(shape=(1, None, None), name="look_ahead_mask")
     padding_mask = tf.keras.Input(shape=(1, 1, None), name="padding_mask")
 
-    attention1 = multi_head_attention.MultiHeadAttention(
+    attention1 = layers.MultiHeadAttention(
         d_model, num_heads, name="attention_1"
     )(inputs={"query": inputs, "key": inputs, "value": inputs, "mask": look_ahead_mask})
     attention1 = tf.keras.layers.LayerNormalization(epsilon=1e-6)(attention1 + inputs)
 
-    attention2 = multi_head_attention.MultiHeadAttention(
+    attention2 = layers.MultiHeadAttention(
         d_model, num_heads, name="attention_2"
     )(
         inputs={
@@ -103,7 +102,7 @@ def decoder(vocab_size, num_layers, units, d_model, num_heads, dropout, name="de
 
     embeddings = tf.keras.layers.Embedding(vocab_size, d_model)(inputs)
     embeddings *= tf.math.sqrt(tf.cast(d_model, tf.float32))
-    embeddings = positional_encoding.PositionalEncoding(vocab_size, d_model)(embeddings)
+    embeddings = layers.PositionalEncoding(vocab_size, d_model)(embeddings)
 
     outputs = tf.keras.layers.Dropout(rate=dropout)(embeddings)
 
@@ -130,17 +129,17 @@ def transformer(
     dec_inputs = tf.keras.Input(shape=(None,), name="dec_inputs")
 
     enc_padding_mask = tf.keras.layers.Lambda(
-        masks.create_padding_mask, output_shape=(1, 1, None), name="enc_padding_mask"
+        layers.create_padding_mask, output_shape=(1, 1, None), name="enc_padding_mask"
     )(inputs)
     # mask the future tokens for decoder inputs at the 1st attention block
     look_ahead_mask = tf.keras.layers.Lambda(
-        masks.create_look_ahead_mask,
+        layers.create_look_ahead_mask,
         output_shape=(1, None, None),
         name="look_ahead_mask",
     )(dec_inputs)
     # mask the encoder outputs for the 2nd attention block
     dec_padding_mask = tf.keras.layers.Lambda(
-        masks.create_padding_mask, output_shape=(1, 1, None), name="dec_padding_mask"
+        layers.create_padding_mask, output_shape=(1, 1, None), name="dec_padding_mask"
     )(inputs)
 
     enc_outputs = encoder(
@@ -195,21 +194,26 @@ def loss_function(y_true, y_pred):
     return tf.reduce_mean(loss)
 
 
-START_TOKEN, END_TOKEN = helpers.get_start_and_end_tokens()
-tokenizer = helpers.get_tokenizer()
-model = transformer(
-    vocab_size=VOCAB_SIZE,
-    num_layers=NUM_LAYERS,
-    units=UNITS,
-    d_model=D_MODEL,
-    num_heads=NUM_HEADS,
-    dropout=DROPOUT,
-)
-model.load_weights("chatbot_model/best_model")
+def accuracy(y_true, y_pred):
+    # ensure labels have shape (batch_size, MAX_LENGTH - 1)
+    y_true = tf.reshape(y_true, shape=(-1, MAX_LENGTH - 1))
+    return tf.keras.metrics.sparse_categorical_accuracy(y_true, y_pred)
 
 
 def evaluate(sentence):
-    sentence = helpers.preprocess_sentence(sentence)
+    START_TOKEN, END_TOKEN = data_utils.get_start_and_end_tokens()
+    tokenizer = data_utils.get_tokenizer()
+    model = transformer(
+        vocab_size=VOCAB_SIZE,
+        num_layers=NUM_LAYERS,
+        units=UNITS,
+        d_model=D_MODEL,
+        num_heads=NUM_HEADS,
+        dropout=DROPOUT,
+    )
+    model.load_weights("chatbot_model/best_model")
+
+    sentence = data_utils.preprocess_sentence(sentence)
 
     sentence = tf.expand_dims(
         START_TOKEN + tokenizer.encode(sentence) + END_TOKEN, axis=0
@@ -243,3 +247,4 @@ def predict(sentence):
     )
 
     return predicted_sentence
+

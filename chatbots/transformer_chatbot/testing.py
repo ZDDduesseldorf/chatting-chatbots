@@ -1,16 +1,14 @@
 import tensorflow as tf
 import tensorflow.python.keras as ks
-import helpers
+import data_utils
 from dotenv import load_dotenv
 import os
 import transformer
-from chatbotsclient.chatbot import Chatbot
-from chatbotsclient.message import Message
 from typing import List
 import pandas as pd
 ks.backend.clear_session()
 
-VOCAB_SIZE = helpers.get_vocab_size()
+VOCAB_SIZE = data_utils.get_vocab_size()
 NUM_LAYERS = int(os.environ.get('NUM_LAYERS'))
 UNITS = int(os.environ.get('UNITS'))
 D_MODEL = int(os.environ.get('D_MODEL'))
@@ -23,8 +21,8 @@ BATCH_SIZE = int(os.environ.get('BATCH_SIZE'))
 
 load_dotenv()
 
-START_TOKEN, END_TOKEN = helpers.get_start_and_end_tokens()
-tokenizer = helpers.get_tokenizer()
+START_TOKEN, END_TOKEN = data_utils.get_start_and_end_tokens()
+tokenizer = data_utils.get_tokenizer()
 model = transformer.transformer(
     vocab_size=VOCAB_SIZE,
     num_layers=NUM_LAYERS,
@@ -39,7 +37,7 @@ model.load_weights(path)
 
 
 def evaluate(sentence):
-    sentence = helpers.preprocess_sentence(sentence)
+    sentence = data_utils.preprocess_sentence(sentence)
 
     sentence = tf.expand_dims(
         START_TOKEN + tokenizer.encode(sentence) + END_TOKEN, axis=0)
@@ -76,6 +74,7 @@ def predict(sentence):
 def testing():
     df = pd.DataFrame(columns=['Questions', 'Answers'])
 
+    #Test questions
     mock_questions= ["How are you?", "What’s up?", "Good morning.", "Tell me something.", "Goodbye.", "How can you help me?", "Happy birthday!", "I have a question.",
      "Do you know a joke?", "Do you love me?", "Will you marry me?", "Do you like people?","Does Santa Claus exist?", "Are you part of the Matrix?", "You’re cute.","Do you have a hobby?", "You’re smart.",
      "Tell me about your personality.", "You’re annoying.", "you suck.", "I want to speak to a human", "Don’t you speak English?!","I want the answer NOW!","Are you a robot?", "What is your name?","How old are you?",
@@ -86,16 +85,6 @@ def testing():
     for index, question in enumerate(mock_questions):
         df.loc[index] = question, predict(question)
 
-    df.to_csv(f'./bot_conversations/bot_convo_{EPOCHS}EPOCHS_{NUM_LAYERS}LAYERS_{NUM_HEADS}HEADS_{UNITS}UNITS_{D_MODEL}DMODEL_{MAX_LENGTH}MAXLENGTH_{BATCH_SIZE}BATCHSIZE.csv')
+    df.to_csv(f'./testing_results/bot_convo_{EPOCHS}EPOCHS_{NUM_LAYERS}LAYERS_{NUM_HEADS}HEADS_{UNITS}UNITS_{D_MODEL}DMODEL_{MAX_LENGTH}MAXLENGTH_{BATCH_SIZE}BATCHSIZE.csv')
 
 testing()
-# while (True):
-#     inp = input('Say something: ')
-#     print('Freddy: ', predict(inp))
-
-def respond(message: Message, conversation: List[Message]):
-    # custom answer computation of your chatbot
-    answer = predict(message.message)
-    return answer
-
-chatbot = Chatbot(respond, "Freddy")

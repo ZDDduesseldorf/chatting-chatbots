@@ -18,5 +18,4 @@ def respond(message: Message, conversation: List[Message]):
     answer = random_answer(message.message, conversation)
     return answer
 
-
 chatbot = Chatbot(respond, "Steve", app_id="", app_key="", app_secret="", app_cluster="eu")

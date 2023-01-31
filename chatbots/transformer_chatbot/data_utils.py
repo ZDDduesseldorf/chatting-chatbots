@@ -1,7 +1,6 @@
 import os
 import pickle
-import re
-
+import sentence_processing
 import pandas as pd
 import tensorflow as tf
 import tensorflow_datasets as tfds
@@ -21,36 +20,24 @@ path = f"{directory}{MAX_LENGTH}LENGTH/"
 
 
 def get_start_and_end_tokens():
+    """Get START and END tokens from persisted tokenizer (both are not included in tokenizer vocabulary)."""
     tokenizer = get_tokenizer()
     return [tokenizer.vocab_size], [tokenizer.vocab_size + 1]
 
 
 def get_vocab_size():
+    """Get vocab size from persisted tokenizer including START and END token."""
     tokenizer = get_tokenizer()
     return tokenizer.vocab_size + 2
 
 
-def preprocess_sentence(sentence):
-    sentence = sentence.lower().strip()
-    # set dot at the end of sentence if there is no ?.!
-    if re.search('[.!?]$',sentence) is None:
-        sentence = sentence + '.'
-    # creating a space between a word and the punctuation following it
-    # eg: "he is a boy." => "he is a boy ."
-    sentence = re.sub(r"([?.!,])", r" \1 ", sentence)
-    sentence = re.sub(r'[" "]+', " ", sentence)
-    # replacing everything with space except (a-z, A-Z, ".", "?", "!", ",")
-    sentence = re.sub(r"[^a-zA-Z0-9?.!,]+", " ", sentence)
-    sentence = sentence.strip()
-    
-    return sentence
-
-
 def load_conversations(datapath, filename):
+    """Load question/answer pairs from csv containing 2M samples."""
     df = pd.read_csv(datapath + filename, sep=";")
     input_df = df["Input"]
     output_df = df["Output"]
 
+    # defaults to 0 when whole dataset is respected
     if MAX_SAMPLES == 0:
         input_list = input_df.values.tolist()
         output_list = output_df.values.tolist()
@@ -58,74 +45,27 @@ def load_conversations(datapath, filename):
         input_list = input_df.values.tolist()[:MAX_SAMPLES]
         output_list = output_df.values.tolist()[:MAX_SAMPLES]
 
+
     preprocessed_inputs, preprocessed_outputs = [], []
     progress = tqdm(range(len(input_list) - 1))
     for index in progress:
         progress.set_description("Reading from csv")
         input = input_list[index]
         output = output_list[index]
-
+        # samples not of type str are filtered out
         if type(input) == str and type(output) == str:
-            input = preprocess_sentence(input)
-            output = preprocess_sentence(output)
+            input = sentence_processing.preprocess_sentence(input)
+            output = sentence_processing.preprocess_sentence(output)
             max_sentence_length = MAX_LENGTH - 2
-            output_words = output.split()
-            input_words = input.split()
-            appendOutput = True
-            appendInput = True
-            if len(output_words) > max_sentence_length:
-                output_words = output_words[:max_sentence_length-1]
-                appendOutput = False
-                if "?" in output_words:
-                    index = output_words.index("?")
-                    if index > 0:
-                        output_words = output_words[:index+1]
-                        output = " ".join(output_words)
-                        appendOutput = True
-                else:
-                    if "!" in output_words:
-                        index = output_words.index("!")
-                        if index > 0:
-                            output_words = output_words[:index+1]
-                            output = " ".join(output_words)
-                            appendOutput = True
-                    else:
-                        if "." in output_words:
-                            index = output_words.index(".")
-                            if index > 0 and output_words[index-1] != 'www':
-                                output_words = output_words[:index+1]
-                                output = " ".join(output_words)
-                                appendOutput = True
-            if len(input_words) > max_sentence_length:
-                input_words = input_words[:max_sentence_length-1]
-                appendInput = False
-                if "?" in input_words:
-                    index = input_words.index("?")
-                    if index > 0:
-                        input_words = input_words[:index+1]
-                        input = " ".join(input_words)
-                        appendInput = True
-                else:
-                    if "!" in input_words:
-                        index = input_words.index("!")
-                        if index > 0:
-                            input_words = input_words[:index+1]
-                            input = " ".join(input_words)
-                            appendInput = True
-                    else:
-                        if "." in input_words:
-                            index = input_words.index(".")
-                            if index > 0 and input_words[index-1] != 'www':
-                                input_words = input_words[:index+1]
-                                input = " ".join(input_words)
-                                appendInput = True                                
+            input, appendInput = sentence_processing.trim_sentence(input, max_sentence_length)
+            output, appendOutput = sentence_processing.trim_sentence(output, max_sentence_length)                   
             if appendOutput and appendInput:
                 preprocessed_inputs.append(input)
                 preprocessed_outputs.append(output)
     return preprocessed_inputs, preprocessed_outputs
 
-
 def tokenize_and_filter(inputs, outputs):
+    """Add START and END token to dataset question/answer samples. Tokenize words and provide padding."""
     tokenizer = get_tokenizer()
     tokenized_inputs, tokenized_outputs = [], []
     START_TOKEN, END_TOKEN = get_start_and_end_tokens()
@@ -149,12 +89,14 @@ def tokenize_and_filter(inputs, outputs):
 
 
 def get_tokenizer():
+    """Load tokenizer from file."""
     return tfds.deprecated.text.SubwordTextEncoder.load_from_file(
         filename_prefix="chatbot_model/tokenizer"
     )
 
 
 def create_tokenizer(questions, answers):
+    """Create tokenizer and store file."""
     tokenizer = tfds.deprecated.text.SubwordTextEncoder.build_from_corpus(
         questions + answers, target_vocab_size=2**14
     )
@@ -163,6 +105,7 @@ def create_tokenizer(questions, answers):
 
 
 def create_and_save_dataset(x, y, name):
+    """Create and save Tensorflow Dataset."""
     # set validation dataset
     dataset = tf.data.Dataset.from_tensor_slices(
         (
@@ -181,6 +124,7 @@ def create_and_save_dataset(x, y, name):
 
 
 def load_dataset(name):
+    """Load Tensorflow dataset."""
     with open(path + name + "/element_spec", "rb") as in_:
         es = pickle.load(in_)
     return tf.data.experimental.load(path + name, es)

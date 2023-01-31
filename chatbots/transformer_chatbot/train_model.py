@@ -1,6 +1,6 @@
 import tensorflow as tf
 import transformer
-import helpers
+import data_utils
 import os
 from dotenv import load_dotenv
 import tensorflow.python.keras as ks
@@ -8,7 +8,7 @@ import tensorflow.python.keras as ks
 load_dotenv()
 print("Num GPUs Available: ", len(tf.config.list_physical_devices('GPU')))
 
-VOCAB_SIZE = helpers.get_vocab_size()
+VOCAB_SIZE = data_utils.get_vocab_size()
 NUM_LAYERS = int(os.environ.get('NUM_LAYERS'))
 UNITS = int(os.environ.get('UNITS'))
 D_MODEL = int(os.environ.get('D_MODEL'))
@@ -37,8 +37,8 @@ optimizer = tf.keras.optimizers.Adam(
 model.compile(optimizer=optimizer,
               loss=transformer.loss_function, metrics=[transformer.accuracy])
 
-train_dataset = helpers.load_dataset("train")
-val_dataset = helpers.load_dataset("val")
+train_dataset = data_utils.load_dataset("train")
+val_dataset = data_utils.load_dataset("val")
 
 logdir = f"logs/merged/scalars/{EPOCHS}EPOCHS_{NUM_LAYERS}LAYERS_{NUM_HEADS}HEADS_{UNITS}UNITS_{D_MODEL}DMODEL_{MAX_LENGTH}MAXLENGTH_{BATCH_SIZE}BATCHSIZE"
 tensorboard_callback = ks.callbacks.TensorBoard(log_dir=logdir)
@@ -46,6 +46,7 @@ checkpoint_callback = ks.callbacks.ModelCheckpoint(
     f"{path}best_model", save_best_only=True, save_weights_only=True)
 stop_early_callback = ks.callbacks.EarlyStopping(
     monitor='val_loss', patience=3)
+    
 model.fit(train_dataset, epochs=EPOCHS, validation_data=val_dataset,
           callbacks=[tensorboard_callback, checkpoint_callback, stop_early_callback])
 
