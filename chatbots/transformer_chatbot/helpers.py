@@ -10,14 +10,14 @@ from tqdm import tqdm
 
 load_dotenv()
 
-BUFFER_SIZE = int(os.environ.get("BUFFER_SIZE"))
-BATCH_SIZE = int(os.environ.get("BATCH_SIZE"))
-MAX_SAMPLES = int(os.environ.get("MAX_SAMPLES"))
-MAX_LENGTH = int(os.environ.get("MAX_LENGTH"))
-MIN_LENGTH = int(os.environ.get("MIN_LENGTH"))
-EPOCHS = int(os.environ.get("EPOCHS"))
-directory = "./data/"
-path = f"{directory}{EPOCHS}EPOCHS_{MAX_SAMPLES}SAMPLES_{MAX_LENGTH}LENGTH/"
+BUFFER_SIZE = int(os.environ.get('BUFFER_SIZE'))
+BATCH_SIZE = int(os.environ.get('BATCH_SIZE'))
+MAX_SAMPLES = int(os.environ.get('MAX_SAMPLES'))
+MAX_LENGTH = int(os.environ.get('MAX_LENGTH'))
+MIN_LENGTH = int(os.environ.get('MIN_LENGTH'))
+EPOCHS = int(os.environ.get('EPOCHS'))
+directory = './data/merged/'
+path = f"{directory}{MAX_LENGTH}LENGTH/"
 
 
 def get_start_and_end_tokens():
@@ -32,13 +32,17 @@ def get_vocab_size():
 
 def preprocess_sentence(sentence):
     sentence = sentence.lower().strip()
+    # set dot at the end of sentence if there is no ?.!
+    if re.search('[.!?]$',sentence) is None:
+        sentence = sentence + '.'
     # creating a space between a word and the punctuation following it
     # eg: "he is a boy." => "he is a boy ."
     sentence = re.sub(r"([?.!,])", r" \1 ", sentence)
     sentence = re.sub(r'[" "]+', " ", sentence)
     # replacing everything with space except (a-z, A-Z, ".", "?", "!", ",")
-    sentence = re.sub(r"[^a-zA-Z?.!,]+", " ", sentence)
+    sentence = re.sub(r"[^a-zA-Z0-9?.!,]+", " ", sentence)
     sentence = sentence.strip()
+    
     return sentence
 
 
@@ -62,15 +66,62 @@ def load_conversations(datapath, filename):
         output = output_list[index]
 
         if type(input) == str and type(output) == str:
+            input = preprocess_sentence(input)
+            output = preprocess_sentence(output)
             max_sentence_length = MAX_LENGTH - 2
-            if (
-                len(input.split()) <= max_sentence_length
-                and len(output.split()) <= max_sentence_length
-                and len(output.split()) > MIN_LENGTH
-                and len(output.split()) > MIN_LENGTH
-            ):
-                preprocessed_inputs.append(preprocess_sentence(input))
-                preprocessed_outputs.append(preprocess_sentence(output))
+            output_words = output.split()
+            input_words = input.split()
+            appendOutput = True
+            appendInput = True
+            if len(output_words) > max_sentence_length:
+                output_words = output_words[:max_sentence_length-1]
+                appendOutput = False
+                if "?" in output_words:
+                    index = output_words.index("?")
+                    if index > 0:
+                        output_words = output_words[:index+1]
+                        output = " ".join(output_words)
+                        appendOutput = True
+                else:
+                    if "!" in output_words:
+                        index = output_words.index("!")
+                        if index > 0:
+                            output_words = output_words[:index+1]
+                            output = " ".join(output_words)
+                            appendOutput = True
+                    else:
+                        if "." in output_words:
+                            index = output_words.index(".")
+                            if index > 0 and output_words[index-1] != 'www':
+                                output_words = output_words[:index+1]
+                                output = " ".join(output_words)
+                                appendOutput = True
+            if len(input_words) > max_sentence_length:
+                input_words = input_words[:max_sentence_length-1]
+                appendInput = False
+                if "?" in input_words:
+                    index = input_words.index("?")
+                    if index > 0:
+                        input_words = input_words[:index+1]
+                        input = " ".join(input_words)
+                        appendInput = True
+                else:
+                    if "!" in input_words:
+                        index = input_words.index("!")
+                        if index > 0:
+                            input_words = input_words[:index+1]
+                            input = " ".join(input_words)
+                            appendInput = True
+                    else:
+                        if "." in input_words:
+                            index = input_words.index(".")
+                            if index > 0 and input_words[index-1] != 'www':
+                                input_words = input_words[:index+1]
+                                input = " ".join(input_words)
+                                appendInput = True                                
+            if appendOutput and appendInput:
+                preprocessed_inputs.append(input)
+                preprocessed_outputs.append(output)
     return preprocessed_inputs, preprocessed_outputs
 
 

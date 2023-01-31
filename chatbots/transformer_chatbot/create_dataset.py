@@ -16,9 +16,9 @@ EPOCHS = int(os.environ.get('EPOCHS'))
 MAX_LENGTH = int(os.environ.get('MAX_LENGTH'))
 MAX_SAMPLES = int(os.environ.get('MAX_SAMPLES'))
 
-datapath = './data/'
-path = f"{datapath}{EPOCHS}EPOCHS_{MAX_SAMPLES}SAMPLES_{MAX_LENGTH}LENGTH/"
-filename = 'transformer_data.csv'
+datapath = './data/merged/'
+path = f"{datapath}{MAX_LENGTH}LENGTH/"
+filename = 'merged.csv'
 os.mkdir(path)
 
 questions, answers = helpers.load_conversations(datapath, filename)
@@ -32,8 +32,8 @@ spinner.stop()
 spinner = Halo(text='Tokenize and filter dataset sentences ...',
                spinner='monkey')
 spinner.start()
-# split dataset 70:30
-val_split = int(len(questions)*(2/3))
+# split dataset 9:10
+val_split = int(len(questions)*(9/10))
 train_questions, train_answers = helpers.tokenize_and_filter(
     questions[:val_split], answers[:val_split])
 val_questions, val_answers = helpers.tokenize_and_filter(
