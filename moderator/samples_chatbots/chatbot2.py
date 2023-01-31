@@ -22,4 +22,4 @@ def respond(message: Message, conversation: List[Message]):
     return answer
 
 
-chatbot = Chatbot(respond, "Pete")
+chatbot = Chatbot(respond, "Pete", app_id="", app_key="", app_secret="", app_cluster="eu")

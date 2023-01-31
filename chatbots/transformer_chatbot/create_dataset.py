@@ -53,3 +53,6 @@ spinner.stop()
 
 print('Size training samples:', len(train_questions))
 print('Size val samples:', len(val_questions))
+
+
+

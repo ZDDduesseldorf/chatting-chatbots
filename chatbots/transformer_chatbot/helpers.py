@@ -39,7 +39,6 @@ def preprocess_sentence(sentence):
     # replacing everything with space except (a-z, A-Z, ".", "?", "!", ",")
     sentence = re.sub(r"[^a-zA-Z?.!,]+", " ", sentence)
     sentence = sentence.strip()
-    # adding a start and an end token to the sentence
     return sentence
 
 

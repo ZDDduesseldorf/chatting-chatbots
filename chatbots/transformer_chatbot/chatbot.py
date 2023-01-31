@@ -36,21 +36,24 @@ def remove_repetitions(sentence):
 
     return sentence
 
-
-class TransformerChatbot:
-    def __init__(self):
-        self.conversation = []
-
-    def process(self, sentence):
-        """Process sentence."""
-        sentence = remove_repetitions(sentence)
-        sentence = (
+def remove_spaces(sentence):
+    sentence = (
             sentence.replace(" the u ", " the usa ")
             .replace(" .", ".")
             .replace(" ?", "?")
             .replace(" !", "!")
             .replace(" ,", ",")
         )
+    return sentence
+
+class TransformerChatbot:
+    def __init__(self):
+        self.conversation = []
+
+    def postprocess(self, sentence):
+        """Process sentence."""
+        sentence = remove_repetitions(sentence)
+        sentence = remove_spaces(sentence)
         sentence = replace_after_sentence_sign(sentence)
         sentence = handle_following_appostrophs(sentence)
         sentence = sentence[0].upper() + sentence[1:]
@@ -61,7 +64,7 @@ class TransformerChatbot:
         sentence,
     ):
         """Respond to input."""
-        output = self.process(model.predict(sentence))
+        output = self.postprocess(model.predict(sentence))
         return output
 
 
@@ -73,4 +76,4 @@ def respond(message: Message, conversation: List[Message]):
     return answer
 
 
-chatbot = Chatbot(respond, "Fridolin")
+chatbot = Chatbot(respond, "Theo", app_id="", app_key="", app_secret="", app_cluster="eu")
