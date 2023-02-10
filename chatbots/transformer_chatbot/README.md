@@ -5,17 +5,10 @@ Dataset preparation model and interface for a transformer based chatbot in Tenso
 
 ### Setup
 
-- create new anaconda environment and initialize environment `transformer-chatbot`
-
+Create conda environment with necessary dependencies.
   ```
-  conda create -n transformer-chatbot tensorflow-gpu python=3.9? //schauen ob python version ok und ob der Command klappt
+  conda create --name transformer-chatbot --file requirements.txt
   conda activate transformer-chatbot
-
-  ```
-
-- run installation script
-  ```
-  pip install -r requirements.txt
   ```
 
 ### Dataset
