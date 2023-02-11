@@ -20,6 +20,33 @@ Create a CSV file containing your training data set and save it to `./data/<data
 Run the following command to start the training:
 
 ```
-$ python train_model.py --dataset <dataset-name>
+python train_model.py --dataset <dataset-name>
 ```
+
+## Evaluation
+
+After you have trained your model, you can evaluate it by running the following command:
+
+```
+python evaluate_model.py --dataset <dataset-name>
+```
+
+## Configuration
+
+You can change the default parameters used during training by passing the following command line arguments. Just remember to use the same values when evaluating you model afterwards.
+
+| Argument | Description |
+| - | - |
+| `--dataset` | Name of the dataset |
+| `--target-vocab-size-exp` | Exponent of the target size for the tokenizer vocabulary |
+| `--max-samples` | Maximum number of data set samples used |
+| `--max-length` | Maximum number of tokens allowed for each sample |
+| `--buffer-size` | Buffer size for data set shuffling |
+| `--batch-size` | Batch size of the data set during training |
+| `--epochs` | Number of epochs during training |
+| `--num-layers` | Number of layers in transformer model |
+| `--num-units` | Number of units in transformer model |
+| `--d-model` | Number of dimensions in transformer model |
+| `--num-heads` | Number of heads in multi-head attention of transformer model |
+| `--dropout` | Dropout rate during training |
 
