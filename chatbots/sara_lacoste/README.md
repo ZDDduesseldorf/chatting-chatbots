@@ -1,6 +1,6 @@
 # Transformer Chatbot Sara Lacoste
 
-_Authors: Paul Kretschel, Kevin Zielke_
+_Authors: [Paul Kretschel](https://github.com/paulkre), [Kevin Zielke](https://github.com/Knerten0815)_
 
 Chatbot system based on the transformer architecture published in [_Attention is all you need_](https://arxiv.org/abs/1706.03762) (2017).
 
