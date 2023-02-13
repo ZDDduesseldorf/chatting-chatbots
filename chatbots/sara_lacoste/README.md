@@ -17,15 +17,15 @@ Create a CSV file containing your training data set and save it to `./data/<data
 | What is the biggest fish? | A whale shark. |
 | ... | ... |
 
-There are some examples in the `./dataset_to_csv_scripts/` folder showing how to load and refactor datasets from [_🤗 Datasets_](https://huggingface.co/docs/datasets/index).
-**Sara Lacoste** was trained on a dataset that was merged from the following datasets:
+There are some examples in the `./dataset_to_csv_scripts/` folder showing how to load and refactor data sets from [_🤗 Datasets_](https://huggingface.co/docs/datasets/index).
+**Sara Lacoste** was trained on a data set that was merged from the following data sets:
 - [yahoo answers dataset](https://www.kaggle.com/datasets/jarupula/yahoo-answers-dataset)
 - [chatbot-dataset-topical-chat](https://www.kaggle.com/datasets/arnavsharmaas/chatbot-dataset-topical-chat)
 - [cornell_movie_dialog](https://huggingface.co/datasets/cornell_movie_dialog)
 - [empathetic_dialogues](https://huggingface.co/datasets/empathetic_dialogues)
 - [allenai/prosocial-dialog](https://huggingface.co/datasets/allenai/prosocial-dialog)
 
-The merged dataset can be downloaded [here](https://fhd.sharepoint.com/:u:/r/teams/Chatbotsdiesmartsind/Freigegebene%20Dokumente/General/Datensaetze/merged.csv.zip?csf=1&web=1&e=jTSgxU)
+The merged data set can be downloaded [here](https://fhd.sharepoint.com/:u:/r/teams/Chatbotsdiesmartsind/Freigegebene%20Dokumente/General/Datensaetze/merged.csv.zip?csf=1&web=1&e=jTSgxU)
 
 ## Training
 
@@ -35,7 +35,7 @@ Run the following command to start the training:
 python train_model.py --dataset <dataset-name>
 ```
 
-<dataset-name> takes the name of the datasets CSV file, without the .csv ending.
+``<dataset-name>`` takes the name of the data sets CSV file, without the .csv ending.
 
 ## Evaluation
 
@@ -47,8 +47,8 @@ python evaluate_model.py --dataset <dataset-name>
 
 This will load the model and ask it some standard questions. The questions and the models answers will be shown in the command prompt and saved to `./logs/<dataset-path>/test_chat_log.csv` for later comparison with other trainings. After that you can enter anything into the cammand line to chat and evaluate the model freely.
 
-<dataset-path> will be created during training and is made up by the models hyperparameters (see [Configuration](#configuration)) used for training.
-<dataset-path> follows this naming rule: <dataset-name>__2<sup><target-vocab-size-exp></sup>Voc__<max-samples>Smp_<max-length>Len_<batch-size>Bat_<batch-size>Buf__<num-layers>Lay_<num-heads>Hed_<epochs>Epo
+``<dataset-path>`` will be created during training and is made up by the models hyperparameters (see [Configuration](#configuration)) used for training.
+``<dataset-path>`` follows this naming rule: ``<dataset-name>__2<sup><target-vocab-size-exp></sup>Voc__<max-samples>Smp_<max-length>Len_<batch-size>Bat_<batch-size>Buf__<num-layers>Lay_<num-heads>Hed_<epochs>Epo``
 
 [Tensorboard](https://www.tensorflow.org/tensorboard) is another way to evaluate the model. It can be used to monitor the loss and accuracy functions of the transformer model during training or compare them between different models after the training. Run:
 
