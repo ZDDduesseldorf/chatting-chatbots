@@ -10,12 +10,14 @@ Why “Sara Lacoste”?
 
 ## Training
 
-Create a CSV file containing your training data set and save it to `./data/<dataset-name>.csv`. The file has to be in the following format:
+Create a CSV file containing your training data set and save it to `./data/<dataset-name>.csv`. The CSV file needs to use semicolons (;) as seperators and has to be in the following format:
 
 | Input | Output |
 | - | - |
 | What is the biggest fish? | A whale shark. |
 | ... | ... |
+
+There are some examples in the './dataset_to_csv_scripts/' folder showing how to load and refactor datasets from [_🤗 Datasets_](https://huggingface.co/docs/datasets/index)
 
 Run the following command to start the training:
 
