@@ -19,13 +19,14 @@ Create a CSV file containing your training data set and save it to `./data/<data
 
 There are some examples in the `./dataset_to_csv_scripts/` folder showing how to load and refactor data sets from [_🤗 Datasets_](https://huggingface.co/docs/datasets/index).
 **Sara Lacoste** was trained on a data set that was merged from the following data sets:
-- [yahoo answers dataset](https://www.kaggle.com/datasets/jarupula/yahoo-answers-dataset)
-- [chatbot-dataset-topical-chat](https://www.kaggle.com/datasets/arnavsharmaas/chatbot-dataset-topical-chat)
-- [cornell_movie_dialog](https://huggingface.co/datasets/cornell_movie_dialog)
-- [empathetic_dialogues](https://huggingface.co/datasets/empathetic_dialogues)
-- [allenai/prosocial-dialog](https://huggingface.co/datasets/allenai/prosocial-dialog)
 
-The merged data set can be downloaded [here](https://fhd.sharepoint.com/:u:/r/teams/Chatbotsdiesmartsind/Freigegebene%20Dokumente/General/Datensaetze/merged.csv.zip?csf=1&web=1&e=jTSgxU)
+- [_Yahoo Answers Dataset (from Kaggle)_](https://www.kaggle.com/datasets/jarupula/yahoo-answers-dataset)
+- [_Chatbot Dataset Topical Chat (from Kaggle)_](https://www.kaggle.com/datasets/arnavsharmaas/chatbot-dataset-topical-chat)
+- [_cornell_movie_dialog (from 🤗 Datasets)_](https://huggingface.co/datasets/cornell_movie_dialog)
+- [_empathetic_dialogues (from 🤗 Datasets)_](https://huggingface.co/datasets/empathetic_dialogues)
+- [_allenai/prosocial-dialog (from 🤗 Datasets)_](https://huggingface.co/datasets/allenai/prosocial-dialog)
+
+The merged data set can be downloaded [_here_](https://fhd.sharepoint.com/:u:/r/teams/Chatbotsdiesmartsind/Freigegebene%20Dokumente/General/Datensaetze/merged.csv.zip?csf=1&web=1&e=jTSgxU).
 
 ## Training
 
@@ -50,13 +51,13 @@ This will load the model and ask it some standard questions. The questions and t
 ``<dataset-path>`` will be created during training and is made up by the models hyperparameters (see [Configuration](#configuration)) used for training.
 ``<dataset-path>`` follows this naming rule: \<*dataset-name*\>\_2<sup>\<*target-vocab-size-exp*\></sup>Voc\_\<*max-samples*\>Smp\_\<*max-length*\>Len\_\<*batch-size*\>Bat\_\<*buffer-size*\>Buf\_\<*num-layers*\>Lay\_\<*num-heads*\>Hed\_\<*epochs*\>Epo
 
-[Tensorboard](https://www.tensorflow.org/tensorboard) is another way to evaluate the model. It can be used to monitor the loss and accuracy functions of the transformer model during training or compare them between different models after the training. Run:
+[_Tensorboard_](https://www.tensorflow.org/tensorboard) is another way to evaluate the model. It can be used to monitor the loss and accuracy functions of the transformer model during training or compare them between different models after the training. Run:
 
 ```
 tensorboard --logdir logs
 ```
 
-Open a browser and access http://localhost:6006/ for the tensorboard GUI.
+Access http://localhost:6006/ through a browser for the tensorboard GUI.
 
 ## Configuration
 
