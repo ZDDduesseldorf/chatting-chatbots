@@ -1,16 +1,16 @@
-# GPT Chatbot “Sara Lacoste”
+# Transformer Chatbot Sara Lacoste
 
 _Authors: Paul Kretschel, Kevin Zielke_
 
 Chatbot system based on the transformer architecture published in [_Attention is all you need_](https://arxiv.org/abs/1706.03762) (2017).
 
-Why “Sara Lacoste”?
+**Sara Lacoste** was the name "chosen" by one of the better performing models we trained with this system:
 
 ![Birth of Sara Lacoste](https://github.com/ZDDduesseldorf/chatting-chatbots/blob/optimus_fine/chatbots/transformer_chatbot/docs/birth-of-sara-lacoste.png)
 
-## Training
+## Prepare Data
 
-Create a CSV file containing your training data set and save it to `./data/<dataset-name>.csv`. The CSV file needs to use semicolons (;) as seperators and has to be in the following format:
+Create a CSV file containing your training data set and save it to `./data/<dataset-name>.csv`. The CSV file has to be in the following format and use semicolons (;) as seperators:
 
 | Input | Output |
 | - | - |
@@ -18,12 +18,24 @@ Create a CSV file containing your training data set and save it to `./data/<data
 | ... | ... |
 
 There are some examples in the `./dataset_to_csv_scripts/` folder showing how to load and refactor datasets from [_🤗 Datasets_](https://huggingface.co/docs/datasets/index).
+**Sara Lacoste** was trained on a dataset that was merged from the following datasets:
+- [yahoo answers dataset](https://www.kaggle.com/datasets/jarupula/yahoo-answers-dataset)
+- [chatbot-dataset-topical-chat](https://www.kaggle.com/datasets/arnavsharmaas/chatbot-dataset-topical-chat)
+- [cornell_movie_dialog](https://huggingface.co/datasets/cornell_movie_dialog)
+- [empathetic_dialogues](https://huggingface.co/datasets/empathetic_dialogues)
+- [allenai/prosocial-dialog](https://huggingface.co/datasets/allenai/prosocial-dialog)
+
+The merged dataset can be downloaded [here](https://fhd.sharepoint.com/:u:/r/teams/Chatbotsdiesmartsind/Freigegebene%20Dokumente/General/Datensaetze/merged.csv.zip?csf=1&web=1&e=jTSgxU)
+
+## Training
 
 Run the following command to start the training:
 
 ```
 python train_model.py --dataset <dataset-name>
 ```
+
+<dataset-name> takes the name of the datasets CSV file, without the .csv ending.
 
 ## Evaluation
 
@@ -33,13 +45,26 @@ After you have trained your model, you can evaluate it by running the following 
 python evaluate_model.py --dataset <dataset-name>
 ```
 
+This will load the model and ask it some standard questions. The questions and the models answers will be shown in the command prompt and saved to `./logs/<dataset-path>/test_chat_log.csv` for later comparison with other trainings. After that you can enter anything into the cammand line to chat and evaluate the model freely.
+
+<dataset-path> will be created during training and is made up by the models hyperparameters (see [Configuration](#configuration)) used for training.
+<dataset-path> follows this naming rule: <dataset-name>__2<sup><target-vocab-size-exp></sup>Voc__<max-samples>Smp_<max-length>Len_<batch-size>Bat_<batch-size>Buf__<num-layers>Lay_<num-heads>Hed_<epochs>Epo
+
+[Tensorboard](https://www.tensorflow.org/tensorboard) is another way to evaluate the model. It can be used to monitor the loss and accuracy functions of the transformer model during training or compare them between different models after the training. Run:
+
+```
+tensorboard --logdir logs
+```
+
+Open a browser and access http://localhost:6006/ for the tensorboard GUI.
+
 ## Configuration
 
-You can change the default parameters used during training by passing the following command line arguments. Just remember to use the same values when evaluating you model afterwards.
+You can change the default parameters used during training by passing the following command line arguments. Just remember to use the same values when evaluating your model afterwards.
 
 | Argument | Description |
 | - | - |
-| `--dataset` | Name of the dataset |
+| `--dataset` | Name of the datasets CSV file, without the .csv ending |
 | `--target-vocab-size-exp` | Exponent of the target size for the tokenizer vocabulary |
 | `--max-samples` | Maximum number of data set samples used |
 | `--max-length` | Maximum number of tokens allowed for each sample |
@@ -52,3 +77,10 @@ You can change the default parameters used during training by passing the follow
 | `--num-heads` | Number of heads in multi-head attention of transformer model |
 | `--dropout` | Dropout rate during training |
 
+## Let Sara chat with other bots
+
+If you want to know what Sara and the other chatbots of this repository are gossiping about, you will need to set up [chatbotsclient](https://github.com/Robstei/chatbotsclient) and follow the installation instructions. After that you can run the following command:
+
+```
+python chat.py --dataset <dataset-name>
+```
