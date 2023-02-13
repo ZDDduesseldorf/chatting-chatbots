@@ -17,7 +17,7 @@ Create a CSV file containing your training data set and save it to `./data/<data
 | What is the biggest fish? | A whale shark. |
 | ... | ... |
 
-There are some examples in the './dataset_to_csv_scripts/' folder showing how to load and refactor datasets from [_🤗 Datasets_](https://huggingface.co/docs/datasets/index)
+There are some examples in the `./dataset_to_csv_scripts/` folder showing how to load and refactor datasets from [_🤗 Datasets_](https://huggingface.co/docs/datasets/index).
 
 Run the following command to start the training:
 
