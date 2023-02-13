@@ -6,7 +6,7 @@ Chatbot system based on the transformer architecture published in [_Attention is
 
 **Sara Lacoste** was the name "chosen" by one of the better performing models we trained with this system:
 
-![Birth of Sara Lacoste](https://github.com/ZDDduesseldorf/chatting-chatbots/blob/optimus_fine/chatbots/transformer_chatbot/docs/birth-of-sara-lacoste.png)
+![Birth of Sara Lacoste](https://github.com/ZDDduesseldorf/chatting-chatbots/blob/main/chatbots/transformer_chatbot/docs/birth-of-sara-lacoste.png)
 
 ## Prepare Data
 
