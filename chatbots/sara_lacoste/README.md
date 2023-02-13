@@ -48,7 +48,7 @@ python evaluate_model.py --dataset <dataset-name>
 This will load the model and ask it some standard questions. The questions and the models answers will be shown in the command prompt and saved to `./logs/<dataset-path>/test_chat_log.csv` for later comparison with other trainings. After that you can enter anything into the cammand line to chat and evaluate the model freely.
 
 <dataset-path> will be created during training and is made up by the models hyperparameters (see [Configuration](#configuration)) used for training.
-<dataset-path> follows this naming rule: _\<dataset-name\>_\_2<sup>_\<target-vocab-size-exp\>_</sup>Voc\__\<max-samples\>_Smp\__\<max-length\>_Len\__\<batch-size\>_Bat\__\<buffer-size\>_Buf\__\<num-layers\>_Lay\__\<num-heads\>_Hed\__\<epochs\>_Epo
+<dataset-path> follows this naming rule: *\<dataset-name\>*\_2<sup>*\<target-vocab-size-exp\>*</sup>Voc\_**\<max-samples\>*Smp\_**\<max-length\>*Len\_**\<batch-size\>*Bat\_**\<buffer-size\>*Buf\_**\<num-layers\>*Lay\_**\<num-heads\>*Hed\_**\<epochs\>*Epo
 
 [Tensorboard](https://www.tensorflow.org/tensorboard) is another way to evaluate the model. It can be used to monitor the loss and accuracy functions of the transformer model during training or compare them between different models after the training. Run:
 
