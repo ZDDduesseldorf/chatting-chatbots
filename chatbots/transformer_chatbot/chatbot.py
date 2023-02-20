@@ -4,11 +4,11 @@ import sentence_processing
 from chatbotsclient.chatbot import Chatbot
 from chatbotsclient.message import Message
 
+
 class TransformerChatbot:
 
     def __init__(self):
         self.conversation = []
-
 
     def postprocess(self, sentence):
         """Process sentence."""
@@ -19,7 +19,6 @@ class TransformerChatbot:
         sentence = sentence_processing.handle_following_appostrophs(sentence)
         sentence = sentence[0].upper() + sentence[1:]
         return sentence
-
 
     def respond(self, sentence):
         """Respond to input."""
@@ -36,4 +35,5 @@ def respond(message: Message, conversation: List[Message]):
     return answer
 
 
-chatbot = Chatbot(respond, "Theo", app_id="", app_key="", app_secret="", app_cluster="eu")
+chatbot = Chatbot(respond, "Theo", app_id="", app_key="",
+                  app_secret="", app_cluster="eu")
