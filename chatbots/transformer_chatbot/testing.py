@@ -1,6 +1,7 @@
 import tensorflow as tf
 import tensorflow.python.keras as ks
 import data_utils
+import sentence_processing
 from dotenv import load_dotenv
 import os
 import transformer
@@ -37,7 +38,7 @@ model.load_weights(path)
 
 
 def evaluate(sentence):
-    sentence = data_utils.preprocess_sentence(sentence)
+    sentence = sentence_processing.preprocess_sentence(sentence)
 
     sentence = tf.expand_dims(
         START_TOKEN + tokenizer.encode(sentence) + END_TOKEN, axis=0)
