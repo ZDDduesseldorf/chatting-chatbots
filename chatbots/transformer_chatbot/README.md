@@ -53,13 +53,28 @@ All custom transformer layers used by encoder and decoder as well as masks are l
 
 ### Usage
 
+All relevant parameters are managed via an env file. The file contains following parameters:
+|Parameter|Description|
+|---------|-----------|
+|MAX_SAMPLES|This parameter was used for testing purposes to receive fast results. Setting it to 0 results in max samples count available.|
+|MAX_LENGTH|The max length of question and answer samples. Sentences longer than the provided value will be trimmed if possible.|
+|MIN_LENGTH|This parameter was used in the experimental phase of the project. We wanted to evaluate sequential training with incresing sentence lengths.|
+|BATCH_SIZE|The amount of samples passed to the neural network simultaniously.|
+|BUFFER_SIZE||
+|NUM_LAYERS|Amount of encoder and decoder layers.|
+|D_MODEL|Model dimension.|
+|NUM_HEADS|Amount of concatinated multi head attention layers.|
+|UNITS|Amount of units in the feed forward neural networks.|
+|DROPOUT|Dropout value for all model layers.|
+|EPOCHS|Amount of epochs. Since early stopping is activated, the training will probibly consist of less epochs though.|
+
 #### 1. Create Dataset
 
 ```
 python create_dataset.py
 ```
 
-- the tokenized dataset will be saved to `data`. //!!! Hier noch Paths und Folder anpassen
+- the tokenized dataset will be saved to `data`.
 
 #### 2. Train Model
 
@@ -67,7 +82,7 @@ python create_dataset.py
 python train_model.py
 ```
 
-- the final (early stop) and best (lowest loss) trained model will be saved to `model`. //!!! Hier noch Paths und Folder anpassen
+- the final (early stop) and best (lowest loss) trained model will be saved to `model`.
 
 #### 3. Create test data as CSV
 
@@ -83,4 +98,4 @@ python testing.py
 python chatbot.py
 ```
 
-- to connect the chatbot with the moderator bot, you have to type in your pusher credentials ([see chatbotsclient README](https://github.com/Robstei/chatbotsclient))
+- to connect the chatbot with the moderator bot you have to provide pusher credentials ([see chatbotsclient README](https://github.com/Robstei/chatbotsclient))
