@@ -41,8 +41,8 @@ This contains following parts of the transformer archtieture:
 - general transformer architecture
 - embeddings of input tokens
 - definition of encoder and decoder layer which are using:
-  -> multihead attention layers (masked and not masked)
-  -> feed forward neural networks
+  - multihead attention layers (masked and not masked)
+  - feed forward neural networks
 - stacking of encoder and decoder layers
 
 All custom transformer layers used by encoder and decoder are located in layers.py:
