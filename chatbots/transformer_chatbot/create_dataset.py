@@ -20,7 +20,7 @@ spinner = Halo(text='Creating tokenizer and vocabulary ...',
 spinner.start()
 
 # load conversation from csv containing 2M question/answer samples
-datapath = './data/merged/'
+datapath = './data/'
 path = f"{datapath}{MAX_LENGTH}LENGTH/"
 filename = 'merged.csv'
 os.mkdir(path)

@@ -21,12 +21,15 @@ def encoder_layer(units, d_model, num_heads, dropout, name="encoder_layer"):
     inputs = tf.keras.Input(shape=(None, d_model), name="inputs")
     padding_mask = tf.keras.Input(shape=(1, 1, None), name="padding_mask")
 
+    # firs attention layer (not masked -> all inputs respect all inputs)
     attention = layers.MultiHeadAttention(
         d_model, num_heads, name="attention"
     )({"query": inputs, "key": inputs, "value": inputs, "mask": padding_mask})
     attention = tf.keras.layers.Dropout(rate=dropout)(attention)
+    # normalize outputs of attention layer
     attention = tf.keras.layers.LayerNormalization(epsilon=1e-6)(inputs + attention)
 
+    # feed forward neural network after the attention layer
     outputs = tf.keras.layers.Dense(units=units, activation="relu")(attention)
     outputs = tf.keras.layers.Dense(units=d_model)(outputs)
     outputs = tf.keras.layers.Dropout(rate=dropout)(outputs)
@@ -35,15 +38,19 @@ def encoder_layer(units, d_model, num_heads, dropout, name="encoder_layer"):
 
 
 def encoder(vocab_size, num_layers, units, d_model, num_heads, dropout, name="encoder"):
+    # create inputs from model key
     inputs = tf.keras.Input(shape=(None,), name="inputs")
+    # apply padding mask for sentences < max_length
     padding_mask = tf.keras.Input(shape=(1, 1, None), name="padding_mask")
 
+    # create embeddings from tokenized inputs
     embeddings = tf.keras.layers.Embedding(vocab_size, d_model)(inputs)
     embeddings *= tf.math.sqrt(tf.cast(d_model, tf.float32))
     embeddings = layers.PositionalEncoding(vocab_size, d_model)(embeddings)
 
     outputs = tf.keras.layers.Dropout(rate=dropout)(embeddings)
 
+    # create encoder layer range num_layers times
     for i in range(num_layers):
         outputs = encoder_layer(
             units=units,
@@ -53,6 +60,7 @@ def encoder(vocab_size, num_layers, units, d_model, num_heads, dropout, name="en
             name="encoder_layer_{}".format(i),
         )([outputs, padding_mask])
 
+    # return model state after encoder to pass to decoder
     return tf.keras.Model(inputs=[inputs, padding_mask], outputs=outputs, name=name)
 
 
@@ -142,6 +150,7 @@ def transformer(
         layers.create_padding_mask, output_shape=(1, 1, None), name="dec_padding_mask"
     )(inputs)
 
+    # encoder returns a model to which we pass inputs to
     enc_outputs = encoder(
         vocab_size=vocab_size,
         num_layers=num_layers,
@@ -151,6 +160,7 @@ def transformer(
         dropout=dropout,
     )(inputs=[inputs, enc_padding_mask])
 
+    # decoder returns a model to which we pass inputs to
     dec_outputs = decoder(
         vocab_size=vocab_size,
         num_layers=num_layers,

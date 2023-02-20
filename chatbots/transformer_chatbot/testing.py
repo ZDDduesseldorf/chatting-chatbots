@@ -31,7 +31,7 @@ model = transformer.transformer(
     num_heads=NUM_HEADS,
     dropout=DROPOUT)
 
-path = f"./models/merged/{EPOCHS}EPOCHS_{NUM_LAYERS}LAYERS_{NUM_HEADS}HEADS_{UNITS}UNITS_{D_MODEL}DMODEL_{MAX_LENGTH}MAXLENGTH_{BATCH_SIZE}BATCHSIZE/best_model"
+path = f"./models/{EPOCHS}EPOCHS_{NUM_LAYERS}LAYERS_{NUM_HEADS}HEADS_{UNITS}UNITS_{D_MODEL}DMODEL_{MAX_LENGTH}MAXLENGTH_{BATCH_SIZE}BATCHSIZE/best_model"
 
 model.load_weights(path)
 

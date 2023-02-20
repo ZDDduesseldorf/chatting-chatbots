@@ -52,11 +52,11 @@ class MultiHeadAttention(tf.keras.layers.Layer):
 
 
 def scaled_dot_product_attention(query, key, value, mask):
-    matmul_qk = tf.matmul(query, key, transpose_b=True)
-
     # scale matmul_qk
-    depth = tf.cast(tf.shape(key)[-1], tf.float32)
-    logits = matmul_qk / tf.math.sqrt(depth)
+    keys_dimension = tf.cast(tf.shape(key)[-1], tf.float32)
+    numerator = tf.matmul(query, key, transpose_b=True)
+    denominator = tf.math.sqrt(keys_dimension)
+    logits = numerator /denominator
 
     # add the mask to zero out padding tokens
     if mask is not None:

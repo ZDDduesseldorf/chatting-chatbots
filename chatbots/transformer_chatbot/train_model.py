@@ -19,7 +19,7 @@ MAX_LENGTH = int(os.environ.get('MAX_LENGTH'))
 EPOCHS = int(os.environ.get('EPOCHS'))
 BATCH_SIZE = int(os.environ.get('BATCH_SIZE'))
 
-path = f"./models/merged/{EPOCHS}EPOCHS_{NUM_LAYERS}LAYERS_{NUM_HEADS}HEADS_{UNITS}UNITS_{D_MODEL}DMODEL_{MAX_LENGTH}MAXLENGTH_{BATCH_SIZE}BATCHSIZE/"
+path = f"./models/{EPOCHS}EPOCHS_{NUM_LAYERS}LAYERS_{NUM_HEADS}HEADS_{UNITS}UNITS_{D_MODEL}DMODEL_{MAX_LENGTH}MAXLENGTH_{BATCH_SIZE}BATCHSIZE/"
 
 model = transformer.transformer(
     vocab_size=VOCAB_SIZE,
@@ -40,14 +40,19 @@ model.compile(optimizer=optimizer,
 train_dataset = data_utils.load_dataset("train")
 val_dataset = data_utils.load_dataset("val")
 
-logdir = f"logs/merged/scalars/{EPOCHS}EPOCHS_{NUM_LAYERS}LAYERS_{NUM_HEADS}HEADS_{UNITS}UNITS_{D_MODEL}DMODEL_{MAX_LENGTH}MAXLENGTH_{BATCH_SIZE}BATCHSIZE"
+# log loss and accuracy using tensorboard
+logdir = f"logs/scalars/{EPOCHS}EPOCHS_{NUM_LAYERS}LAYERS_{NUM_HEADS}HEADS_{UNITS}UNITS_{D_MODEL}DMODEL_{MAX_LENGTH}MAXLENGTH_{BATCH_SIZE}BATCHSIZE"
 tensorboard_callback = ks.callbacks.TensorBoard(log_dir=logdir)
 checkpoint_callback = ks.callbacks.ModelCheckpoint(
     f"{path}best_model", save_best_only=True, save_weights_only=True)
+
+# implement early stopping in case loss does not decrease for 3 epochs
 stop_early_callback = ks.callbacks.EarlyStopping(
     monitor='val_loss', patience=3)
     
+# init model training
 model.fit(train_dataset, epochs=EPOCHS, validation_data=val_dataset,
           callbacks=[tensorboard_callback, checkpoint_callback, stop_early_callback])
 
+# save weights for evaluation
 model.save_weights(f"{path}final_model")
