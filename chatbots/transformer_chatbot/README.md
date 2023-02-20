@@ -45,9 +45,11 @@ This contains following parts of the transformer archtieture:
   - feed forward neural networks
 - stacking of encoder and decoder layers
 
-All custom transformer layers used by encoder and decoder are located in layers.py:
+All custom transformer layers used by encoder and decoder as well as masks are located in layers.py:
 - positional encoding
 - multihead attention including the scaled dot product
+- look ahead mask for first attention layer of decoder
+- padding mask for all layers
 
 ### Usage
 
