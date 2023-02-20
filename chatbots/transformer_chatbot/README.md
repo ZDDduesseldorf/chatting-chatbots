@@ -37,7 +37,7 @@ Dataset preparation:
 The model is based on the transformer technique described in the paper [Attention is all you need](https://arxiv.org/pdf/1706.03762.pdf)
 
 <img src="https://user-images.githubusercontent.com/33390325/220045500-f79d01ed-b9df-4bde-a7d6-1763f5418dbb.jpeg" width="300">
-<i>Source: Attention Is All You Need, Ashish Vaswani et al.</i>
+<i>Source: Attention Is All You Need, Ashish Vaswani et al.</i><br/>
 
 
 Encoder and decoder (including single layers implementation) can be found in transformer.py. 
