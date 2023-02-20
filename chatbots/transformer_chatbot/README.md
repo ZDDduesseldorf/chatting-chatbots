@@ -21,7 +21,7 @@ Merging following datasets resulted in more than 2 million question and answer s
 - empathetic_dialogues (https://huggingface.co/datasets/empathetic_dialogues)
 - allenai/prosocial-dialog (https://huggingface.co/datasets/allenai/prosocial-dialog)
 
-Merged dataset can be downloaded [here](https://fhd.sharepoint.com/:u:/t/Chatbotsdiesmartsind/EVipogxYkvxKpxbXpIOmXT4BqmakIh75tJmh2QACCOah4g?email=florian.huber%40hs-duesseldorf.de&e=eUGCMm) and should be saved in `data` //!!!! paths ändern
+Merged dataset can be downloaded [here](https://fhd.sharepoint.com/:u:/t/Chatbotsdiesmartsind/EVipogxYkvxKpxbXpIOmXT4BqmakIh75tJmh2QACCOah4g?email=florian.huber%40hs-duesseldorf.de&e=eUGCMm) and should be saved in `data`
 
 Dataset preparation:
 
