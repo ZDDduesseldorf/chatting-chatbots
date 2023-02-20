@@ -12,7 +12,7 @@ class TransformerChatbot:
 
     def postprocess(self, sentence):
         """Process sentence."""
-
+        
         sentence = sentence_processing.remove_repetitions(sentence)
         sentence = sentence_processing.remove_spaces(sentence)
         sentence = sentence_processing.replace_after_sentence_sign(sentence)
@@ -29,8 +29,8 @@ class TransformerChatbot:
 
 transformer = TransformerChatbot()
 
-
 def respond(message: Message, conversation: List[Message]):
+    """Creates answer for given input message."""
     answer = transformer.respond(message.message)
     return answer
 

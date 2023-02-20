@@ -109,8 +109,8 @@ def create_and_save_dataset(x, y, name):
     # set validation dataset
     dataset = tf.data.Dataset.from_tensor_slices(
         (
-            {"inputs": x, "dec_inputs": y[:, :-1]},
-            {"outputs": y[:, 1:]},
+            {"inputs": x, "dec_inputs": y[:, :-1]},     # remove last element in y for decoder inputs
+            {"outputs": y[:, 1:]},                      # remove first element in y for outputs
         )
     )
 
