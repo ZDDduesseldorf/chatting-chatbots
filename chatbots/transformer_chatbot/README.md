@@ -36,6 +36,19 @@ Dataset preparation:
 
 The model is based on the transformer technique described in the paper [Attention is all you need](https://arxiv.org/pdf/1706.03762.pdf)
 
+Encoder and decoder (including single layers implementation) can be found in transformer.py. 
+This contains following parts of the transformer archtieture:
+- general transformer architecture
+- embeddings of input tokens
+- definition of encoder and decoder layer which are using:
+  -> multihead attention layers (masked and not masked)
+  -> feed forward neural networks
+- stacking of encoder and decoder layers
+
+All custom transformer layers used by encoder and decoder are located in layers.py:
+- positional encoding
+- multihead attention including the scaled dot product
+
 ### Usage
 
 #### 1. Create Dataset
