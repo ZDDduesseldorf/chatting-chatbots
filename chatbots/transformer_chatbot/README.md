@@ -21,7 +21,7 @@ Merging following datasets resulted in more than 2 million question and answer s
 - empathetic_dialogues (https://huggingface.co/datasets/empathetic_dialogues)
 - allenai/prosocial-dialog (https://huggingface.co/datasets/allenai/prosocial-dialog)
 
-Merged dataset can be downloaded [here](https://fhd.sharepoint.com/:u:/t/Chatbotsdiesmartsind/EVipogxYkvxKpxbXpIOmXT4BqmakIh75tJmh2QACCOah4g?email=florian.huber%40hs-duesseldorf.de&e=eUGCMm) and should be saved in `data` //!!!! paths ändern
+Merged dataset can be downloaded [here](https://fhd.sharepoint.com/:u:/t/Chatbotsdiesmartsind/EVipogxYkvxKpxbXpIOmXT4BqmakIh75tJmh2QACCOah4g?email=florian.huber%40hs-duesseldorf.de&e=eUGCMm) and should be saved in `data`
 
 Dataset preparation:
 
@@ -64,7 +64,7 @@ All relevant parameters for data preperation and training are managed via env fi
 |MAX_LENGTH|The max length of question and answer samples. Sentences longer than the provided value will be trimmed if possible.|
 |MIN_LENGTH|This parameter was used in the experimental phase of the project. We wanted to evaluate sequential training with incresing sentence lengths.|
 |BATCH_SIZE|The amount of samples passed to the neural network simultaniously.|
-|BUFFER_SIZE||
+|BUFFER_SIZE|Amount of samples to be shuffled before training.|
 |NUM_LAYERS|Amount of encoder and decoder layers.|
 |D_MODEL|Model dimension.|
 |NUM_HEADS|Amount of concatinated multi head attention layers.|
