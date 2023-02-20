@@ -53,7 +53,7 @@ All custom transformer layers used by encoder and decoder as well as masks are l
 
 ### Usage
 
-All relevant parameters are managed via env file.
+All relevant parameters for data preperation and training are managed via env file.
 |Parameter|Description|
 |---------|-----------|
 |MAX_SAMPLES|This parameter was used for testing purposes to receive fast results. Setting it to 0 results in max samples count available.|
