@@ -34,6 +34,7 @@ model = transformer.transformer(
 
 path = f"./models/{EPOCHS}EPOCHS_{NUM_LAYERS}LAYERS_{NUM_HEADS}HEADS_{UNITS}UNITS_{D_MODEL}DMODEL_{MAX_LENGTH}MAXLENGTH_{BATCH_SIZE}BATCHSIZE/best_model"
 
+#loading model weights for evaluation
 model.load_weights(path)
 
 
@@ -65,6 +66,7 @@ def evaluate(sentence):
 
 
 def predict(sentence):
+    """Calls evaluation function and decodes the returned output tokens."""
     prediction = evaluate(sentence)
 
     predicted_sentence = tokenizer.decode(
@@ -73,6 +75,7 @@ def predict(sentence):
     return predicted_sentence
 
 def testing():
+    """Test model with prepaired test questions and save the result in a csv."""
     df = pd.DataFrame(columns=['Questions', 'Answers'])
 
     #Test questions

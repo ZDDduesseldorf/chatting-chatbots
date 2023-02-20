@@ -8,7 +8,6 @@ def preprocess_sentence(sentence):
     if re.search('[.!?]$',sentence) is None:
         sentence = sentence + '.'
     # creating a space between a word and the punctuation following it
-    # eg: "he is a boy." => "he is a boy ."
     sentence = re.sub(r"([?.!,])", r" \1 ", sentence)
     sentence = re.sub(r'[" "]+', " ", sentence)
     # replacing everything with space except (a-z, A-Z, ".", "?", "!", ",")
