@@ -1,5 +1,5 @@
 models/
-data/
+data/*
 train_model.ipynb
 tokenizer.subwords
 ipynb_checkpoints/

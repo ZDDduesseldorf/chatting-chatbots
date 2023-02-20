@@ -15,7 +15,7 @@ MAX_SAMPLES = int(os.environ.get('MAX_SAMPLES'))
 MAX_LENGTH = int(os.environ.get('MAX_LENGTH'))
 MIN_LENGTH = int(os.environ.get('MIN_LENGTH'))
 EPOCHS = int(os.environ.get('EPOCHS'))
-directory = './data/merged/'
+directory = './data/'
 path = f"{directory}{MAX_LENGTH}LENGTH/"
 
 
