@@ -5,11 +5,8 @@ Dataset preparation model and interface for a transformer based chatbot in Tenso
 
 ### Setup
 
-Create conda environment with necessary dependencies.
-  ```
-  conda create --name transformer-chatbot --file requirements.txt
-  conda activate transformer-chatbot
-  ```
+Install packages from requirements.txt or create conda environment using the environment.yml.
+
 
 ### Dataset
 
