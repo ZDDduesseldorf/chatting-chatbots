@@ -4,4 +4,3 @@ tokenizer.subwords
 ipynb_checkpoints/
 logs/
 chatbot_model/
-.env
