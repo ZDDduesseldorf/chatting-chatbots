@@ -2,6 +2,10 @@ import os
 import re
 import csv
 
+"""
+Run this script from parant directory (`python dataset_to_csv_scripts/movie_dialogs.py`).
+Save data from https://www.kaggle.com/datasets/Cornell-University/movie-dialog-corpus to data/movie_dialog_corpus/.
+"""
 
 OUTPUT_PATH = "data/movie_dialogs.csv"
 

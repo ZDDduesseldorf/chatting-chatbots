@@ -1,15 +1,15 @@
-from helpers import Params
+from lib.helpers import Params
 import tensorflow as tf
-import masks
-import positional_encoding
-import multi_head_attention
+from .positional_encoding import PositionalEncoding
+from .multi_head_attention import MultiHeadAttention
+from .masks import create_look_ahead_mask, create_padding_mask
 
 
 def encoder_layer(params: Params, name="encoder_layer"):
     inputs = tf.keras.Input(shape=(None, params.d_model), name="inputs")
     padding_mask = tf.keras.Input(shape=(1, 1, None), name="padding_mask")
 
-    attention = multi_head_attention.MultiHeadAttention(
+    attention = MultiHeadAttention(
         params.d_model, params.num_heads, name="attention")({
             'query': inputs,
             'key': inputs,
@@ -35,7 +35,7 @@ def encoder(params: Params, vocab_size: int, name="encoder"):
 
     embeddings = tf.keras.layers.Embedding(vocab_size, params.d_model)(inputs)
     embeddings *= tf.math.sqrt(tf.cast(params.d_model, tf.float32))
-    embeddings = positional_encoding.PositionalEncoding(
+    embeddings = PositionalEncoding(
         vocab_size, params.d_model)(embeddings)
 
     outputs = tf.keras.layers.Dropout(rate=params.dropout)(embeddings)
@@ -56,7 +56,7 @@ def decoder_layer(params: Params, name="decoder_layer"):
         shape=(1, None, None), name="look_ahead_mask")
     padding_mask = tf.keras.Input(shape=(1, 1, None), name='padding_mask')
 
-    attention1 = multi_head_attention.MultiHeadAttention(
+    attention1 = MultiHeadAttention(
         params.d_model, params.num_heads, name="attention_1")(inputs={
             'query': inputs,
             'key': inputs,
@@ -66,7 +66,7 @@ def decoder_layer(params: Params, name="decoder_layer"):
     attention1 = tf.keras.layers.LayerNormalization(
         epsilon=1e-6)(attention1 + inputs)
 
-    attention2 = multi_head_attention.MultiHeadAttention(
+    attention2 = MultiHeadAttention(
         params.d_model, params.num_heads, name="attention_2")(inputs={
             'query': attention1,
             'key': enc_outputs,
@@ -100,7 +100,7 @@ def decoder(params: Params, vocab_size: int, name='decoder'):
 
     embeddings = tf.keras.layers.Embedding(vocab_size, params.d_model)(inputs)
     embeddings *= tf.math.sqrt(tf.cast(params.d_model, tf.float32))
-    embeddings = positional_encoding.PositionalEncoding(
+    embeddings = PositionalEncoding(
         vocab_size, params.d_model)(embeddings)
 
     outputs = tf.keras.layers.Dropout(rate=params.dropout)(embeddings)
@@ -115,21 +115,24 @@ def decoder(params: Params, vocab_size: int, name='decoder'):
         name=name)
 
 
-def transformer(params: Params, vocab_size: int, name="transformer"):
+def create_model(params: Params, vocab_size: int, name="transformer"):
     inputs = tf.keras.Input(shape=(None,), name="inputs")
     dec_inputs = tf.keras.Input(shape=(None,), name="dec_inputs")
 
     enc_padding_mask = tf.keras.layers.Lambda(
-        masks.create_padding_mask, output_shape=(1, 1, None),
-        name='enc_padding_mask')(inputs)
+        create_padding_mask,
+        output_shape=(1, 1, None),
+        name='enc_padding_mask'
+    )(inputs)
     # mask the future tokens for decoder inputs at the 1st attention block
     look_ahead_mask = tf.keras.layers.Lambda(
-        masks.create_look_ahead_mask,
+        create_look_ahead_mask,
         output_shape=(1, None, None),
-        name='look_ahead_mask')(dec_inputs)
+        name='look_ahead_mask'
+    )(dec_inputs)
     # mask the encoder outputs for the 2nd attention block
     dec_padding_mask = tf.keras.layers.Lambda(
-        masks.create_padding_mask, output_shape=(1, 1, None),
+        create_padding_mask, output_shape=(1, 1, None),
         name='dec_padding_mask')(inputs)
 
     enc_outputs = encoder(params, vocab_size)(

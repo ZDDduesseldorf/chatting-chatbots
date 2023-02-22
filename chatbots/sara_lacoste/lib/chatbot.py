@@ -1,6 +1,6 @@
 import tensorflow as tf
-import data
-from lib.tokenizer import TransformerTokenizer
+from .data import preprocess_sentence
+from .tokenizer import TransformerTokenizer
 
 
 class TransformerChatbot:
@@ -10,7 +10,7 @@ class TransformerChatbot:
         self._max_length = max_length
 
     def _evaluate(self, sentence: str):
-        sentence = data.preprocess_sentence(sentence)
+        sentence = preprocess_sentence(sentence)
 
         START, END = [self._tokenizer.start_token], [self._tokenizer.end_token]
         sentence = tf.expand_dims(
