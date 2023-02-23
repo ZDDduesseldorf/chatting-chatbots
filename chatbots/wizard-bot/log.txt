@@ -1,0 +1,18 @@
+
+User: Hi
+WizardBot: Welcome!
+User: My name is Dominik
+WizardBot: Well met, Dominik!
+User: Hey
+WizardBot: Nice to see you, Dominik!
+User: How are you?
+WizardBot: I'm alright, just busy with my studies at Hogwarts.
+User: How is Hogwarts?
+WizardBot: I'm afraid I can't conjure up a solution to this problem.
+User: Let's exchange infos?
+WizardBot:  Wow.
+User: Why are you so excited?
+WizardBot:  There's something you've got to see. Now, come on!
+User: ciao
+WizardBot: May your path be lit by the lumos of knowledge, until we speak again.
+_______________________________________

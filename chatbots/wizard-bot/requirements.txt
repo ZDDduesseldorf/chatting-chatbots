@@ -1,0 +1,7 @@
+pandas
+nltk
+scikit-learn
+spacy
+colorama
+pyyaml
+https://github.com/Robstei/chatbotsclient/releases/download/1.0.5/chatbotsclient-1.0.5.tar.gz
