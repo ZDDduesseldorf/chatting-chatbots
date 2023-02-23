@@ -45,10 +45,10 @@ def encoder(vocab_size, num_layers, units, d_model, num_heads, dropout, name="en
     # apply padding mask for sentences < max_length
     padding_mask = tf.keras.Input(shape=(1, 1, None), name="padding_mask")
 
-    #Create keras embedding layer with the input_dim: size of the vocabulary and the output_dim: Length of the vector for each word 
+    # Create keras embedding layer with the input_dim: size of the vocabulary and the output_dim: Length of the vector for each word
     embeddings = tf.keras.layers.Embedding(vocab_size, d_model)(inputs)
     embeddings *= tf.math.sqrt(tf.cast(d_model, tf.float32))
-    #The positional encoding vector is added to the embedding vector
+    # The positional encoding vector is added to the embedding vector
     embeddings = layers.PositionalEncoding(vocab_size, d_model)(embeddings)
 
     outputs = tf.keras.layers.Dropout(rate=dropout)(embeddings)
@@ -187,7 +187,7 @@ def transformer(
     )(inputs=[dec_inputs, enc_outputs, look_ahead_mask, dec_padding_mask])
 
     outputs = tf.keras.layers.Dense(
-        units=vocab_size, name="outputs")(dec_outputs)
+        units=vocab_size, name="outputs", activation="softmax")(dec_outputs)
 
     return tf.keras.Model(inputs=[inputs, dec_inputs], outputs=outputs, name=name)
 

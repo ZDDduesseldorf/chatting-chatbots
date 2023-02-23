@@ -1,5 +1,6 @@
 import tensorflow as tf
 
+
 class MultiHeadAttention(tf.keras.layers.Layer):
     def __init__(self, d_model, num_heads, name="multi_head_attention"):
         super(MultiHeadAttention, self).__init__(name=name)
@@ -54,9 +55,10 @@ class MultiHeadAttention(tf.keras.layers.Layer):
 def scaled_dot_product_attention(query, key, value, mask):
     # scale matmul_qk
     keys_dimension = tf.cast(tf.shape(key)[-1], tf.float32)
+    # transpose second matrix for dot product calculation
     numerator = tf.matmul(query, key, transpose_b=True)
     denominator = tf.math.sqrt(keys_dimension)
-    logits = numerator /denominator
+    logits = numerator / denominator
 
     # add the mask to zero out padding tokens
     if mask is not None:
@@ -90,7 +92,8 @@ class PositionalEncoding(tf.keras.layers.Layer):
         self.pos_encoding = self.positional_encoding(position, d_model)
 
     def get_angles(self, position, i, d_model):
-        angles = 1 / tf.pow(10000, (2 * (i // 2)) / tf.cast(d_model, tf.float32))
+        angles = 1 / tf.pow(10000, (2 * (i // 2)) /
+                            tf.cast(d_model, tf.float32))
         return position * angles
 
     def positional_encoding(self, position, d_model):

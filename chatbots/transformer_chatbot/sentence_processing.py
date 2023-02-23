@@ -5,7 +5,7 @@ def preprocess_sentence(sentence):
     """Replace special characters and correct wrong punctuations."""
     sentence = sentence.lower().strip()
     # set dot at the end of sentence if there is no ?.!
-    if re.search('[.!?]$',sentence) is None:
+    if re.search('[.!?]$', sentence) is None:
         sentence = sentence + '.'
     # creating a space between a word and the punctuation following it
     sentence = re.sub(r"([?.!,])", r" \1 ", sentence)
@@ -13,37 +13,39 @@ def preprocess_sentence(sentence):
     # replacing everything with space except (a-z, A-Z, ".", "?", "!", ",")
     sentence = re.sub(r"[^a-zA-Z0-9?.!,]+", " ", sentence)
     sentence = sentence.strip()
-    
+
     return sentence
+
 
 def trim_sentence(sentence, max_sentence_length):
     """Trim sentence to prevent data loss for sentences longer than max_sentence_length."""
     words = sentence.split()
     append = True
     if len(words) > max_sentence_length:
-                words = words[:max_sentence_length-1]
-                append = False
-                if "?" in words:
-                    index = words.index("?")
-                    if index > 0:
+        words = words[:max_sentence_length-1]
+        append = False
+        if "?" in words:
+            index = words.index("?")
+            if index > 0:
+                words = words[:index+1]
+                sentence = " ".join(words)
+                append = True
+        else:
+            if "!" in words:
+                index = words.index("!")
+                if index > 0:
+                    words = words[:index+1]
+                    sentence = " ".join(words)
+                    append = True
+            else:
+                if "." in words:
+                    index = words.index(".")
+                    if index > 0 and words[index-1] != 'www':
                         words = words[:index+1]
                         sentence = " ".join(words)
                         append = True
-                else:
-                    if "!" in words:
-                        index = words.index("!")
-                        if index > 0:
-                            words = words[:index+1]
-                            sentence = " ".join(words)
-                            append = True
-                    else:
-                        if "." in words:
-                            index = words.index(".")
-                            if index > 0 and words[index-1] != 'www':
-                                words = words[:index+1]
-                                sentence = " ".join(words)
-                                append = True
     return sentence, append
+
 
 def handle_following_appostrophs(sentence):
     """Set appostroph if appostroph is missing."""
@@ -82,10 +84,10 @@ def remove_repetitions(sentence):
 def remove_spaces(sentence):
     """Remove spaces before punctuations."""
     sentence = (
-            sentence.replace(" the u ", " the usa ")
-            .replace(" .", ".")
-            .replace(" ?", "?")
-            .replace(" !", "!")
-            .replace(" ,", ",")
-        )
+        sentence.replace(" the u ", " the usa ")
+        .replace(" .", ".")
+        .replace(" ?", "?")
+        .replace(" !", "!")
+        .replace(" ,", ",")
+    )
     return sentence
