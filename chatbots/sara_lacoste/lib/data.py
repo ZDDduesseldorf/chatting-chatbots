@@ -1,6 +1,3 @@
-import helpers
-from helpers import Params
-from lib.tokenizer import TransformerTokenizer
 from tqdm import tqdm
 import tensorflow as tf
 import re
@@ -8,6 +5,8 @@ import pandas as pd
 import os
 import pickle
 from halo import Halo
+from .helpers import Params, ensure_dir
+from .tokenizer import TransformerTokenizer
 
 
 def preprocess_sentence(sentence: str):
@@ -52,11 +51,8 @@ class DataLoader:
         self._conversations: tuple[list, list] = None
         self._samples: int = None
 
-    def _load_tokenizer(self, load_super_tokenizer = False):
-        if load_super_tokenizer:
-            tokenizer_path = 'D:/Programmierung/StudyProjects/chatting-chatbots/chatbots/transformer_chatbot/data/super-tokenizer' # needs to be adjusted
-        else:
-            tokenizer_path = self.params.tokenizer_path
+    def _load_tokenizer(self):
+        tokenizer_path = self.params.tokenizer_path
 
         spinner = Halo(
             text=f"Loading Tokenizer from {tokenizer_path}", spinner='dots')
@@ -78,7 +74,7 @@ class DataLoader:
             inputs + outputs,
             self.params.target_vocab_size)
 
-        helpers.ensure_dir(self.params.tokenizer_dir)
+        ensure_dir(self.params.tokenizer_dir)
         self._tokenizer.save_to_file(self.params.tokenizer_path)
 
         spinner.stop()
@@ -155,7 +151,7 @@ class DataLoader:
         dataset = dataset.prefetch(tf.data.experimental.AUTOTUNE)
 
         dir = f"{self.params.dataset_dir}/{name}"
-        helpers.ensure_dir(dir)
+        ensure_dir(dir)
         tf.data.experimental.save(dataset, dir)
         with open(f"{dir}/element_spec", 'wb') as out_:
             pickle.dump(dataset.element_spec, out_)

@@ -1,17 +1,13 @@
-from lib.tokenizer import TransformerTokenizer
-import helpers
-import tensorflow as tf
 import pandas as pd
-import transformer
-import data
+import tensorflow as tf
 import tensorflow.python.keras as ks
+from lib.helpers import Params, ensure_dir
+from lib.data import DataLoader
+from lib.transformer import create_model
 
-params = helpers.Params()
-loader = data.DataLoader(params)
+params = Params()
+loader = DataLoader(params)
 tokenizer = loader.get_tokenizer()
-# use these for initial training of multiple trainings
-# tokenizer = TransformerTokenizer.load_from_file(
-#     'C:/Users/User/Desktop/chatting-chatbots/chatbots/transformer_chatbot/data/merged/16384Voc/tokenizer')
 
 
 class CustomSchedule(tf.keras.optimizers.schedules.LearningRateSchedule):
@@ -27,7 +23,7 @@ class CustomSchedule(tf.keras.optimizers.schedules.LearningRateSchedule):
         return tf.math.rsqrt(self.d_model) * tf.math.minimum(arg1, arg2)
 
 
-model = transformer.transformer(params, tokenizer.vocab_size)
+model = create_model(params, tokenizer.vocab_size)
 learning_rate = CustomSchedule(params.d_model)
 
 optimizer = tf.keras.optimizers.Adam(
@@ -60,8 +56,8 @@ model.compile(optimizer=optimizer, loss=loss_function, metrics=[accuracy])
 
 train_dataset, val_dataset = loader.get_datasets()
 
-helpers.ensure_dir(params.model_dir)
-helpers.ensure_dir(params.log_dir)
+ensure_dir(params.model_dir)
+ensure_dir(params.log_dir)
 
 df = pd.DataFrame([vars(params)])
 df.to_csv(f"{params.log_dir}/training_params.csv")

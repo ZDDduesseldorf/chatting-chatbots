@@ -1,20 +1,17 @@
 from typing import List
 from chatbotsclient.message import Message
 from chatbotsclient.chatbot import Chatbot
-import helpers
-import data
-import transformer
-from chatbot import TransformerChatbot
-from chatbotsclient.chatbot import Chatbot
-from chatbotsclient.message import Message
-from typing import List
+from lib.helpers import Params
+from lib.data import DataLoader
+from lib.transformer import create_model
+from lib.chatbot import TransformerChatbot
 
 
-params = helpers.Params()
-loader = data.DataLoader(params)
+params = Params()
+loader = DataLoader(params)
 tokenizer = loader.get_tokenizer()
 
-model = transformer.transformer(params, tokenizer.vocab_size)
+model = create_model(params, tokenizer.vocab_size)
 model.load_weights(params.weights_path)
 
 sara = TransformerChatbot(model, tokenizer, params.max_length)

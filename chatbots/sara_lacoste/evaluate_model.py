@@ -1,17 +1,14 @@
-from lib.tokenizer import TransformerTokenizer
-import helpers
-import data
-import transformer
 import pandas as pd
-from chatbot import TransformerChatbot
+from lib.helpers import Params
+from lib.data import DataLoader
+from lib.transformer import create_model
+from lib.chatbot import TransformerChatbot
 
-params = helpers.Params()
-loader = data.DataLoader(params)
+params = Params()
+loader = DataLoader(params)
 tokenizer = loader.get_tokenizer()
-# tokenizer = TransformerTokenizer.load_from_file(
-#     'C:/Users/User/Desktop/chatting-chatbots/chatbots/transformer_chatbot/data/merged/16384Voc/tokenizer')
 
-model = transformer.transformer(params, tokenizer.vocab_size)
+model = create_model(params, tokenizer.vocab_size)
 model.load_weights(params.best_weights_path)
 
 chatbot = TransformerChatbot(model, tokenizer, params.max_length)
