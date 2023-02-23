@@ -1,0 +1,43 @@
+version: "3.1"
+
+rules:
+
+- rule: Say hello anytime the user says hello
+  steps:
+  - intent: greet
+  - action: utter_greet
+
+- rule: Say goodbye anytime the user says goodbye
+  steps:
+  - intent: goodbye
+  - action: utter_goodbye
+
+- rule: Say 'You're welcome' anytime the user says thanks
+  steps:
+  - intent: thanks
+  - action: utter_welcome
+
+- rule: Respond to FAQs
+  steps:
+  - intent: faq
+  - action: utter_faq
+
+- rule: Respond to chitchat
+  steps:
+  - intent: chitchat
+  - action: utter_chitchat
+  
+- rule: Out-of-scope
+  steps:
+  - intent: out_of_scope
+  - action: utter_out_of_scope
+
+- rule: Ask the user to rephrase whenever they send a message with low NLU confidence
+  steps:
+  - intent: nlu_fallback
+  - action: utter_please_rephrase
+
+- rule: Say don't worry when the user says sorry
+  steps:
+  - intent: sorry
+  - action: utter_not_worry

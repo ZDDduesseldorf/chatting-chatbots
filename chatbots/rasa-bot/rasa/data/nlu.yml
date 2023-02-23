@@ -1,0 +1,267 @@
+version: "3.1"
+
+nlu:
+- intent: greet
+  examples: |
+    - hey
+    - hello
+    - hi
+    - hello there
+    - good morning
+    - good evening
+    - moin
+    - hey there
+    - hey dude
+    - goodmorning
+    - goodevening
+    - good afternoon
+    - afternoon
+- intent: goodbye
+  examples: |
+    - cu
+    - good by
+    - cee you later
+    - good night
+    - bye
+    - goodbye
+    - have a nice day
+    - see you around
+    - bye bye
+    - see you later
+    - see you
+- intent: affirm
+  examples: |
+    - yes
+    - y
+    - indeed
+    - of course
+    - that sounds good
+    - correct
+    - okay
+- intent: deny
+  examples: |
+    - no
+    - n
+    - never
+    - I don't think so
+    - don't think that
+    - no way
+    - not really
+- intent: mood_great
+  examples: |
+    - perfect
+    - great
+    - amazing
+    - feeling like a king
+    - wonderful
+    - feeling very good
+    - super stoked
+    - extremely good
+    - fine
+- intent: mood_unhappy
+  examples: |
+    - horrible
+    - I am sad
+    - disappointed
+    - super sad
+    - sad
+    - very sad
+    - unhappy
+    - not good
+    - not very good
+    - extremly sad
+- intent: thanks
+  examples: |
+    - thanks
+    - thank you
+    - thank u
+    - thank you so much
+    - I appreciate it so much.
+    - I am so thankful
+    - Thanks for the support.
+    - Thanks for all you do.
+    - Thank you for being there.
+    - Thank you so much for your assistance.
+- intent: welcome
+  examples: |
+    - You're welcome
+    - You are more than welcome.
+    - My pleasure.
+    - Don't mention it
+    - I'm glad
+    - Not at all
+- intent: sorry
+  examples: |
+    - sorry
+    - so sorry
+    - I am so sorry
+    - I am very sorry
+    - I am terribly sorry
+    - I'm sorry
+    - My apologies
+    - I apologize
+    - Oh, my bad.
+    - My mistake
+    - My fault
+    - I beg your pardon
+- intent: faq
+  examples: |
+    - test
+    - this is a test
+- intent: chitchat/ask_name
+  examples: |
+    - What is your name?
+    - May I know your name?
+    - What do people call you?
+    - Do you have a name for yourself?
+    - Who are you?
+    - And you are...?
+    - What's your name
+- intent: chitchat/ask_job
+  examples: |
+    - Do you have a job?
+    - What's your job?
+    - job
+    - what you do professionally
+    - do you work?
+- intent: chitchat/ask_family
+  examples: |
+    - Do you have any brothers or sisters?
+    - Do you have any sibblings?
+    - Tell me about your family.
+- intent: presentation
+  examples: |
+    - I'm
+    - My name is
+    - name
+- intent: out_of_scope
+  examples: |
+    - I want to order food
+    - What is 2 + 2?
+    - Who's the US President?
+    - Can you predict the future?
+- intent: talk_hobbies
+  examples: |
+    - do you play something
+    - which instrument do you play
+    - tell me about your hobbies
+    - do you have a hobby
+    - what are you listening to
+    - which kind of music do you listen to
+    - do you like games
+- intent: ask_weather
+  examples: |
+    - What's the weather in [Dusseldorf](location)
+    - weather in [Cologne](location)
+    - weather of [Bonn] (location)
+    - weather in [Berlin](location)
+    - weather of [Wuppertal](location)
+    - weather of [London](location)
+    - weather in [Munich](location)
+    - What's the weather like today?
+- intent: ask_activity
+  examples: |
+    - I'm bored
+    - so bored
+    - bored
+    - I'd like to have some fun
+    - tell me something to do
+    - which activity can I do
+- intent: ask_joke
+  examples: |
+    - joke
+    - tell me a joke
+    - could you please tell me a joke
+    - I'd like to hear a joke
+    - joke about Chuck Norris
+    - Chuck Norris
+    - tell me a joke about Chuck Norris
+    - know a joke
+- intent: talk_beer
+  examples: |
+    - beer
+    - which kind of beer
+    - do you like beer
+    - brew beer
+- intent: talk_meal
+  examples: |
+    - I'm hungry
+    - hungry
+    - I don't know what to cook
+    - what cook
+    - cook
+    - don't know what to cook
+    - cook a meal
+    - meal
+    - eat
+    - eating
+    - I'd like to eat something
+    - I'd like to prepare something to eat
+- intent: talk_cocktail
+  examples: |
+    - cocktail
+    - cocktail party
+    - should be prepare some cocktails?
+    - I'd like to drink a cocktail
+    - margarita
+    - drink margarita
+    - drink
+    - to have a drink
+- intent: ask_meaning
+  examples: |
+    - What does [thing](word) mean?
+    - what [thing](word) is?
+    - Explain to me what [thing](word) is?
+    - [thing](word) mean
+    - Define [thing](word)
+    - definition for [thing](word)
+    - meaning of [thing](word)
+- intent: ask_info
+  examples: |
+    - I want to know about
+    - want info about
+    - info of
+    - I want to have info about
+    - I want to know who
+    - I want to know what
+    - I'd like to know more information about Einstein
+    - info about 
+- intent: funny
+  examples: |
+    - haha
+    - funny
+    - lol
+    - so funny
+    - can't stop laughing
+- intent: ask_news
+  examples: |
+    - Tell me about the news
+    - Have you watched the news?
+    - What's going on in the world?
+    - Can you tell me about the news?
+    - What's happening out there?
+    - I'd like to watch the news
+- intent: ask_riddle
+  examples: |
+    - riddle
+    - Tell me a riddle
+    - solve a riddle
+    - solving riddles
+    - enjoy solving riddles
+    - I like riddles.
+    - I'd like to solve a riddle
+- intent: offended
+  examples: |
+    - That wasn't funny
+    - It's not funny
+    - You've hurt my feelings
+    - I am offended
+    - I am heartbroken
+    - It hurts to hear you say that
+    - I'm sorry, but I can't continue this conversation
+
+- synonym: job
+  examples: |
+    - profession
+    - occupation
+    - work

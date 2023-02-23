@@ -1,0 +1,4 @@
+/rasa/.rasa
+/rasa/models
+/rasa/actions/__pycache__/
+/rasa/story_graph.dot

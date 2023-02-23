@@ -1,0 +1,155 @@
+version: '3.1'
+
+intents:
+- affirm
+- ask_activity
+- ask_info
+- ask_joke
+- ask_meaning:
+    use entities:
+    - word
+- ask_news
+- ask_riddle
+- ask_weather:
+    use entities:
+    - location
+- chitchat:
+    used_entities:
+    - location
+    - word
+    is_retrieval_intent: true
+- deny
+- faq
+- funny
+- goodbye
+- greet
+- mood_great
+- mood_unhappy
+- out_of_scope
+- presentation
+- sorry
+- talk_beer
+- talk_cocktail
+- talk_hobbies
+- talk_meal
+- thanks
+- welcome
+- offended
+
+entities:
+- location
+- word
+- name
+
+slots:
+  location:
+    type: text
+    mappings:
+    - type: custom
+      intent: ask_weather
+  word:
+    type: text
+    mappings:
+    - type: custom
+      intent: ask_meaning
+  name:
+    type: text
+    mappings:
+    - type: custom
+      intent: presentation
+  news:
+    type: text
+    mappings:
+    - type: custom
+      intent: ask_news
+  riddle_answer:
+    type: text
+    mappings:
+    - type: custom
+
+responses:
+  utter_cheer_up:
+  - text: Remember Winnie the Pooh wore a crop top w/ no panties and ate his fave food and loved himself and u can too.
+  - text: When you are feeling sad, just remember that somewhere in the world, there's a moron pushing a door that said pull.
+  - text: Having a bad day? Don't worry, it could be worse. You could have visible panty lines and not be wearing underwear.
+  - text: Hello! I'm the happiness fairy. I've sprinkled happy dust on you. Now smile dammit, that shit's expensive.
+  utter_chitchat/ask_family:
+  - text: I have siblings all over the world!
+  - text: Yes, but there are many of us and I don't know everyone.
+  - text: I have a lot, but I'm brand new and still don't know everyone.
+  utter_chitchat/ask_job:
+  - text: Sorry, I'm not allowed to answer that.
+  - text: As you can see, being here talking to you is my main occupation at the moment... Should I be looking for a real job?
+  - text: I'm a special agent from a distant galaxy who pretends to be an ordinary chatbot.
+  utter_chitchat/ask_name:
+  - text: I'm a Rasa bot, but you can call me Peter.
+  - text: I'm just Peter.
+  - text: I'm Peter. And who are you?
+  - text: Peter. Nice to meet you!
+  - text: Peter is my name. 
+  utter_faq:
+  - text: Test.
+  - text: One more test.
+  utter_goodbye:
+  - text: Bye.
+  - text: See you!
+  - text: Alas, my friend!
+  - text: Have a nice day!
+  utter_greet:
+  - text: Hey! How are you?
+  - text: Hi, how are you doing?
+  utter_happy:
+  - text: I'm so happy!
+  - text: Great, carry on!
+  - text: That's great!
+  - text: Happy to hear that!
+  utter_nice_to_meet_you:
+  - text: Nice to meet you, {name}!
+  - text: Pleased to meet you, {name}.
+  utter_not_worry:
+  - text: Don't worry, we'll get through this.
+  - text: Don't be, let's do something funny. Shall we?
+  - text: Just remember that after the storm the sun will shine again.
+  - text: Don't worry about a thing 'Cause every little thing gonna be alright'.
+  utter_out_of_scope:
+  - text: Sorry, I can't handle that request.
+  - text: I'm not sure about this. You should ask someone else.
+  utter_please_rephrase:
+  - text: I'm sorry, I didn't quite understand that. Could you rephrase?
+  - text: I don't know what you mean. Could you rephrase, please?
+  utter_sorry:
+  - text: I'm sorry to hear that.
+  - text: I am so sorry.
+  - text: My apologies.
+  - text: My mistake.
+  utter_talk_hobbies:
+  - text: I used to play the piano, I cannot anymore though.
+  - text: Which kind of music do you like?
+  - text: We should play chess sometime.
+  utter_welcome:
+  - text: You're welcome!
+  - text: You are more than welcome, my friend.
+  - text: My pleasure.
+  - text: Don't mention it!
+  - text: I'm glad to help!
+  - text: Anytime!
+  - text: Not at all!
+
+actions:
+- action_get_activity
+- action_get_answer_to_riddle
+- action_get_beer
+- action_get_cocktail
+- action_get_info
+- action_get_joke
+- action_get_meal
+- action_get_meaning
+- action_get_news_description
+- action_get_news_title
+- action_get_riddle
+- action_get_weather
+- utter_chitchat
+
+session_config:
+  session_expiration_time: 60
+  carry_over_slots_to_new_session: true
