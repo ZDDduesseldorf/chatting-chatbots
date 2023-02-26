@@ -25,7 +25,7 @@ Automated transcript scraping crawls the webpage "https://transcripts.foreverdre
 
 ### Processing Scraped Files to CSV
 
-The process_scraped_files() function processes the scraped raw files, removes non-Barney statements and name prefixes, and maps the dialogs into question-and-answer pairs, where the question matches the previous non-Barney sentence and the answer corresponds to Barney's theorem. The result is a dictionary containing all of the questions and answers given by Barney in the scraped scripts.
+The `process_scraped_files()` function processes the scraped raw files, removes non-Barney statements and name prefixes, and maps the dialogs into question-and-answer pairs, where the question matches the previous non-Barney sentence and the answer corresponds to Barney's theorem. The result is a dictionary containing all of the questions and answers given by Barney in the scraped scripts.
 
 The save_corpus function saves the dictionary as a single CSV file in the file path defined in the global variable CORPUS_PATH_BARNEY.
 
@@ -51,19 +51,19 @@ The chatbot will try to find a suitable answer from its corpora. If no matching 
 
 ## Answer generation
 
-The respond can be generated with either spacy oder tfidf.
+The respond can be generated with either `spacy` oder `tfidf`.
 
-In respond(), the entry point for response generation, the user's input is first checked for salutations or specific phrases to generate a quick response. If no matching answer is found, get_best_response_from_corpus() is called to generate the best answer from the corpora. If no answer is found, a random answer is returned from the FAILS_RESPONSES list.
+In `respond()`, the entry point for response generation, the user's input is first checked for salutations or specific phrases to generate a quick response. If no matching answer is found, `get_best_response_from_corpus()` is called to generate the best answer from the corpora. If no answer is found, a random answer is returned from the FAILS_RESPONSES list.
 
 ### SpaCy
 
-When spacy is used, the user's input is first parsed with spacy to create a document representation of the input. The corpus variable is an instance of the Corpus class that contains a list of items. Each entry contains both the text and the spacy document vector.
+When `spacy` is used, the user's input is first parsed with spacy to create a document representation of the input. The corpus variable is an instance of the Corpus class that contains a list of items. Each entry contains both the text and the spacy document vector.
+
+Then the `get_best_response_from_corpus()` function searches each entry in the corpus list and calculates the similarity between the user's input and each entry's `spacy` document vector. If the similarity is higher than the current highest similarity, the current highest similarity is updated and the response is set to this entry's response.
 
 ### Tfidf method
 
-When the tfidf method is used, the text of the user input is transformed by the vectorizer to obtain a TF-IDF vector, and the similarity between this vector and the TF-IDF vector of each corpus entry is calculated.
-
-Then the get_best_response_from_corpus() function searches each entry in the corpus list and calculates the similarity between the user's input and each entry's spacy document vector. If the similarity is higher than the current highest similarity, the current highest similarity is updated and the response is set to this entry's response.
+When the `tfidf` method is used, the text of the user input is transformed by the vectorizer to obtain a TFIDF vector, and the similarity between this vector and the TF-IDF vector of each corpus entry is calculated.
 
 ### Entity replacement
 
@@ -77,7 +77,7 @@ If the "moderator" tag is included in the command line arguments, it can communi
 
 If the "moderator" tag is not included in the command-line arguments, the user is prompted for input, which the chatbot then processes and emits a response. This process repeats itself until the user enters "exit".
 
-To determine which method to use to compare the similarity between the user's input and the stored conversation chunks, the tag "spacy" or "tfidf" can be entered on the command line at startup. If no tag is used, spacy is used automatically.
+To determine which method to use to compare the similarity between the user's input and the stored conversation chunks, the tag `spacy` or `tfidf`can be entered on the command line at startup. If no tag is used, `spacy` is used automatically.
 
 ## Code stucture
 
@@ -85,6 +85,6 @@ To determine which method to use to compare the similarity between the user's in
     - Corpus class
     - scarping scripts
 
-The Barney class includes a method called get_best_response_from_corpus() that responds with either the spacy or tfidf method. Both methods are ways of computing similarity to find the best answer for a given input.
+The Barney class includes a method called `get_best_response_from_corpus()` that responds with either the `spacy` or `tfidf` method. Both methods are ways of computing similarity to find the best answer for a given input.
 
-The Corpus class is responsible for loading and preparing the conversation data from a CSV file. The CSV file contains the previous message and Barney's reply. The class uses spaCy to tokenize and parse the messages, and sklearn to create a Tf-Idf vector for each message in the corpus. The class stores the previous messages, Barney's reply, and the associated tf-idf vectors in a list of CorpusEntry objects.
+The Corpus class is responsible for loading and preparing the conversation data from a CSV file. The CSV file contains the previous message and Barney's reply. The class uses spaCy to tokenize and parse the messages, and `sklearn` to create a TfIdf vector for each message in the corpus. The class stores the previous messages, Barney's reply, and the associated tf-idf vectors in a list of CorpusEntry objects.
