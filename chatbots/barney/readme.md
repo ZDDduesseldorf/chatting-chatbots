@@ -11,8 +11,9 @@ A corpus based chatbot based on the character Barney Stinson from the series "Ho
 
 ## Used technologies and libraries
 
-- BeautifulSoup
--
+- BeautifulSoup: a Library for parsing HTML and XML documents to extract information from them.
+- sklearn (TfidfVectorizer): a machine learning library that contains various models and tools. TfidfVectorizer is a tool for converting text documents to a matrix of TF-IDF features.
+- spacy: a library for natural language processing in Python.
 
 ## Source of corpora
 
@@ -50,14 +51,40 @@ The chatbot will try to find a suitable answer from its corpora. If no matching 
 
 ## Answer generation
 
-- spacy
-- tfidf
-- entity replacement
+The respond can be generated with either spacy oder tfidf.
+
+In respond(), the entry point for response generation, the user's input is first checked for salutations or specific phrases to generate a quick response. If no matching answer is found, get_best_response_from_corpus() is called to generate the best answer from the corpora. If no answer is found, a random answer is returned from the FAILS_RESPONSES list.
+
+### SpaCy
+
+When spacy is used, the user's input is first parsed with spacy to create a document representation of the input. The corpus variable is an instance of the Corpus class that contains a list of items. Each entry contains both the text and the spacy document vector.
+
+### Tfidf method
+
+When the tfidf method is used, the text of the user input is transformed by the vectorizer to obtain a TF-IDF vector, and the similarity between this vector and the TF-IDF vector of each corpus entry is calculated.
+
+Then the get_best_response_from_corpus() function searches each entry in the corpus list and calculates the similarity between the user's input and each entry's spacy document vector. If the similarity is higher than the current highest similarity, the current highest similarity is updated and the response is set to this entry's response.
+
+### Entity replacement
+
+The replace_entity method in the Barney class takes a string (reply), a new entity (new_entity), and a Corpus instance. It looks for the first recognized entity with the label "PERSON" in the string and replaces it with the new entity. If no matching entity is found, it returns the original string. The method is used to match the entity in the bots' response string to the current user's name.
 
 ## How to use Barney
+
+The chatbot can run either as a participant of the moderator bot or as a standalone interactive chatbot.
+
+If the "moderator" tag is included in the command line arguments, it can communicate with the moderator bot. In this case, credentials are also provided to assist the moderator.
+
+If the "moderator" tag is not included in the command-line arguments, the user is prompted for input, which the chatbot then processes and emits a response. This process repeats itself until the user enters "exit".
+
+To determine which method to use to compare the similarity between the user's input and the stored conversation chunks, the tag "spacy" or "tfidf" can be entered on the command line at startup. If no tag is used, spacy is used automatically.
 
 ## Code stucture
 
      -    Barney Class
     - Corpus class
     - scarping scripts
+
+The Barney class includes a method called get_best_response_from_corpus() that responds with either the spacy or tfidf method. Both methods are ways of computing similarity to find the best answer for a given input.
+
+The Corpus class is responsible for loading and preparing the conversation data from a CSV file. The CSV file contains the previous message and Barney's reply. The class uses spaCy to tokenize and parse the messages, and sklearn to create a Tf-Idf vector for each message in the corpus. The class stores the previous messages, Barney's reply, and the associated tf-idf vectors in a list of CorpusEntry objects.
