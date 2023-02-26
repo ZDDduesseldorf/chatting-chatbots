@@ -4,9 +4,9 @@ import re
 from typing import Dict
 
 from config import (
+    CORPUS_PATH_BARNEY,
     CSV_QUOTECHAR,
     CSV_SEPERATOR,
-    corpus_path,
     scraped_resources_folder_name,
 )
 
@@ -54,7 +54,7 @@ def process_scraped_files() -> Dict[str, str]:
 
 def save_corpus(processed_files: Dict[str, str]):
     """Save corpus as single csv"""
-    output_path = os.path.join(corpus_path)
+    output_path = os.path.join(CORPUS_PATH_BARNEY)
     with open(output_path, "w", newline="", encoding="utf-8") as file:
         writer = csv.writer(
             file,

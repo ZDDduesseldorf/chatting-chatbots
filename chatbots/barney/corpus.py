@@ -1,10 +1,9 @@
 import csv
 from dataclasses import dataclass
-from typing import List, Tuple, Union
+from typing import List, Tuple
 
 import en_core_web_lg
-from config import CSV_QUOTECHAR, CSV_SEPERATOR, corpus_path
-from numpy import asarray
+from config import CSV_QUOTECHAR, CSV_SEPERATOR
 from sklearn.feature_extraction.text import TfidfVectorizer
 from spacy.language import Language
 from spacy.tokens import Doc
@@ -27,19 +26,22 @@ class CorpusEntry:
 
 
 class Corpus:
-    def __init__(self) -> None:
-        loading_tupel = self.load_corpus()
+    def __init__(self, path: str, name: str) -> None:
+        loading_tupel = self.load_corpus(path)
         self.corpus = loading_tupel[0]
         self.nlp = loading_tupel[1]
         self.vectorizer = loading_tupel[2]
+        self.name = name
 
-    def load_corpus(self) -> Tuple[List[CorpusEntry], Language, TfidfVectorizer]:
+    def load_corpus(
+        self, path: str
+    ) -> Tuple[List[CorpusEntry], Language, TfidfVectorizer]:
         """Get conversation peaces from csv"""
 
         corpus_no_tfidf: List[CorpusEntryNoTfidf] = []
 
         nlp = en_core_web_lg.load()
-        with open(corpus_path, "r", encoding="utf-8") as csvfile:
+        with open(path, "r", encoding="utf-8") as csvfile:
             reader = csv.reader(
                 csvfile, delimiter=CSV_SEPERATOR, quotechar=CSV_QUOTECHAR
             )
