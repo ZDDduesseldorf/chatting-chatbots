@@ -1,5 +1,11 @@
 import json
 import jsonlines
+import csv
+
+from config import (
+    CSV_QUOTECHAR,
+    CSV_SEPERATOR,
+)
 
 qa_dict = {}
 try:
@@ -18,8 +24,15 @@ try:
                     print(f"Question: {question} - Answer: {answer}")
                     qa_dict[question] = answer
     
-    with open('fragen_antworten_joey.json', 'w') as f:
-        json.dump(qa_dict, f)
+    with open('fragen_antworten_joey.csv', "w", newline="", encoding="utf-8") as file:
+        print("writing")
+        writer = csv.writer(
+            file,
+            delimiter=CSV_SEPERATOR,
+            quotechar=CSV_QUOTECHAR,
+            quoting=csv.QUOTE_ALL,
+        )
+        writer.writerows(qa_dict.items())
 
 except json.JSONDecodeError as e:
     print("JSONDecodeError: ", e)
