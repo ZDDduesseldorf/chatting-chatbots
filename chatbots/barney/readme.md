@@ -73,6 +73,17 @@ When the `tfidf` method is used, the text of the user input is transformed by th
 
 The replace_entity method in the Barney class takes a string (reply), a new entity (new_entity), and a Corpus instance. It looks for the first recognized entity with the label "PERSON" in the string and replaces it with the new entity. If no matching entity is found, it returns the original string. The method is used to match the entity in the bots' response string to the current user's name.
 
+## Installation
+
+```python3 -m venv venv```
+
+Activate venv based on OS.
+
+```pip install -r requirements.txt```
+
+```pip install git+https://github.com/boudinfl/pke.git```
+
+
 ## How to use Barney
 
 Starting the chatbot using spacy:
