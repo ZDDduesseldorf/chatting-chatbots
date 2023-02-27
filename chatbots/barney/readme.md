@@ -79,10 +79,9 @@ The replace_entity method in the Barney class takes a string (reply), a new enti
 
 Activate venv based on OS.
 
-```pip install -r requirements.txt```
-
 ```pip install git+https://github.com/boudinfl/pke.git```
 
+```pip install -r requirements.txt```
 
 ## How to use Barney
 
