@@ -54,9 +54,6 @@ class Barney:
             message_doc = corpus.nlp(message)
             best_spacy_reply: Tuple[str, float] = "", 0
             for entry in corpus.corpus:
-                if not entry.spacy_doc.vector_norm:
-                    print(entry)
-
                 similarity = entry.spacy_doc.similarity(message_doc)
                 if similarity > best_spacy_reply[1]:
                     best_spacy_reply = (
