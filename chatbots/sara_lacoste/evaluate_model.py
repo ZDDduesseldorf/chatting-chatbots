@@ -1,5 +1,5 @@
 import pandas as pd
-from lib.helpers import Params
+from lib.helpers import Params, ensure_dir
 from lib.data import DataLoader
 from lib.transformer import create_model
 from lib.chatbot import TransformerChatbot
@@ -32,6 +32,7 @@ def testing():
         print("Sara Lacoste: ", answer)
         df.loc[index] = question, answer
 
+    ensure_dir(params.log_dir)
     df.to_csv(f"{params.log_dir}/test_chat_log.csv")
 
 
