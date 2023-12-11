@@ -1,0 +1,790 @@
+[
+  {
+    "label": "PERSON",
+    "pattern": "Tyrion Lannister"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Jon Snow"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Daenerys Targaryen"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Bran Stark"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Sansa Stark"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Arya Stark"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Cersei Lannister"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Jaime Lannister"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Joffrey Baratheon"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Tommen Baratheon"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Sandor Clegane"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "The Hound"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Theon Greyjoy"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Samwell Tarly"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Davos Seaworth"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Brienne of Tarth"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Petyr Baelish"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Littlefinger"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Varys"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Bronn"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Missandei"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Jorah Mormont"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Gendry"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Yara Greyjoy"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Euron Greyjoy"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Robb Stark"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Catelyn Stark"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Eddard Stark"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Ned Stark"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Rickon Stark"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Talisa Maegyr"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Margaery Tyrell"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Renly Baratheon"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Loras Tyrell"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Stannis Baratheon"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Balon Greyjoy"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Ramsay Bolton"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Ros"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Shae"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Gilly"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Ygritte"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Osha"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Hodor"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Meera Reed"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Jojen Reed"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Grey Worm"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Barristan Selmy"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Xaro Xhoan Daxos"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Qyburn"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Melisandre"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Mance Rayder"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Beric Dondarrion"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Tormund Giantsbane"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Tyrion"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Lannister"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Jon"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Snow"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Daenerys"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Targaryen"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Bran"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Stark"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Sansa"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Arya"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Cersei"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Jaime"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Joffrey"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Baratheon"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Tommen"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Sandor"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Clegane"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Hound"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Theon"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Greyjoy"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Samwell"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Tarly"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Davos"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Seaworth"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Brienne"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Tarth"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Petyr"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Baelish"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Littlefinger"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Varys"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Bronn"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Missandei"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Jorah"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Mormont"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Gendry"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Yara"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Euron"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Robb"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Catelyn"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Eddard"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Rickon"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Talisa"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Maegyr"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Margaery"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Tyrell"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Renly"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Loras"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Stannis"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Balon"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Ramsay"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Bolton"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Ros"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Shae"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Gilly"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Ygritte"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Osha"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Hodor"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Meera"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Reed"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Jojen"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Reed"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Grey"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Worm"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Barristan"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Selmy"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Xaro"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Xhoan"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Daxos"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Qyburn"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Melisandre"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Mance"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Rayder"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Beric"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Dondarrion"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Tormund"
+  },
+  {
+    "label": "PERSON",
+    "pattern": "Giantsbane"
+  },
+  {
+    "label": "LOC",
+    "pattern": "King's Landing"
+  },
+  {
+    "label": "LOC",
+    "pattern": "Winterfell"
+  },
+  {
+    "label": "LOC",
+    "pattern": "Braavos"
+  },
+  {
+    "label": "LOC",
+    "pattern": "Pentos"
+  },
+  {
+    "label": "LOC",
+    "pattern": "Volantis"
+  },
+  {
+    "label": "LOC",
+    "pattern": "Oldtown"
+  },
+  {
+    "label": "LOC",
+    "pattern": "Dorne"
+  },
+  {
+    "label": "LOC",
+    "pattern": "Meereen"
+  },
+  {
+    "label": "LOC",
+    "pattern": "Astapor"
+  },
+  {
+    "label": "LOC",
+    "pattern": "Qarth"
+  },
+  {
+    "label": "LOC",
+    "pattern": "Yunkai"
+  },
+  {
+    "label": "LOC",
+    "pattern": "Lannisport"
+  },
+  {
+    "label": "LOC",
+    "pattern": "Dragonstone"
+  },
+  {
+    "label": "LOC",
+    "pattern": "Casterly Rock"
+  },
+  {
+    "label": "LOC",
+    "pattern": "Highgarden"
+  },
+  {
+    "label": "LOC",
+    "pattern": "The Eyrie"
+  },
+  {
+    "label": "LOC",
+    "pattern": "Sunspear"
+  },
+  {
+    "label": "LOC",
+    "pattern": "White Harbor"
+  },
+  {
+    "label": "LOC",
+    "pattern": "Harrenhal"
+  },
+  {
+    "label": "LOC",
+    "pattern": "Pyke"
+  },
+  {
+    "label": "LOC",
+    "pattern": "Storm's End"
+  },
+  {
+    "label": "LOC",
+    "pattern": "Riverrun"
+  },
+  {
+    "label": "LOC",
+    "pattern": "Starfall"
+  },
+  {
+    "label": "LOC",
+    "pattern": "Shadow Tower"
+  },
+  {
+    "label": "LOC",
+    "pattern": "Last Hearth"
+  },
+  {
+    "label": "LOC",
+    "pattern": "Horn Hill"
+  },
+  {
+    "label": "LOC",
+    "pattern": "Karhold"
+  },
+  {
+    "label": "LOC",
+    "pattern": "The Twins"
+  },
+  {
+    "label": "LOC",
+    "pattern": "Bear Island"
+  },
+  {
+    "label": "LOC",
+    "pattern": "Fair Isle"
+  },
+  {
+    "label": "LOC",
+    "pattern": "Goldroad"
+  },
+  {
+    "label": "LOC",
+    "pattern": "The Dreadfort"
+  },
+  {
+    "label": "LOC",
+    "pattern": "Blackwater Bay"
+  },
+  {
+    "label": "LOC",
+    "pattern": "The Nightfort"
+  },
+  {
+    "label": "LOC",
+    "pattern": "Moat Cailin"
+  },
+  {
+    "label": "LOC",
+    "pattern": "Greywater Watch"
+  },
+  {
+    "label": "LOC",
+    "pattern": "The Dreadfort"
+  },
+  {
+    "label": "LOC",
+    "pattern": "Riverrun"
+  },
+  {
+    "label": "LOC",
+    "pattern": "Oldtown"
+  },
+  {
+    "label": "LOC",
+    "pattern": "The Citadel"
+  },
+  {
+    "label": "LOC",
+    "pattern": "Winterfell"
+  },
+  {
+    "label": "ORG",
+    "pattern": "Iron Bank"
+  },
+  {
+    "label": "ORG",
+    "pattern": "Golden Company"
+  },
+  {
+    "label": "ORG",
+    "pattern": "Faceless Men"
+  },
+  {
+    "label": "ORG",
+    "pattern": "Night's Watch"
+  },
+  {
+    "label": "ORG",
+    "pattern": "Kingsguard"
+  },
+  {
+    "label": "ORG",
+    "pattern": "Second Sons"
+  },
+  {
+    "label": "ORG",
+    "pattern": "Brotherhood Without Banners"
+  },
+  {
+    "label": "ORG",
+    "pattern": "The Unsullied"
+  },
+  {
+    "label": "ORG",
+    "pattern": "The Dothraki"
+  },
+  {
+    "label": "ORG",
+    "pattern": "Faith of the Seven"
+  },
+  {
+    "label": "PRODUCT",
+    "pattern": "Wildfire"
+  },
+  {
+    "label": "PRODUCT",
+    "pattern": "Valyrian steel"
+  },
+  {
+    "label": "PRODUCT",
+    "pattern": "Dragonglass"
+  },
+  {
+    "label": "PRODUCT",
+    "pattern": "Milk of the poppy"
+  },
+  {
+    "label": "PRODUCT",
+    "pattern": "Arbor gold"
+  },
+  {
+    "label": "PRODUCT",
+    "pattern": "Dornish wine"
+  },
+  {
+    "label": "PRODUCT",
+    "pattern": "Weirwood arrows"
+  },
+  {
+    "label": "PRODUCT",
+    "pattern": "Essos silk"
+  },
+  {
+    "label": "PRODUCT",
+    "pattern": "Myrish lenses"
+  },
+  {
+    "label": "MONEY",
+    "pattern": "Gold dragons"
+  },
+  {
+    "label": "MONEY",
+    "pattern": "Silver stags"
+  },
+  {
+    "label": "MONEY",
+    "pattern": "Copper pennies"
+  },
+  {
+    "label": "MONEY",
+    "pattern": "Iron coins"
+  },
+  {
+    "label": "MONEY",
+    "pattern": "Braavosi iron bank notes"
+  },
+  {
+    "label": "MONEY",
+    "pattern": "Lannister gold"
+  },
+  {
+    "label": "MONEY",
+    "pattern": "Tyrell roses"
+  },
+  {
+    "label": "MONEY",
+    "pattern": "Ironborn krakens"
+  }
+]
